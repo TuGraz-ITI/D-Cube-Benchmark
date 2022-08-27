@@ -1,0 +1,106 @@
+{% extends 'fileupload/base.html' %}
+
+{% block title %}
+File Upload &mdash; D-Cube
+{% endblock title %}
+
+{% block extrastyle %}
+    <link href="{{ url_for('static', filename='css/zoom.css') }}" rel="stylesheet"/>
+    <link href="{{ url_for('static', filename='datatables/datatables.min.css') }}" rel="stylesheet"/>
+{% endblock %}
+
+{% block main %}
+    <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6>Do you really want to delete this image? It can't be undone.</h6>
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-danger btn-ok">Delete</a>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row d-block">
+        <div class="col-12">
+            <h1>File Upload</h1>
+        </div>
+    </div>
+    <div class="row d-block">
+        <form method="post" enctype=multipart/form-data>
+            <div class="form-group">
+                {{ form.csrf_token }}
+                {{ form.upload_name(required=True, class_="d-block form-control", placeholder=config.FILEUPLOAD_ALLOWED_EXTENSIONS|join(", ")) }}
+                {{ form.upload_img }}
+                <input class="btn btn-primary float-right" type="submit" value="Submit">
+            </div>
+        </form>
+        <div class="col-md-12" style="height:30px;"></div>
+    </div>
+    <hr>
+    <div class="row d-block">
+        <table id="imges" class="table table-striped table-condensed">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Path</th>
+                    <th>Preview</th>
+                    <th>Del</th>
+		</tr>
+            </thead>
+            <tbody>
+                {% for file_abs in fu_get_existing_files() %}
+                    {% set filename = file_abs|fu_filename %}
+                    <tr>
+                        <td><a href="{{ file_abs }}">{{ file_abs|fu_filename }}</a></td>
+                        <td class="path-input-col"><input class="path-input" title="path" style="width: 100%;" type="text" readonly value="{{file_abs}}"></td>
+                        <td><img class="thumbnail zoom" style="height: 30px; width: auto; max-width:30px;" src="{{file_abs}}"> </td>
+                        <td><a data-href="{{ url_for('flask_fileupload.upload_delete', filename=filename) }}" data-toggle="modal" data-target="#confirm-delete"><span role="button" class="fas fa-trash"></span></a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}
+
+{% block extrajs %}
+    <script src="{{url_for("static",filename="datatables/datatables.min.js")}}"></script>
+    <script>
+        $(document).ready(function() {
+            // Build the whole data table
+            $('#imges').DataTable({
+                "columnDefs":[
+                    {"orderable": false, "targets": [1, 2, 3]}
+                ]
+            });
+
+            // Register autofill on new selected image upload
+            document.getElementById("upload_img").addEventListener("change", function(){
+                var file = document.getElementById("upload_img").files[0].name;
+                {% if config.FILEUPLOAD_RANDOM_FILE_APPENDIX %}
+                    var position = file.lastIndexOf(".");
+                    var hash = ["_", Math.random().toString(36).substring(6)].join("");
+                    file = [file.slice(0, position), hash, file.slice(position)].join("");
+                {% endif %}
+                document.getElementById("upload_name").value = file
+            });
+
+            // Select all on click
+            [].forEach.call(document.getElementsByClassName("path-input"), function(input){
+                input.addEventListener("click", function(){
+                    input.select()
+                });
+            })
+        } );
+    </script>
+
+    <script>
+        $('#confirm-delete').on('show.bs.modal', function(e) {
+            $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+        });
+    </script>
+{% endblock extrajs %}
+

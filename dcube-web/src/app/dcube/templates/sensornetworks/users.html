@@ -1,0 +1,61 @@
+{# This simple template derives from ``base.html``. See ``base.html`` for
+   more information about template inheritance. #}
+{%- extends "base.html" %}
+
+{# Inside the ``content`` is where you should place most of your own stuff.
+   This will keep scripts at the page end and a navbar you add on later
+   intact. #}
+{% block content %}
+  <div class="container">
+    <div class="container">
+      <h1>Users</h1>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Username</th>
+            <th>Allowed</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {%- for user in users %}
+              <tr>
+                <td>{{user.id}}</td>
+                <td>{{user.username}}</td>
+                <td>
+                  {%- for role in user.roles %}
+                  {{role.name}}{% if not loop.last %}, {% endif %}
+                  {%- endfor %}
+                </td>
+                <td>
+                <div class="btn-group">
+                  {% if not user.has_role("sensornetworks") %}
+                  <a class="btn btn-sm btn-success" href="{{url_for("sensornetworks.promote_user",id=user.id,permission=1)}}" role="button" title="add to sensornetworks"><span class="glyphicon glyphicon glyphicon-chevron-up" aria-hidden="true"></span></a>
+                  {% else %}
+                  <a class="btn btn-sm btn-warning" href="{{url_for("sensornetworks.promote_user",id=user.id,permission=1)}}" role="button" title="remove from sensornetworks"><span class="glyphicon glyphicon glyphicon-chevron-down" aria-hidden="true"></span></a>
+                  {%- endif %}
+                </div>
+                </td>
+              </tr>
+          {%- endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+{%- endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+<script>
+$('#apiModal').on('show.bs.modal', function(e) {
+    $("#apiField").find("pre").remove();
+    var key = $(e.relatedTarget).data('api-key');
+    var markup = "<pre>"+key+"</pre>";
+    $("#apiField").append(markup);
+});
+</script>
+
+{%- endblock %}

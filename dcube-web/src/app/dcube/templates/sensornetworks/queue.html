@@ -1,0 +1,267 @@
+{# This simple template derives from ``base.html``. See ``base.html`` for
+   more information about template inheritance. #}
+{%- extends "base.html" %}
+
+{% from "bootstrap/pagination.html" import render_pagination %}
+
+{# Inside the ``content`` is where you should place most of your own stuff.
+   This will keep scripts at the page end and a navbar you add on later
+   intact. #}
+{% block content %}
+    <div class="container">
+      <h1>
+        <span class="hidden-xs">Jobs for team {{current_user.group.name}}</span>
+        <span class="col-xs-8 visible-xs">Jobs: {{current_user.group.name}}</span>
+         <div class="btn-group pull-right">
+        <button type="button col-xs-2" class="btn btn-lg btn-success" data-toggle="modal" data-target="#createJob"><span class="hidden-xs">Create Job</span><span class="visible-xs glyphicon glyphicon-plus" aria-hidden="true" title="Create Job"></span></button>
+         </div>
+      </h1>
+      {{render_pagination(jobs)}}
+      <!-- Trigger the modal with a button -->
+      <table id=refreshing class="table queue">
+        <thead>
+          <tr>
+            <th class="hidden-xs">#</th>
+            <th class="visible-xs">Name</th>
+            <th class="hidden-xs">Name</th>
+            <th class="hidden-xs hidden-sm">Description</th>
+            <th><span class="hidden-xs">Scheduled</span></th>
+            <th>Flags</th>
+            <th class="hidden-xs hidden-sm">File</th>
+            {% if current_user.is_authenticated and current_user.has_role("admins") %}
+            <th class="hidden-xs">Node</th>
+            {% endif %}
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {%- for job in jobs.items %}
+              <tr {% if job.running %}class="lead" style="background-color: #eee;"{% endif %}>
+                <td class="hidden-xs">{{job.id}}</td>
+                <td class="shortname visible-xs">{{job.name}}</td>
+                <td class="longname hidden-xs">{{job.name}}</td>
+                <td class="hidden-xs hidden-sm">{{job.description}}</td>
+                <td><span class="hidden-sm hidden-xs">{{job.scheduled|datetimefilter}}</span><span class="visible-sm hidden-xs">{{job.scheduled|datetimefilter("%H:%M")}}</span></td>
+                <td class="flag-group">
+                {% if job.running %}
+                <span class="glyphicon glyphicon-play" aria-hidden="true" title="job running"></span>
+                {% endif %}
+                {% if job.failed %}
+                <span class="glyphicon glyphicon-remove" aria-hidden="true" title="job failed"></span>
+                {% else %}
+                {% if job.finished %}
+                <span class="glyphicon glyphicon-ok" aria-hidden="true" title="job finished"></span>
+                {% endif %}
+                {% endif %}
+                {% if job.priority %}
+                <span class="glyphicon glyphicon-star" aria-hidden="true" title="high priority job"></span>
+                {% endif %}
+                {% if job.reboot %}
+                <span class="glyphicon glyphicon-repeat" aria-hidden="true" title="rebooting"></span>
+                {% endif %}
+                {% if job.logs %}
+                <span class="glyphicon glyphicon-align-justify" aria-hidden="true" title="logs enabled"></span>
+                {% endif %}
+                {% if job.patch %}
+                <span class="glyphicon glyphicon-cog" aria-hidden="true" title="patching enabled"></span>
+                {% endif %}
+                {% if job.jamming_composition_id and  job.jamming_composition_id > 1 %}
+                {#<span class="glyphicon glyphicon-flash" aria-hidden="true" title="jamming enabled"></span><sub>{% if job.jamming>3 %}D{{job.jamming-3}}{% else %}{{job.jamming}}{% endif %}</sub>#}
+                <span class="glyphicon glyphicon-flash" aria-hidden="true" title="jamming enabled"></span><sub>{{job.jamming_composition.short}}</sub>
+                {% endif %}
+
+	        </td>
+                <td class="hidden-xs hidden-sm">{{job.firmware.name}}</td>
+                {% if current_user.is_authenticated and current_user.has_role("admins") %}
+                <td class="hidden-xs">{{job.node}}</td>
+                {% endif %}
+                <td>
+                <div class="btn-group">
+                  {% if job.running or job.finished %}
+                  <a class="btn btn-sm btn-info hidden-xs" href="#" role="button" data-toggle="modal" title="show program log" data-job="{{job.id}}" data-target="#showLog"><span class="glyphicon glyphicon glyphicon-question-sign" aria-hidden="true"></span></a>
+                  {% endif %}
+                  {% if not job.finished and not job.running%}
+                  <a class="btn btn-sm btn-danger" href="/queue/delete_job/{{job.id}}" role="button" title="delete job"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+                  {% endif %}
+                  {% if job.finished and not (job.result == None) and not job.failed%}
+                  <a class="btn btn-sm btn-primary" href="#" role="button" title="show results in grafana" data-job-composition="{{job.layout.id}}" data-job-start="{{job.result.begin|timestampfilter +30000}}" data-job-end="{{job.result.end|timestampfilter}}" data-toggle="modal" data-target="#selectDash"><span class="glyphicon glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
+                  {% endif %}
+                  {% if job.logs and job.finished and not job.failed%}
+                  <a class="btn btn-sm btn-default" href="/queue/download_logs/{{job.id}}" role="button" title="download serial logs"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+                  {% endif %}
+                  {% if job.failed and current_user.is_authenticated and current_user.has_role("admins") %}
+                  <a class="btn btn-sm btn-success" href="/admin/queue/rerun_job/{{job.id}}" role="button" 
+                    title="rerun job"><span class="glyphicon glyphicon glyphicon-repeat" aria-hidden="true"></span></a> 
+                  {% endif %}
+                  {% if job.priority==False and job.running==False and job.finished==False and current_user.is_authenticated and current_user.has_role("admins") %}
+                  <a class="btn btn-sm btn-success" href="/admin/queue/prioritize_job/{{job.id}}" role="button" title="prioritize job"><span class="glyphicon glyphicon-star" aria-hidden="true"></span></a>
+                  {% endif %}
+                </div>
+                </td>
+              </tr>
+          {%- endfor %}
+        </tbody>
+    </table>
+    </div>
+    </div>
+    <div class="container">
+      <!-- Modal -->
+      <div class="modal fade" id="createJob" role="dialog">
+        <div class="modal-dialog">
+
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h1 class="text-center login-title">Create Job</h1>
+            </div>
+              <form action="create_job" enctype="multipart/form-data" method="post" class="form-signin">
+            <div class="modal-body">
+                <div class="form-group required"><label class="control-label" for="name">Name</label>
+                  <input class="form-control" id="name" name="name" required type="text" value="" maxlength="255">
+                </div>
+                <div class="form-group required"><label class="control-label" for="description">Description</label>
+                  <input class="form-control" id="description" name="description" type="text" value="" maxlength="255">
+                  {#<textarea class="form-control" id="description" name="description" type="text" value="" maxlength="255"></textarea>#}
+                </div>
+                <div class="form-group required">
+                  <input class="file-upload" id="file" name="file" required type="file" accept=".ihex" value="">
+                </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <input class="btn btn-success" id="submit" name="submit" type="submit" value="Create">
+            </div>
+              </form>
+          </div>
+    </div>
+    </div>
+
+
+    <div class="container">
+      <!-- Trigger the modal with a button -->
+
+      <!-- Modal -->
+      <div class="modal fade" id="showLog" role="dialog">
+        <div class="modal-dialog modal-lg">
+
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h1 class="text-center login-title">Program Log Summary</h1>
+            </div>
+            <div class="modal-body report-modal-body">
+            <div id="logWindow"><pre>Loading...</pre></div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+    </div>
+    </div>
+   </div>
+
+
+    <div class="container">
+      <!-- Trigger the modal with a button -->
+
+      <!-- Modal -->
+      <div class="modal fade" id="selectDash" role="dialog">
+        <div class="modal-dialog">
+
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h1 class="text-center login-title">Select Grafana Dashboard</h1>
+            </div>
+            <div class="modal-body">
+              <table class="table table-borderless">
+              <tbody id="dashbody">
+              </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+    </div>
+    </div>
+   </div>
+{%- endblock %}
+
+{% block scripts %}
+{{super()}}
+<link href="{{url_for("static",filename="bootstrap-toggle.min.css")}}" rel="stylesheet">
+<script src="{{url_for("static",filename="bootstrap-toggle.min.js")}}"></script>
+<script>
+$( document ).ready(function() {
+//$('body').tooltip({
+//    selector: '[rel="tooltip"]',
+//});
+$('[rel="tooltip"]').tooltip({
+    container: 'body'
+});
+  setInterval(function()
+  {
+      $('#refreshing').load(document.URL +  ' #refreshing>*','');
+  }, 5000);
+
+});
+var timer=null;
+var job=null;
+
+$('#showLog').on('show.bs.modal', function(e) {
+    $("#logWindow").find("pre").remove();
+    job = $(e.relatedTarget).data('job');
+    $("#logWindow").load('/queue/log/'+job+ " #log pre");
+    $("#logWindow").load('{{url_for("sensornetworks.show_log")}}'+job+ " #log pre");
+    timer=setInterval(function()
+    {
+    $("#logWindow").load('{{url_for("sensornetworks.show_log")}}'+job+ " #log pre");
+    }, 1000);
+});
+
+$('#showLog').on('hide.bs.modal', function () {
+    clearInterval(timer);
+    timer=null;
+});
+
+function updateDash(started,ended,nodes){
+        $.getJSON('/proxy/dashboards', function(data) {
+            jQuery.each(data, function(i, val) {
+                var params="";
+                if(val.title=="Overview of EEPROM Messages"){
+                    for(i=0;i<nodes.length;i++) {
+                        params+="&var-Node="+nodes[i]["label"]+"_eeprom"
+                    }
+                }
+                else if(val.title=="Overview of GPIO Events"){
+                    for(i=0;i<nodes.length;i++) {
+                        params+="&var-Node="+nodes[i]["label"]+"_evt"
+                    }
+                    if(nodes.length!=0) {
+                        params+="&var-GPIO=24"
+                    }
+                }
+
+                var btnstring = '<a class="btn btn-sm btn-primary" target="_blank" href="{{config['GRAFANA_URL']}}/dashboard/'+val.uri+'?from='+started+'&to='+ended+params+'" role="button" title="show in grafana"><span class="glyphicon glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>'
+                var markup = "<tr><td>"+val.title+"</td><td>" +btnstring+ "</td></tr>";
+                $("#dashbody").append(markup);
+            });
+        });
+}
+
+$('#selectDash').on('show.bs.modal', function(e) {
+   $("#dashbody").find("tr").remove();
+
+    var ended = $(e.relatedTarget).data('job-end');
+    var started = $(e.relatedTarget).data('job-start');
+
+    updateDash(started,ended,[]); 
+});
+</script>
+{%- endblock %}

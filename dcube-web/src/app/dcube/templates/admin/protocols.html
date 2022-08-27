@@ -1,0 +1,169 @@
+{# This simple template derives from ``base.html``. See ``base.html`` for
+   more information about template inheritance. #}
+{%- extends "base.html" %}
+
+{% block title %}
+Protocols (Admin) &mdash; D-Cube
+{%- endblock %}
+
+{# Inside the ``content`` is where you should place most of your own stuff.
+   This will keep scripts at the page end and a navbar you add on later
+   intact. #}
+{% block content %}
+<div class="container">
+  <div class="container">
+    <h1>Protocols</h1>
+    <table class="table">    
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Link</th>
+        <th>Benchmark Suite</th>
+        <th>Group</th>
+        <th>Action</th>
+    	</tr>
+    </thead>
+    <tbody>
+    {% for protocol in protocols %}
+    	<tr>
+        <td>{{protocol.id}}</td>
+        <td>{{protocol.name}}</td>
+        <td>{{protocol.description}}</td>
+        <td>{{protocol.link}}</td>
+        <td>{{protocol.benchmark_suite.name}}</td>
+        <td>{{protocol.group.name}}</td>
+        <td>
+          <div class="btn-group float-left">
+            <a class="btn btn-primary" href="#" role="button" data-protocol-id="{{protocol.id}}" data-protocol-name="{{protocol.name}}" data-protocol-link="{{protocol.link}}" data-protocol-description="{{protocol.description}}" data-toggle="modal" data-target="#editProtocol"><span class="fas fa-edit" aria-hidden="true"></span></a>
+	    <a class="btn btn-danger" href="{{url_for("admin.admin_delete_protocol",id=protocol.id)}}" role="button">  <span class="fas fa-times" aria-hidden="true"></span></a>
+          </div>
+
+	</td>
+    	</tr>
+    {% endfor %}
+    </table>
+  </div>
+
+  <div class="container">
+    <!-- Trigger the modal with a button -->
+    <div class="btn-group">
+      <button role="button" data-toggle="modal" data-target="#createProtocol" class="btn btn-success">Create Protocol</a>
+    </div>
+  </div>
+
+</div>
+
+<div class="container">
+  <!-- Trigger the modal with a button -->
+
+  <!-- Modal -->
+  <div class="modal fade" id="editProtocol" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+	<form id="updateProtocolForm" action="dummy" enctype="multipart/form-data" method="post">
+	  <div class="modal-header">
+	    <h1 class="col-12 text-center">Edit Protocol
+	    <button type="button" class="close" data-dismiss="modal">&times;</button>
+	    </h1>
+	  </div>
+	  <div class="modal-body">
+	    <div class="form-group required"><label class="control-label" required for="name">Name</label>
+	      <input class="form-control" id="name" name="name" type="text" value="" maxlength="255">
+	    </div>
+	    <div class="form-group required"><label class="control-label" required for="link">Link</label>
+	      <input class="form-control" id="name" name="link" type="link" value="" maxlength="2048">
+	    </div>
+	    <div class="form-group required"><label class="control-label" required for="description">Description</label>
+              <textarea class="form-control" id="description" name="description" type="text" value="" maxlength="61440"></textarea>
+	    </div>
+	  </div>
+	  <div class="modal-footer">
+	    <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Update">
+	    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+	  </div>
+	</form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Trigger the modal with a button -->
+
+  <!-- Modal -->
+  <div class="modal fade" id="createProtocol" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <form id="updateProtocolForm" action="{{url_for("admin.admin_create_protocol")}}" enctype="multipart/form-data" method="post">
+	  <div class="modal-header">
+	    <h1 class="col-12 text-center">Create Protocol
+	    <button type="button" class="close" data-dismiss="modal">&times;</button>
+	    </h1>
+	  </div>
+	  <div class="modal-body">
+	    <div class="form-group required"><label class="control-label" required for="name">Name</label>
+	      <input class="form-control" id="name" name="name" type="text" value="" maxlength="255">
+	    </div>
+	    <div class="form-group required"><label class="control-label" required for="link">Link</label>
+	      <input class="form-control" id="name" name="link" type="link" value="" maxlength="2048">
+	    </div>
+	    <div class="form-group required"><label class="control-label" required for="description">Description</label>
+		    <textarea class="form-control" id="description" name="description" type="text" value="" maxlength="61440"></textarea>
+	    </div>
+	    <div class="form-group required"><label class="control-label" required for="benchmark_suite">Benchmark Suite</label>
+	      <select class="form-control" id="benchmark_suite" name="benchmark_suite" aria-describedby="benchmark_suite-addon">
+	        {% for bs in benchmark_suites %}
+	        <option value="{{bs.id}}">{{bs.name}}</option>
+	        {% endfor%}
+	      </select>
+	    </div>
+	    <div class="form-group required"><label class="control-label" required for="groups">Groups</label>
+	      <select class="form-control" id="group" name="group" aria-describedby="groups-addon">
+	        {% for g in groups %}
+	        <option value="{{g.id}}">{{g.name}}</option>
+	        {% endfor%}
+	      </select>
+	    </div>
+	  </div>
+	  <div class="modal-footer">
+	    <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Update">
+	    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+	  </div>
+	</form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+{%- endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+<script>
+$('#editProtocol').on('show.bs.modal', function(e) {
+  //get data-id attribute of the clicked element
+  var id = $(e.relatedTarget).data('protocol-id');
+  var name = $(e.relatedTarget).data('protocol-name');
+  var link = $(e.relatedTarget).data('protocol-link');
+  var description = $(e.relatedTarget).data('protocol-description');
+
+  var url="{{url_for("frontend.update_protocol")}}";
+  url=url+id;
+  $('#updateProtocolForm').attr("action",url);
+  
+  $(e.currentTarget).find('input[name="name"]').val(name);
+  $(e.currentTarget).find('input[name="link"]').val(link);
+  $(e.currentTarget).find('textarea[name="description"]').val(description);
+});
+</script>
+
+{%- endblock %}

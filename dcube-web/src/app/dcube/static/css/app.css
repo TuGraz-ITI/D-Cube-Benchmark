@@ -1,0 +1,203 @@
+body main {
+    padding-top: 60px;
+    padding-bottom: 30px;
+}
+
+.tooltip-wrapper {
+    display: flex;
+    float: left;
+}
+/*
+.tooltip-wrapper .btn {
+    border-radius: 0;
+}
+
+.tooltip-wrapper:first-child .btn {
+    border-radius: 3px 0 0 3px;
+}
+
+.tooltip-wrapper:last-child .btn {
+    border-radius: 0 3px 3px 0;
+}
+*/
+.navbar {
+    padding: 0px;
+}
+
+.table-borderless tbody tr td,
+.table-borderless tbody tr th,
+.table-borderless thead tr th,
+.table-borderless thead tr td,
+.table-borderless tfoot tr th,
+.table-borderless tfoot tr td {
+    border: none;
+}
+
+.btn-group {
+    display: flex;
+}
+
+.nowrap {
+    white-space: pre;
+}
+
+@media screen and (min-width: 576px) {
+.flag-group {
+    white-space: nowrap;
+}
+}
+
+@media screen and (max-width: 575.98px) {
+.flag-group .fas {
+    font-size: 60%;
+}
+}
+
+@media screen and (min-width: 576px) {
+.flag-group .fas {
+    font-size: small;
+}
+}
+
+.queue .jobname{
+    overflow: hidden;
+    max-width: 100px;
+}
+
+.queue .longname{
+    overflow: hidden;
+    max-width: 300px;
+}
+
+.queue .shortname{
+    overflow: hidden;
+    max-width: 60px;
+}
+
+.fakescroll { 
+  overflow-y: scroll; 
+}
+
+.form-signin
+{
+    max-width: 330px;
+    padding: 15px;
+    margin: 0 auto;
+}
+.form-signin .form-signin-heading, .form-signin .checkbox
+{
+    margin-bottom: 10px;
+}
+.form-signin .checkbox
+{
+    font-weight: normal;
+}
+/*
+.form-signin textarea
+{
+    width: 300px;
+    min-width : 300px;
+    max-width: 300px;
+}
+*/
+.form-signin textarea
+{
+    resize:vertical;
+}
+
+.form-signin .form-control
+{
+    position: relative;
+    font-size: 16px;
+    height: auto;
+    padding: 10px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.form-signin .form-control:focus
+{
+    z-index: 2;
+}
+.form-signin input[type="text"]
+{
+    margin-bottom: -1px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.form-signin input[type="password"]
+{
+    margin-bottom: 10px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.account-wall
+{
+    margin-top: 20px;
+    padding: 40px 0px 20px 0px;
+    background-color: #f7f7f7;
+    -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+}
+
+.login-title
+{
+    color: #555;
+    font-weight: 400;
+    display: block;
+}
+
+.btn-tt
+{
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 8px;
+    padding-right: 8px;
+    margin: 0px;
+    font-size: 5pt;
+}
+
+.navbar-brand
+{
+    padding: 10px;
+    height: 50px;
+    margin: 0px;
+}
+
+.nopadding {
+   padding: 0 !important;
+   margin: 0 !important;
+}
+
+.jumbotron {
+    margin-top: 20px;
+    padding: 20px;
+    display: float;
+}
+
+.jumbotron ul.advisorlist {
+    list-style: none;
+}
+
+.jumbotron .maintainance_banner {
+    padding: 10px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    background: #F55;
+    box-sizing: border-box;
+   
+}
+
+.footer {
+  /*position: absolute;
+  bottom: 0;*/
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  line-height: 60px; /* Vertically center the text there */
+  background-color: #FF8888;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+}

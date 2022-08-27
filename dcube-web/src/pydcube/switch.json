@@ -1,0 +1,19 @@
+[
+{
+	"switch":"192.168.101.42",
+	"type":"Mikrotik",
+	"nodes":[
+		{
+		"hostname":"rpi100",
+		"ip":"192.168.101.100",
+		"port":"ether15"
+		},
+		{
+		"hostname":"rpi101",
+		"ip":"192.168.101.101",
+		"port":"ether16"
+		}
+	]
+}
+]
+

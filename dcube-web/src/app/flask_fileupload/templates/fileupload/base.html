@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet"/>
+    <style>
+        body { padding-top: 80px;}
+    </style>
+    {% block extrastyle %}
+    {% endblock %}
+</head>
+<body>
+    <!-- main content -->
+     <div class="container">
+         {% block message %}
+             {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-3">
+                        <div id="alert_div" class="alert alert-{{category}} alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            {{ message }}
+                        </div>
+                        </div>
+                     </div>
+                    {% endfor %}
+                {% endif %}
+             {% endwith %}
+         {% endblock %}
+
+         {% block main %}
+         {% endblock main %}
+
+     </div>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script>
+    $(document).ready(function(){
+        $("#alert_div").fadeTo(2000, 500).slideUp(500, function(){
+            $("#alert_div").slideUp(500);
+        });
+    });
+    </script>
+
+    {% block extrajs %}
+    {% endblock %}
+</body>
+</html>

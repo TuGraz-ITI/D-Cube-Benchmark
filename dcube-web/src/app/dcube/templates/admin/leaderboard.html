@@ -1,0 +1,354 @@
+{# This simple template derives from ``base.html``. See ``base.html`` for
+   more information about template inheritance. #}
+{%- extends "base.html" %}
+
+{# Inside the ``content`` is where you should place most of your own stuff.
+   This will keep scripts at the page end and a navbar you add on later
+   intact. #}
+{% block head %}
+{{super()}}
+<style>
+html{
+  overflow-y: scroll;
+}
+
+.row.no-pad {
+    margin-right:0;
+    margin-left:0;
+}
+
+.row #toggle {
+    padding-top:5px;
+}
+
+.row.no-pad > [class*='col-'] {
+    padding-right:2px;
+    padding-left:2px;
+}
+
+#chart {
+    width:100%;
+}
+
+</style>
+</style>
+{% endblock %} 
+
+{% block content %}
+  <div class="container" id="stats">
+
+      <div class="row no-pad collapse" id="controls">
+          <div class="col-sm-1">
+              <label for="duration" id="duration-addon">Duration</label>
+              <div class="input-group-btn">
+                  {#<label class="input-group-addon" id="duration-addon"><span class="hidden-md hidden-sm">Duration</span><span class="visible-md visible-sm">Dur.</span></label>#}
+                  <select class="form-control" id="duration" name="duration" aria-describedby="duration-addon">
+                      {% if default_duration=="any"%}<option selected="selected" value="any">Any</option>
+                      {% else %}<option value="any">Any</option>{%endif%}
+                      {% for d in durations %}
+                      <option {% if d==default_duration|int %}selected="selected"{% endif %}value={{d}}>{{d}}</option>
+                      {% endfor%}
+                  </select>
+              </div>
+          </div>
+
+          <div class="col-sm-1">
+              <label for="jamming" id="jamming-addon"><span class="hidden-sm">Jamming</span><span class="visible-sm">Jam.</span></label>
+              <div class="input-group-btn">
+                  {#<label class="input-group-addon" id="jamming-addon"><span class="hidden-md hidden-sm">Jamming</span><span class="visible-md visible-sm">Jam.</span></label>#}
+                  <select class="form-control" id="jamming" name="jamming" aria-describedby="jamming-addon">
+                      {% if jamming=="any"%}<option selected="selected" value="any">Any</option>
+                      {% else %}<option value="any">Any</option>{%endif%}
+                      {% for j in jammings %}
+                      {#<option {% if i==0 %}selected="selected"{% endif %}value={{i}}>{% if i==0%}None{% else %}Level {% if i>3 %}D{{i-3}}{% else %}{{i}}{% endif %}{% endif%}</option>#}
+
+                      <option {% if jamming|int ==j.id %}selected="selected"{% endif %}value="{{j.id}}">{{j.name}}</option>
+                      {% endfor%}
+                      {#
+                      {% for i in range(0,jamming_max+1) %}
+                      <option {% if i==jamming|int %}selected="selected"{% endif %}value={{i}}>{% if i==0%}None{% else %}Level {% if i>3 %}D{{i-3}}{% else %}{{i}}{% endif %}{% endif%}</option>
+                      {% endfor%}
+                      #}
+                  </select>
+              </div>
+          </div>
+
+          <div class="col-sm-2">
+              <label for="count" id="count-addon">Count</label>
+              <div class="input-group-btn">
+                  {#<label class="input-group-addon" id="count-addon"><span class="hidden-md hidden-sm">Count</span><span class="visible-md visible-sm">Cnt.</span></label>#}
+                  <select class="form-control" id="count" name="count" aria-describedby="count-addon">
+                      <option {% if count=="stats"%}selected="selected"{%endif%} value="stats">Stats</option>
+                      <option {% if count=="median"%}selected="selected"{%endif%} value="median">Median</option>
+                      {% for i in [0, 1, 2, 3, 5, 10] %}
+                      <option {% if not (count=="stats" or count=="median") and  i==count|int %}selected="selected"{% endif %}value={{i}}>{% if i==0%}All{% else %}{{i}}{% endif%}</option>
+                      {% endfor%}
+                  </select>
+              </div>
+          </div>
+
+          <div class="col-sm-1">
+              <label for="category" id="category-addon"><span class="hidden-sm">Category</span><span class="visible-sm">Cat.</span></label>
+              <div class="input-group-btn">
+                  {#<label class="input-group-addon" id="category-addon"><span class="hidden-md hidden-sm">Category</span><span class="visible-md visible-sm">Cat.</span></label>#}
+                  <select class="form-control" id="category" name="category" aria-describedby="category-addon">
+                      {% if category=="any"%}<option selected="selected" value="any">Any</option>
+                      {% else %}<option value="any">Any</option>{%endif%}
+
+                      {% for i in categories %}
+                      <option {% if i.id==category|int %}selected="selected"{% endif %}value={{i.id}}>{{i.short}}</option>
+                      {% endfor%}
+                  </select>
+              </div>
+          </div>
+
+          <div class="col-sm-1">
+              <label for="layout" id="layout-addon">Layout</label>
+              <div class="input-group-btn">
+                  {#<label class="input-group-addon" id="layout-addon">Layout</label>#}
+                  <select class="form-control" id="layout" name="layout" aria-describedby="layout-addon">
+                      {% if layout=="any"%}<option selected="selected" value="any">Any</option>
+                      {% else %}<option value="any">Any</option>{%endif%}
+
+                      {% if not category=="any" %}
+                      {% for i in layouts %}
+                      <option {% if i.id==layout|int %}selected="selected"{% endif %}value={{i.id}}>{{i.short}}</option>
+                      {% endfor%}
+                      {%endif%}
+                  </select>
+              </div>
+          </div>
+
+          <div class="col-sm-1">
+              <label for="period" id="period-addon"><span class="hidden-sm">Periodicity</span><span class="visible-sm">Per.</span></label>
+              <div class="input-group-btn">
+                  {#<label class="input-group-addon" id="layout-addon">Layout</label>#}
+                  <select class="form-control" id="period" name="period" aria-describedby="period-addon">
+                      {% if period=="any"%}<option selected="selected" value="any">Any</option>
+                      {% else %}<option value="any">Any</option>{%endif%}
+                      {% if period=="periodic"%}<option selected="selected" value="periodic">Periodic</option>
+                      {% else %}<option value="periodic">Periodic</option>{%endif%}
+                      {% for i in periods %}
+                      <option {% if i==period|int and not (period=="any" or period=="periodic") %}selected="selected"{% endif %}value={{i}}>{%if i==0%}Aperiodic{%else%}{{i}}{%endif%}</option>
+                      {% endfor%}
+                  </select>
+              </div>
+          </div>
+
+          <div class="col-sm-1">
+              <label for="length" id="length-addon"><span class="hidden-sm">Msg. len.</span><span class="visible-sm">M. len.</span></label>
+              <div class="input-group-btn">
+                  {#<label class="input-group-addon" id="layout-addon">Layout</label>#}
+                  <select class="form-control" id="length" name="length" aria-describedby="length-addon">
+                      {% if length=="any"%}<option selected="selected" value="any">Any</option>
+                      {% else %}<option value="any">Any</option>{%endif%}
+                      {% for i in lengths %}
+                      <option {% if i==length|int %}selected="selected"{% endif %}value={{i}}>{{i}}</option>
+                      {% endfor%}
+                  </select>
+              </div>
+          </div>
+
+          <div class="col-sm-1">
+              <label id="energy-addon" for="coeff_energy">K_E</label>
+              <div class="input-group-btn">
+                  <input type=number class="form-control" id="coeff_energy" name="coeff_energy" aria-describedby="energy-addon" value="{{coeff_energy}}">
+                  </input>
+              </div>
+          </div>
+          <div class="col-sm-1">
+              <label id="latency-addon" for="coeff_latency">K_L</label>
+              <div class="input-group-btn">
+                  <input type=number class="form-control" id="coeff_latency" name="coeff_latency" aria-describedby="latency-addon" value="{{coeff_latency}}">
+                  </input>
+              </div>
+          </div>
+          <div class="col-sm-1">
+              <label id="rel-addon" for="coeff_rel">K_R</label>
+              <div class="input-group-btn">
+                  <input type=number class="form-control" id="coeff_rel" name="coeff_rel" aria-describedby="rel-addon" value="{{coeff_rel}}">
+                  </input>
+              </div>
+          </div>
+
+
+    </div>
+    <div class="row visible-xs">
+        <div class="col-xs-12" id="toggle">
+            <button class="btn btn-block btn-primary" type="button" data-toggle="collapse" data-target="#controls" aria-expanded="false" aria-controls="controls">Toggle Filters</button>
+        </div>
+    </div>
+
+    <div class="row no-pad collapse" id="score">
+        <div class="col-sm-4">
+            <label id="rel-addon" for="points">Points</label>
+            <div class="input-group-btn">
+                <input type=text class="form-control" id="points" name="points" aria-describedby="rel-addon" value="{{points}}">
+                </input>
+            </div>
+        </div>
+          <div class="col-sm-1">
+              <label id="rel-addon" for="threshold"><span class="hidden-sm">Threshold</span><span class="visible-sm">Thrsh.</span></label>
+              <div class="input-group-btn">
+                  <input type=number class="form-control" id="threshold" name="threshold" aria-describedby="rel-addon" value="{{threshold}}">
+                  </input>
+              </div>
+          </div>
+          <div class="col-sm-1">
+              <label id="rel-addon" for="margin">Margin</label>
+              <div class="input-group-btn">
+                  <input type=number class="form-control" id="margin" name="margin" aria-describedby="rel-addon" value="{{margin}}">
+                  </input>
+              </div>
+          </div>
+          <div class="col-sm-1">
+              <label id="rel-addon" for="margin">Failed</label>
+              <div class="input-group-btn">
+                  <select class="form-control" id="failed" name="failed" aria-describedby="failed-addon">
+                      <option {% if show_failed==True %}selected="selected"{%endif%} value="show">Show</option>
+                      <option {% if show_failed==False %}selected="selected"{%endif%} value="hide">Hide</option>
+                  </select>
+              </div>
+          </div>
+          <div class="col-sm-1">
+              <label id="rel-addon" for="margin">Sort</label>
+              <div class="input-group-btn">
+                  <select class="form-control" id="sort" name="sort" aria-describedby="failed-addon">
+                      <option {% if do_sort=="total" %}selected="selected"{%endif%} value="total">Score</option>
+                      <option {% if do_sort=="job_name" %}selected="selected"{%endif%} value="job_name">Team</option>
+                  </select>
+              </div>
+          </div>
+
+    </div>
+
+    <div class="row visible-xs">
+        <div class="col-xs-12" id="toggle">
+            <button class="btn btn-block btn-primary" type="button" data-toggle="collapse" data-target="#score" aria-expanded="false" aria-controls="score">Toggle Scores</button>
+        </div>
+    </div>
+
+  <div class="container">
+    <h1>Secret Leaderboard</h1>
+    <h4>Best: Energy={{min_energy}} Realiability={{max_reliability}} Latency={{min_latency}} with Jamming={{jamming}}</h4>
+        <table class="table-hover table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>T</th>
+              <th>abs E[J]</th>
+              <th>rel E[%]</th>
+              <th>abs R[%]</th>
+              <th>rel R[%]</th>
+              <th>abs L[ms]</th>
+              <th>rel L[%]</th>
+              <th>T[%]</th>
+              <th>&Delta;T[%]</th>
+              <th>rel T[%]</th>
+              <th>P</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for index,metric in df.iterrows() %}
+            <tr {% if not count=="stats" %}class='clickable-row' data-href="/queue/details/{{metric['job_id']}}{% endif %}">
+              {% if count=="stats" %}
+              <td>{{metric['count']}}</td>
+              {% else %}
+              <td>{{metric['job_id']}}</td>
+              {% endif %}
+              {#<td>{{metric['description']}}</td>#}
+              <td>{{metric['job_name']}}</td>
+              <td>{{'%0.2f' | format(metric['energy'])}}</td>
+              <td>{{'%0.2f' | format(metric['rel_energy']*100)}}</td>
+              <td>{{'%0.2f' | format(metric['reliability']*100)}}</td>
+              <td>{{'%0.2f' | format(metric['rel_reliability']*100)}}</td>
+              <td>{{'%0.2f' | format(metric['latency'])}}</td>
+              <td>{{'%0.2f' | format(metric['rel_latency']*100)}}</td>
+              <td>{{'%0.2f' | format(metric['total']*100)}}</td>
+              <td>{{'%0.2f' | format(metric['diff_total']*100)}}</td>
+              <td>{{'%0.2f' | format(metric['rel_total']*100)}}</td>
+              {% if metric['points']>0 %}
+              <td>{{'%0d' | format(metric['points'])}}</td>
+              {% else %}
+              <td>-</td>
+              {% endif %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+  </div>
+  <div class="container">
+      {% if png != None %}
+      <img id="chart" src="data:image/png;base64,{{ png }}"\>
+      {% endif %}
+  </div>
+{%- endblock %}
+
+{% block scripts %}
+{{super()}}
+  <script>
+$(document).ready(function () {
+    if (matchMedia) {
+        var mq = window.matchMedia("(min-width: 768px)");
+        mq.addListener(WidthChange);
+        WidthChange(mq);
+    }
+    function WidthChange(mq) {
+        if (mq.matches) {
+            $("#controls").addClass("in");
+            $("#score").addClass("in");
+        } else {
+            $("#controls").removeClass("in");
+            $("#score").removeClass("in");
+        }
+    }
+});
+
+
+
+    $('.clickable-row' ).click(function() {
+      window.document.location = $(this).data("href");
+    });
+    //$( document ).ready(function() {
+    //  $("html").css("overflow-y","scroll");
+    //});
+    $("#jamming").on('change', update);
+    $("#count").on('change', update);
+    $("#duration").on('change', update);
+    $("#coeff_energy").on('change', update);
+    $("#coeff_latency").on('change', update);
+    $("#coeff_rel").on('change', update);
+    $("#category").on('change', update);
+    $("#layout").on('change', update);
+    $("#period").on('change', update);
+    $("#length").on('change', update);
+    $("#threshold").on('change', update);
+    $("#margin").on('change', update);
+    $("#points").on('change', update);
+    $("#failed").on('change', update);
+    $("#sort").on('change', update);
+
+    function update(){
+        j=$("#jamming").val();
+        c=$("#count").val();
+        d=$("#duration").val();
+        cat=$("#category").val();
+        l=$("#layout").val();
+        p=$("#period").val();
+        le=$("#length").val();
+
+        k_e=$("#coeff_energy").val();
+        k_l=$("#coeff_latency").val();
+        k_r=$("#coeff_rel").val();
+
+        t=$("#threshold").val();
+        m=$("#margin").val();
+        pts=$("#points").val();
+        f=$("#failed").val();
+        s=$("#sort").val();
+        
+    window.open("/admin/leaderboard?jamming="+j+"&count="+c+"&duration="+d+"&category="+cat+"&layout="+l+"&period="+p+"&length="+le+"&coeff_energy="+k_e+
+            "+&coeff_latency="+k_l+"&coeff_rel="+k_r+"&threshold="+t+"&points="+pts+"&margin="+m+"&failed="+f+"&sort="+s,"_self");
+    }
+  </script>
+{% endblock %} 

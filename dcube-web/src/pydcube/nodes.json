@@ -1,0 +1,17 @@
+[
+	{
+		"name":"sky",
+		"mayor":0,
+		"minor":1
+	},
+	{
+		"name":"nrf52840dk-jlink",
+		"mayor":0,
+		"minor":0
+	},
+	{
+		"name":"nrf52840dk-native",
+		"mayor":1,
+		"minor":1
+	}
+]

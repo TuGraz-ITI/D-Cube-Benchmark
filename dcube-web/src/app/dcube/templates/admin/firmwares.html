@@ -1,0 +1,39 @@
+{# This simple template derives from ``base.html``. See ``base.html`` for
+   more information about template inheritance. #}
+{%- extends "base.html" %}
+
+{% from "bootstrap/pagination.html" import render_pagination %}
+
+{# Inside the ``content`` is where you should place most of your own stuff.
+   This will keep scripts at the page end and a navbar you add on later
+   intact. #}
+{% block content %}
+  <div class="container">
+    <div class="container">
+      <h1>Firmwares</h1>
+      {{render_pagination(firmwares)}}
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th class="d-none d-sm-table-cell">Name</th>
+            <th class="d-none d-md-table-cell">Filename</th>
+            <th>Job [ID]</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {%- for firmware in firmwares.items %}
+              <tr>
+                <td>{{firmware.id}}</td>
+                <td class="d-none d-sm-table-cell">{{firmware.name}}</td>
+                <td class="d-none d-md-table-cell">{{firmware.filename}}</td>
+		<td>{%if firmware.job == None%}<i>Deleted</i>{%else%}{{firmware.job.name}} [{{firmware.job.id}}]{%endif%}</td>
+                <td><a class="btn btn-sm btn-secondary" href="{{url_for("admin.admin_download_firmware",id=firmware.id)}}" role="button"><span class="fas fa-save" aria-hidden="true"></span></a></td>
+              </tr>
+          {%- endfor %}
+        </tbody>
+    </table>
+    </div>
+   </div>
+{%- endblock %}

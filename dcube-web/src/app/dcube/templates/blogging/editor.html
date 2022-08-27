@@ -1,0 +1,69 @@
+{% extends 'blogging/base.html' %}
+{% block title %}
+D-Cube &mdash; Blog Editor
+{% endblock title %}
+
+
+{% block extrastyle %}
+<link href="{{url_for("static",filename="bootstrap-markdown/bootstrap-markdown.min.css")}}" rel="stylesheet"/>
+{% endblock extrastyle %}
+{% block main %}
+<form class="form-horizontal" action="{{url_for('blogging.editor', post_id=post_id or None)}}" method="POST">
+
+    {{ form.hidden_tag() }}
+
+    <fieldset>
+        <!-- Form Name -->
+        <h1>Blog Editor</h1>
+        <!-- Text input-->
+        <div class="form-group">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" for="title">Title</span>
+	        </div>
+                {{form.title(placeholder="Title", id="title", class="form-control", required="" )}}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="input-group d-block">
+                {{form.text(placeholder="Blog text", required="", data_provide="markdown", rows="16")}}
+            </div>
+                <span class="help-block">
+                    Learn more about <a href="http://en.wikipedia.org/wiki/Markdown" target="_blank">MarkDown</a><br>
+                    {% if config.BLOGGING_ALLOW_FILEUPLOAD %}
+                        <a target="_blank" href="{{ url_for("flask_fileupload.upload") }}">Upload new File</a>
+                    {% endif %}
+                </span>
+
+        </div>
+        <!-- Text input-->
+        <div class="form-group">
+            <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text" for="tags">Tags</span>
+	    </div>
+                {{form.tags(id="tags", placeholder="Comma separated tags", class="form-control input-md", required="")}}
+            </div>
+        </div>
+        <!-- draft input-->
+        <!--div class="form-group">
+            <div class="offset-md-2">
+                <label>
+                    {{form.draft(id="draft")}} draft?
+                </label>
+            </div>
+        </div-->
+        <div class="form-group">
+            <div>
+                {{ form.submit(id="submit", class="btn btn-primary") }}
+            </div>
+        </div>
+    </fieldset>
+</form>
+{% endblock main %}
+
+{% block extrajs %}
+    <script type="text/javascript" src="{{url_for("static",filename="marked/marked.js")}}"></script>
+    <script type="text/javascript" src="{{url_for("static",filename="bootstrap-markdown/bootstrap-markdown.js")}}"></script>
+{% endblock extrajs %}

@@ -1,0 +1,173 @@
+{% from 'bootstrap/nav.html' import render_nav_item %}
+{% from 'bootstrap/navbar.html' import render_nav_dropdown_toggle, render_nav_dropdown_item, render_nav_dropdown_item_plus %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% block head %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{% block title %}D-Cube{% endblock %}</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link href="{{url_for('static',filename="fontawesome/css/all.css")}}" rel="stylesheet">
+    <link href="{{url_for('static',filename="bootstrap/bootstrap.min.css")}}" rel="stylesheet">
+    {#{{ bootstrap.load_css() }}#}
+    {% endblock %}
+    {#
+    <style>
+    @media screen and (min-width: 960px) {
+      .navbar, .banner {
+        margin-right: calc(100% - 100vw);
+        margin-left: 0;
+      }
+    }
+    </style>
+    #}
+    {% block styles %}
+    {%- endblock %}
+  </head>
+  <body>
+    <header>
+      {% block navbar %}
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <div id="tbstatus" class="navbar-brand d-flex align-items-center">
+            {% if get_config("scheduler_stop","off")=="on" %}
+            <span class="d-inline-block" tabindex="0" title="Oops, something is wrong with the testbed. Execution is temporarily halted!">
+              <a href="#" class="btn btn-danger btn-lg disabled" stype="pointer-events: none;"><span class="fas fa-power-off" aria-hidden="true"></span></a>
+            </span>
+            {% else %}
+            {% if check_scheduler_running() %}
+            {% if check_jamming_running() %}
+            <span class="d-inline-block" tabindex="0" title="Scheduler with interference is running">
+              <a href="#" class="btn btn-success btn-lg disabled" stype="pointer-events: none;"><span class="fas fa-play" aria-hidden="true"></span></a>
+            </span>
+            {% else %}
+            <span class="d-inline-block" tabindex="0" title="Jamming is only enabled between {{get_config("jamming_time_start")}} to {{get_config("jamming_time_stop")}} CET and on weekends">
+              <a href="#" class="btn btn-secondary btn-lg disabled" stype="pointer-events: none;"><span class="fas fa-play" aria-hidden="true"></span></a>
+            </span>
+            {% endif %}
+            {% else %}
+            <span class="d-inline-block" tabindex="0" title="Jobs are executed only between {{get_config("scheduler_time_start")}} to {{get_config("scheduler_time_stop")}} CET and on weekends">
+              <a href="#" class="btn btn-warning btn-lg disabled" stype="pointer-events: none;"><span class="fas fa-pause" aria-hidden="true"></span></a>
+            </span>
+            {% endif %}
+            {% endif %}
+          </div>
+
+	  <a class="navbar-brand" href="/">
+	    <strong>D-Cube</strong>
+	  </a>
+
+	  <button class="navbar-toggler mr-3" type="button" data-toggle="collapse" data-target="#navbarDC" aria-controls="navbarsDC" aria-expanded="false" aria-label="Toggle navigation">
+	    <span class="navbar-toggler-icon"></span>
+	  </button>
+
+	  <div class="collapse navbar-collapse mr-3 ml-3" id="navbarDC">
+	    <ul class="navbar-nav mr-auto">
+	      {{ render_nav_item('frontend.index', 'Jobs Overview', use_li=True) }}
+
+	      {% if current_user.is_authenticated %}
+	      <li class="nav-item dropdown">
+		{{ render_nav_dropdown_toggle("navbarQueues","Protocols") }}
+		<div class="dropdown-menu" aria-labelledby="navbarQueues">
+	          {{ render_nav_dropdown_item('frontend.show_protocols', 'Manage') }}
+		  {% if current_user.has_role("sky") %}
+		    {{ render_nav_dropdown_item('sky.show_queue', 'Sky Queue') }}
+		  {% endif %}
+		  {% if current_user.has_role("nordic") %}
+		    {{ render_nav_dropdown_item('nordic.show_queue', 'Nordic Queue') }}
+		  {% endif %}
+
+		</div>
+	      </li>
+	      {% endif %}
+	      {% if get_config_bool("leaderboard") == True or (current_user.is_authenticated and  current_user.has_role("admins")) %}
+	      <li class="nav-item dropdown">
+		{{ render_nav_dropdown_toggle("navbarQueues","Benchmark Results") }}
+		<div class="dropdown-menu" aria-labelledby="navbarQueues">
+		    {% for benchmark in get_benchmark_suites() %}
+	            {{ render_nav_dropdown_item_plus('leaderboard.show_benchmark_suite', benchmark.name, benchmark_suite_id=benchmark.id) }}
+		    {% endfor %}
+		</div>
+	      </li>
+	      {% else %}
+	      {% endif %}
+	    </ul>
+	    <ul class="nav navbar-nav navbar-right">
+	      <li class="nav-item dropdown">
+                {#
+		{{ render_nav_dropdown_toggle("navbarContact","Contact") }}
+		<div class="dropdown-menu" aria-labelledby="navbarContact">
+		  <a class="dropdown-item" href="https://iti.tugraz.at/D-Cube">GIT</a>
+		  <a class="dropdown-item" href="/wiki">Wiki</a>
+		</div>
+		#}
+		{% if (current_user.is_authenticated) and (current_user.has_role("admins")) %}
+		  <li class="nav-item dropdown">
+		    {{ render_nav_dropdown_toggle("navbarManagement","Management") }}
+		    <div class="dropdown-menu" aria-labelledby="navbarManagement">
+		      {{ render_nav_dropdown_item('admin.users', 'Users') }}
+		      {{ render_nav_dropdown_item('admin.groups', 'Groups') }}
+		      {{ render_nav_dropdown_item('admin.roles', 'Roles') }}
+		      <div class="dropdown-divider"></div>
+		      {{ render_nav_dropdown_item('admin.firmwares', 'Firmwares') }}
+		      {{ render_nav_dropdown_item('admin.logs', 'Logs') }}
+		      {{ render_nav_dropdown_item('admin.admin_queue', 'Queue') }}
+		      {{ render_nav_dropdown_item('admin.admin_statistics', 'Statistics') }}
+		      <div class="dropdown-divider"></div>
+		      {{ render_nav_dropdown_item('admin.configs', 'Configs') }}
+		      {{ render_nav_dropdown_item('admin.admin_nodes', 'Nodes') }}
+		      {{ render_nav_dropdown_item('admin.admin_jamming', 'Jamming') }}
+		      <div class="dropdown-divider"></div>
+		      {{ render_nav_dropdown_item('admin.admin_benchmark_suite', 'Benchmark Suites') }}
+		      {{ render_nav_dropdown_item('admin.admin_protocols', 'Protocols') }}
+		    </div>
+		  </li>
+		  {% endif %}
+		  {% if current_user.is_authenticated %}
+		  <li class="nav-item dropdown">
+		    {{ render_nav_dropdown_toggle("navbarUser",current_user.username) }}
+		    <div class="dropdown-menu" aria-labelledby="navbarUser">
+		      {{ render_nav_dropdown_item('security.logout', 'Logout') }}
+		      {{ render_nav_dropdown_item('security.change_password', 'Change Password') }}
+		      {{ render_nav_dropdown_item('frontend.user_manage_api_key', 'API key Management') }}
+		    </div>
+		  </li>
+		  {% else %}
+		  {{ render_nav_item('security.login', 'Login', use_li=True) }}
+		  {% endif %}
+
+		</li>
+	    </ul>
+	  </div>
+
+	</div>
+      </nav>
+      {% endblock %}
+
+    </header>
+
+    <main role="main">
+       <div class="banner">
+      {% block banner %}{% endblock %}
+      {% block messages %}{% endblock %}
+       </div>
+      {% block content %}{% endblock %}
+    </main>
+    {{ bootstrap.load_js() }}
+    <script href="{{url_for('bootstrap.static',filename="js/bootstrap.bundle.min.js")}}"></script>
+    {% block scripts %}
+    <script>
+    $( document ).ready(function() {
+      $('[data-toggle="tooltip"]').tooltip();
+      setInterval(function()
+      {
+        $('#tbstatus').load(document.URL +  ' #tbstatus>*','');
+      }, 5000);
+    });
+    </script>
+
+    {% endblock %}
+  </body>
+</html>

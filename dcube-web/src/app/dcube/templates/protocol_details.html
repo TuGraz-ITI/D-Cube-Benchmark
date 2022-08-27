@@ -1,0 +1,120 @@
+{# This simple template derives from ``base.html``. See ``base.html`` for
+more information about template inheritance. #}
+{%- extends "base.html" %}
+
+{% block title %}
+{{protocol.name}} &mdash; D-Cube
+{%- endblock %}
+
+
+{# Inside the ``content`` is where you should place most of your own stuff.
+This will keep scripts at the page end and a navbar you add on later
+intact. #}
+{% block content %}
+<div class="container">
+  <h1>
+    <div class="row">
+      <div class="col-sm-10 col-md-8">
+      {{protocol.name}}
+      </div>
+      <div class="col-sm-2 col-md-4">
+        <div class="btn-group float-sm-right">
+          {% if current_user.is_authenticated and current_user.has_role("admins") and not protocol.final_job == None %}
+          <a href={{url_for("admin.unlock_protocol",id=protocol.id)}} class="btn btn-lg btn-danger">Unlock</a> 
+	  {% endif %}
+	  <button type="button" {%if protocol.final_job%}disabled{%endif%} class="btn btn-lg btn-secondary" data-toggle="modal" data-target="#finalizeProtocol" href="#" title="finalize protocol"><span class="d-none d-lg-inline-block">Finalize Protocol</span><span class="d-none d-md-inline-block d-lg-none">Finalize</span><span class="d-inline-block d-md-none fas fa-bookmark" aria-hidden="true" ></span></button>
+        </div>  
+      </div>
+    </div>
+  </h1>
+</div>
+
+<div class="container">
+  <table class="table-hover table">
+    <thead>
+      <tr>
+	<th>Job ID</th>
+	<th class="d-none d-md-table-cell">Layout</th>
+	<th class="d-none d-md-table-cell">Traffic Load</th>
+	<th><span class="d-none d-md-inline-block">Energy [J]</span><span class="d-inline d-md-none">E [J]</span></th>
+	<th><span class="d-none d-md-inline-block">Latency [ms]</span><span class="d-inline d-md-none">L [ms]</span></th>
+	<th><span class="d-none d-md-inline-block">Reliability [%]</span><span class="d-inline d-md-none">R [%]</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      {%- for job in protocol.jobs|reverse %}
+      <tr {%if protocol.final_job.id==job.id%}class='clickable-row lead' style="background-color: #eee;"{%else%}class='clickable-row'{%endif%} data-href="{{url_for(jobdetails(job),id=job.id)}}">
+        <td>{{job.id}}</td>
+        <td>{{job.layout.short}}</td>
+	<td class="d-none d-md-table-cell">{% if job.traffic_load == 0 %}Aperiodic{%else%}{% if job.traffic_load > 1000 %}{{(job.traffic_load/1000)|int}}s{%else%}{{job.traffic_load}}ms{%endif%}{%endif%}/{{job.msg_len}}B</td>
+        <td class="d-none d-md-table-cell">
+          {% if (not job.metric==None) and (not job.metric.energy==None) %}
+          {{'%0.1f' | format(job.metric.energy) }}
+          {% else %}
+          -
+          {% endif %}
+        </td>
+        <td>
+          {% if (not job.metric==None) and (not job.metric.latency==None) %}
+          {{'%0.1f'| format(job.metric.latency / 1000) }}
+          {% else %}
+          -
+          {% endif %}
+        </td>
+        <td>
+	  {% if (not job.metric==None) and (not job.metric.reliability==None) %}
+          {{'%0.1f' | format(job.metric.reliability * 100) }}
+          {% else %}
+          -
+          {% endif %}
+	</td>
+      </tr>
+      {% endfor %}
+</div>
+
+<div class="container">
+  <!-- Trigger the modal with a button -->
+
+  <!-- Modal -->
+  <div class="modal fade" id="finalizeProtocol" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+          <form id="finalizeProtocolForm" action="{{url_for("frontend.finalize_protocol",id=protocol.id)}}" enctype="multipart/form-data" method="post">
+	  <div class="modal-header">
+	    <h1 class="col-12 text-center">Finalize Protocol
+	    <button type="button" class="close" data-dismiss="modal">&times;</button>
+	    </h1>
+	  </div>
+	  <div class="modal-body">
+	    <div class="form-group required"><label class="control-label" required for="final_job">Final Job</label>
+	      <select class="form-control" id="final_job" name="final_job" aria-describedby="final_job-addon">
+	        {% for j in protocol.jobs|reverse %}
+		<option value="{{j.id}}">{{j.id}} - {{j.name}}</option>
+	        {% endfor%}
+	      </select>
+	    </div>
+	  </div>
+	  <div class="modal-footer">
+	    <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Finalize">
+	    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+	  </div>
+	</form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{%- endblock %}
+
+{% block scripts %}
+{{super()}}
+
+<script>
+$('.clickable-row' ).click(function() {
+    window.document.location = $(this).data("href");
+});
+</script>
+{%- endblock %}

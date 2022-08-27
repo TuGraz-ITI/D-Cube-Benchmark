@@ -1,0 +1,143 @@
+{# This simple template derives from ``base.html``. See ``base.html`` for
+   more information about template inheritance. #}
+{%- extends "base.html" %}
+
+{# Inside the ``content`` is where you should place most of your own stuff.
+   This will keep scripts at the page end and a navbar you add on later
+   intact. #}
+{% block content %}
+  <div class="container">
+    <div class="container">
+      <h1>Users</h1>
+      <table class="table">
+        <thead>
+          <tr>
+            <th class="d-none d-sm-table-cell">#</th>
+            <th>Username</th>
+            <th class="d-none d-lg-table-cell">Email</th>
+            <th class="d-none d-sm-table-cell">API Key</th>
+            <th class="d-none d-md-table-cell">Active</th>
+            <th>Group</th>
+            <th>Roles</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {%- for user in users %}
+              <tr>
+                <td class="d-none d-sm-table-cell">{{user.id}}</td>
+                <td>{{user.username}}</td>
+                <td class="d-none d-lg-table-cell">{{user.email}}</td>
+                <td class="d-none d-sm-table-cell">{% if user.api_key == None %}<span class="fas fa-remove" aria-hidden="true">{% else %}<span class="fas fa-check" aria-hidden="true">{% endif %}</td>
+                <td class="d-none d-md-table-cell">{{user.active}}</td>
+                <td>{{user.group.name}}</td>
+                <td>
+                  {%- for role in user.roles %}
+                  {{role.name}}{% if not loop.last %}, {% endif %}
+                  {%- endfor %}
+                </td>
+                <td>
+                <div class="btn-group float-left">
+			<a class="btn btn-sm btn-danger" href="{{url_for("admin.delete_user",id=user.id)}}" role="button" title="delete user"><span class="fas fa-times" aria-hidden="true"></span></a>
+                  {% if user.api_key == None %}
+		  <a class="btn btn-sm btn-primary d-none d-sm-inline-block" href="{{url_for("admin.generate_api_key",id=user.id)}}" role="button" title="generate api key"><span class="fas fa-lock" aria-hidden="true"></span></a>
+                  {% else %}
+                  <a class="btn btn-sm btn-primary d-none d-sm-inline-block" href="#" data-toggle="modal" data-target="#apiModal" data-api-key="{{user.api_key}}" role="button" title="show api key"><span class="fas fa-eye" aria-hidden="true"></span></a>
+                  <a class="btn btn-sm btn-danger d-none d-sm-inline-block" href="/admin/delete_apikey/{{user.id}}" role="button" title="delete api key"><span class="fas fa-lock" aria-hidden="true"></span></a>
+                  {% endif %}
+                  {% if ((not current_user==user) and (not user.has_role("admins"))) %}
+                  <a class="btn btn-sm btn-success" href="/admin/users/{{user.id}}/admin1" role="button" title="add admin rights"><span class="fas fa-chevron-up" aria-hidden="true"></span></a>
+                  {%- endif %}
+                  {% if ((not current_user==user) and (user.has_role("admins"))) %}
+                  <a class="btn btn-sm btn-warning" href="/admin/users/{{user.id}}/admin0" role="button" title="remove admin rights"><span class="fas fa-chevron-down" aria-hidden="true"></span></a>
+                  {%- endif %}
+                </div>
+                </td>
+              </tr>
+          {%- endfor %}
+        </tbody>
+    </table>
+
+    <div class="container">
+      <!-- Trigger the modal with a button -->
+      <div class="btn-group">
+      <button type="button" class="btn btn-success" data-toggle="modal" data-target="#createUser">Create User</button>
+      </div>
+
+      <!-- Modal -->
+      <div class="modal fade" id="createUser" role="dialog">
+        <div class="modal-dialog">
+
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class=" col-12 text-center">Create User
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+	      </h1>
+            </div>
+            <div class="modal-body">
+              <form action="create_user" method="post">
+                <div class="form-group required"><label class="control-label" for="username">Username</label>
+                  <input class="form-control" id="username" name="username" required type="text" value=""  maxlength="255">
+                </div>
+                <div class="form-group required"><label class="control-label" for="email">Email</label>
+                  <input class="form-control" id="email" name="email" required type="email" value=""  maxlength="255">
+                </div>
+                <div class="form-group required"><label class="control-label" for="password">Password</label>
+                  <input class="form-control" id="password" name="password" required type="password" value=""  maxlength="255">
+                </div>
+                <div class="form-group required"><label class="control-label" for="group">Group</label>
+                  <select class="form-control" id="group" name="group" required>
+                    {%- for group in groups %}
+                    <option>{{group.name}}</option>
+                    {%- endfor %}
+                  </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Create">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+              </form>
+          </div>
+
+        </div>
+      </div>
+
+<!-- Modal -->
+<div class="modal fade" id="apiModal" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="col-12 text-center">API Key
+	<button type="button" class="close" data-dismiss="modal">&times;</button></h1>
+      </div>
+      <div class="modal-body" id="apiField">
+        <pre></pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+   </div>
+    </div>
+    </div>
+
+{%- endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+<script>
+$('#apiModal').on('show.bs.modal', function(e) {
+    $("#apiField").find("pre").remove();
+    var key = $(e.relatedTarget).data('api-key');
+    var markup = "<pre>"+key+"</pre>";
+    $("#apiField").append(markup);
+});
+</script>
+
+{%- endblock %}

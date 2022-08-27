@@ -1,0 +1,200 @@
+{# This simple template derives from ``base.html``. See ``base.html`` for
+   more information about template inheritance. #}
+{%- extends "base.html" %}
+
+{# Inside the ``content`` is where you should place most of your own stuff.
+   This will keep scripts at the page end and a navbar you add on later
+   intact. #}
+{% block content %}
+  <div class="container">
+    <div class="container">
+         <h1>
+            <span>API Key Management</span>
+        </h1>
+        <div class="container">
+            {% if current_user.api_key==None %}
+            <a class="btn btn-success" href="/user/apikey/generate" role="button">Generate API key</a>
+            {% else %}
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#apikeyModal">Show API Key</button>
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal">Delete API Key</button>
+            {% endif %}
+        </div>
+
+        <h2>
+            <span>How to use the API Key?</span>
+        </h2>
+        
+        <div class="container">
+            <div class="bg-danger text-white"><h4>The current API is still under development and may change without prior notice.</h4></div> 
+            <p>All API functions are under a common root at <pre class="bg-light rounded border border-secondary p-2">https://iti-testbed.tugraz.at/api</pre>You must pass the your API key via HTTP GET by adding <b>?key=[yourkey]</b> to the end of your query.</p>
+	    <p>The following example can be yoused to create a new job with the name test. This requires a linux machine or at least curl and base64 in you environment path:<pre class="bg-light rounded border border-secondary p-2">curl -H "Content-Type: application/json" -X POST -d '{"name":"test", "protocol":1, "layout":"1", "periodicity":5000, "message_length":8, "file": "'$(cat [YOURFILE].ihex|base64 -w0)'"}' "https://iti-testbed.tugraz.at/api/queue/create_job?key=[APIKEY]"</pre></p>
+	    <p>In case you receive the error message "Argument list too long" you need to write the JSON into a file and upload it via<pre class="bg-light rounded border border-secondary p-2">curl -H "Content-Type: application/json" -X POST -d @[YOURJSON].json "https://iti-testbed.tugraz.at/api/queue/create_job?key=[APIKEY]"</pre></p>
+        <h2>
+            <span>API Endpoints</span>
+        </h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                        <th>JSON</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                        <td>/</td>
+                        <td>[GET] informs you that this is the api root</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>/queue</td>
+                        <td>[GET] returns a JSON object with all your jobs</td>
+<td style="width:400px;display: inline-block;"><pre class="bg-light rounded border border-secondary p-2"><code>[
+    {
+        "procotol": INTEGER,
+        "layout": INTEGER,
+        "periodicity": INTEGER,
+        "message_length": INTEGER,
+        "patching": BOOLEAN,
+        "description": STRING,
+        "finished": BOOLEAN,
+        "evaluated": BOOLEAN,
+        "failed": BOOLEAN,
+        "running": BOOLEAN,
+        "schduled" :STRING,
+        "jamming": BOOLEAN,
+        "id": INTEGER,
+        "name": STRING,
+        "result": (if finished)
+        {
+            "begin":" STRING,
+            "end": STRING
+        }
+    },
+]</code></pre></td>
+                    </tr>
+
+                    <tr>
+                        <td>/queue/[JOB ID]</td>
+                        <td>[GET] returns a JSON object for the job with id=[JOB ID]</td>
+<td style="width:400px;display: inline-block;"><pre class="bg-light rounded border border-secondary p-2"><code>{
+    "protocol": INTEGER,
+    "layout": INTEGER,
+    "periodicity": INTEGER,
+    "message_length": INTEGER,
+    "patching": BOOLEAN,
+    "description": STRING,
+    "finished": BOOLEAN,
+    "evaluated": BOOLEAN,
+    "failed": BOOLEAN,
+    "running": BOOLEAN,
+    "schduled" :STRING,
+    "jamming": BOOLEAN,
+    "id": INTEGER,
+    "name": STRING,
+    "result": (if finished)
+    {
+        "begin":" STRING,
+        "end": STRING
+    }
+},</code></pre></td>
+                    </tr>
+
+
+                    <tr>
+                        <td>/queue/create_job</td>
+            			<td>[POST] takes a "application/json" payload containing the base64 encoded ihex<br>a jamming value of 0 means no jamming<br>returns a JSON object with the new job</td>
+<td style="width:400px;display: inline-block;"><pre class="bg-light rounded border border-secondary p-2"><code>{
+    "protocol": INTEGER,
+    "layout": INTEGER,
+    "periodicity": INTEGER,
+    "message_length": INTEGER,
+    "patching": BOOLEAN,
+    "id": INTEGER,
+    "finished": BOOLEAN,
+    "schduled" :STRING,
+    "failed": BOOLEAN,
+    "running": BOOLEAN,
+    "name": STRING,
+    "description": STRING,
+    "duration": INTEGER,
+    "logs": BOOLEAN,
+    "jamming": INTEGER,
+    "file": STRING
+}</code></pre></td>
+                    </tr>
+                    <tr>
+                        <td>/metric/[JOB ID]</td>
+			            <td>[GET] retruns the combined performance metrics for the job with id=[JOB ID]</td>
+<td style="width:400px;display: inline-block;"><pre class="bg-light rounded border border-secondary p-2"><code>{
+    "latency": FLOAT,
+    "energy": FLOAT,
+    "reliability": FLOAT
+}</code></pre></td>
+                    <tr>
+                        <td>/scenario/[JOB ID]</td>
+			            <td>[GET] retruns the per scenario metrics for the job with id=[JOB ID]</td>
+<td style="width:400px;display: inline-block;"><pre class="bg-light rounded border border-secondary p-2"><code>[
+    {
+        "Latency combined [us]": STRING,
+        "Latency median [us]": STRING,
+        "GPIO pin": STRING,
+        "Events detected on source node": STRING,
+        "Missed events": STRING,
+        "Superflous events": STRING,
+        "Events with causality error": STRING,
+        "Latency mean [us]": STRING,
+        "Destination node(s)": STRING,
+        "Total Energy [J]": STRING,
+        "Source node(s)": STRING,
+        "Reliability [%]": STRING,
+        "Events detected on sink node": STRING,
+        "Correct events": STRING
+    },
+]</code></pre></td>
+
+                </tbody>
+            </table>
+        </div>
+   </div>
+
+<!-- Modal -->
+<div id="deleteModal" class="modal fade" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h1 class="modal-title">Delete API Key?</h1>
+      </div>
+      <div class="modal-body">
+        <p>This operation cannot be undone! Are you sure?</p>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-danger" href="/user/apikey/delete" role="button">Delete API key</a>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="apikeyModal" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h1 class="text-center login-title">API Key</h4>
+      </div>
+      <div class="modal-body" id="apiField">
+        <pre id="apikey">{{current_user.api_key}}</pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{%- endblock %}
+

@@ -1,0 +1,27 @@
+{%- extends "base.html" %}
+
+{% block styles %}
+{{super()}}
+{% block style %}{% endblock %}
+{% block extrastyle %}{% endblock %}
+
+{% endblock %}
+
+{% block banner %}{% endblock %}
+
+{% block content %}
+    <!-- main content -->
+     <div class="container">
+         {% block main %}
+         {% endblock main %}
+         {% block extramain %}
+         {% endblock extramain %}
+     </div>
+{% endblock %}
+
+{% block scripts %}
+{{super()}}
+{% block js %}
+{% endblock %}
+{% block extrajs %}{% endblock %}
+{% endblock %}

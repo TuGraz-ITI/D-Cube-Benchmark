@@ -1,0 +1,114 @@
+{# This simple template derives from ``base.html``. See ``base.html`` for
+more information about template inheritance. #}
+{%- extends "base.html" %}
+
+{% block title %}
+Layout of Nodes per Benchmark Suite &mdash; D-Cube
+{%- endblock %}
+
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{{url_for("static",filename="vis-network/vis-network.min.css")}}">
+
+<style type="text/css">
+#graph {
+    height: 600px;
+}
+</style>
+
+
+{{super()}}
+{%- endblock %}
+
+{# Inside the ``content`` is where you should place most of your own stuff.
+This will keep scripts at the page end and a navbar you add on later
+intact. #}
+{% block content %}
+<div class="container">
+    <div class="container">
+        <h1>Layout of Nodes per Benchmark Suite</h1>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="input-group">
+	            <div class="input-group-prepend">
+                    <span class="input-group-text" id="benchmark_suite-addon">Benchmark Suite</span>
+                    </div>
+                    <select class="form-control" id="benchmark_suite" name="benchmark_suite" aria-describedby="benchmark_suite-addon">
+                        {% for c in benchmark_suites %}
+                        <option {% if benchmark_suite.id ==c.id %}selected="selected"{% endif %}value="{{c.id}}">{{c.name}}</option>
+                        {% endfor%}
+                    </select>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="input-group">
+	            <div class="input-group-prepend">
+                    <span class="input-group-text" id="composition-addon">Node Layout</span>
+		    </div>
+                    <select class="form-control" id="composition" name="composition" aria-describedby="composition-addon">
+                        {% for c in compositions %}
+                        <option {% if composition.id ==c.id %}selected="selected"{% endif %}value="{{c.id}}">{{c.name}}</option>
+                        {% endfor%}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="container mt-2">
+		    <div class="card">
+                    <div class="card-body">
+                        <div id="graph"></div>
+                    </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+{%- endblock %}
+
+{% block scripts %}
+{{super()}}
+
+<script src="{{url_for("static",filename="vis-network/vis-network.min.js")}}"></script>
+
+<script>
+
+{%if (not layout_dict==None)  %}
+var nodes = new vis.DataSet({{layout_dict['nodes']|tojson}});
+//var nodes = new vis.DataSet([{}]);
+var edges = new vis.DataSet({{layout_dict['edges']|tojson}});
+//var edges = new vis.DataSet([{}]);
+var container = document.getElementById('graph');
+var data = { nodes: nodes, edges:edges };
+var layoutMethod = "directed";
+
+
+var options={
+    layout: {
+        randomSeed: 1
+    },
+    edges: {
+        smooth: true,
+        arrows: {to : true }
+    }
+};
+var network=new vis.Network(container,data,options);
+
+{%endif%}
+
+$("#benchmark_suite").on('change', update_benchmark_suite);
+$("#composition").on('change', update_composition);
+
+function update_composition(){
+    cat=$("#benchmark_suite").val();
+    comp=$("#composition").val();
+    window.open("/layout?benchmark_suite="+cat+"&composition="+comp,"_self");
+}
+
+function update_benchmark_suite(){
+    cat=$("#benchmark_suite").val();
+    window.open("/layout?benchmark_suite="+cat,"_self");
+}
+
+</script>
+
+{%- endblock %}

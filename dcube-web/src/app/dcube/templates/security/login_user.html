@@ -1,0 +1,30 @@
+{# This simple template derives from ``base.html``. See ``base.html`` for
+   more information about template inheritance. #}
+{%- extends "base.html" %}
+
+{% from "bootstrap/form.html" import render_form, render_field, render_form_row %}
+
+{# Inside the ``content`` is where you should place most of your own stuff.
+   This will keep scripts at the page end and a navbar you add on later
+   intact. #}
+{% block content %}
+  <div class="container">
+      <div class="row">
+        <div class="col-sm-6 col-md-4 offset-md-4">
+      <h1 class="text-center login-title">Login</h1>
+      <div class="account-wall">
+
+      <form action="{{ url_for_security('login') }}" method="POST" name="login_user_form" class="form-signin">
+        {{ login_user_form.hidden_tag() }}
+
+        {{ render_field(login_user_form.email) }}
+        {{ render_field(login_user_form.password) }}
+        {{ render_field(login_user_form.remember) }}
+
+        {{ render_field(login_user_form.submit) }}
+      </form>
+    </div>
+  </div>
+</div>
+   </div>
+{%- endblock %}

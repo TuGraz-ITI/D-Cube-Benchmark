@@ -1,0 +1,99 @@
+{# This simple template derives from ``base.html``. See ``base.html`` for
+   more information about template inheritance. #}
+{%- extends "base.html" %}
+
+{# Inside the ``content`` is where you should place most of your own stuff.
+   This will keep scripts at the page end and a navbar you add on later
+   intact. #}
+{% block content %}
+<div class="container">
+  <div class="container">
+    <h1>Nodes</h1>
+    <table class="table">    
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Action</th>
+    	</tr>
+    </thead>
+    <tbody>
+    {% for node in nodes %}
+    	<tr>
+        <td>{{node.id}}</td>
+        <td>{{node.name}}</td>
+        <td>
+          <div class="btn-group float-left">
+            <a class="btn btn-primary" href="#" role="button" data-node-id="{{node.id}}" data-node-name="{{node.name}}" data-toggle="modal" data-target="#editNode"><span class="fas fa-edit" aria-hidden="true"></span></a>
+	    <a class="btn btn-danger" href="{{url_for("admin.admin_delete_node",id=node.id)}}" role="button">  <span class="fas fa-times" aria-hidden="true"></span></a>
+          </div>
+
+	</td>
+    	</tr>
+    {% endfor %}
+    </table>
+  </div>
+
+  <div class="container">
+    <!-- Trigger the modal with a button -->
+    <div class="btn-group">
+      <a href="{{url_for("admin.admin_create_node")}}" class="btn btn-success">Create Node</a>
+    </div>
+  </div>
+
+</div>
+
+<div class="container">
+  <!-- Trigger the modal with a button -->
+
+  <!-- Modal -->
+  <div class="modal fade" id="editNode" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+	<form id="updateNodeForm" action="dummy" enctype="multipart/form-data" method="post">
+	  <div class="modal-header">
+	    <h1 class="col-12 text-center">Edit Node
+	    <button type="button" class="close" data-dismiss="modal">&times;</button>
+	    </h1>
+	  </div>
+	  <div class="modal-body">
+	    <div class="form-group required"><label class="control-label" required for="name">Name</label>
+	      <input class="form-control" id="name" name="name" type="text" value="" maxlength="255">
+	    </div>
+	  </div>
+	  <div class="modal-footer">
+	    <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Update">
+	    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+	  </div>
+	</form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{%- endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+<script>
+$('#editNode').on('show.bs.modal', function(e) {
+
+  //get data-id attribute of the clicked element
+  var id = $(e.relatedTarget).data('node-id');
+  var name = $(e.relatedTarget).data('node-name');
+
+  var url="{{url_for("admin.admin_update_node")}}";
+  url=url+id;
+  $('#updateNodeForm').attr("action",url);
+  
+  $(e.currentTarget).find('input[name="name"]').val(name);
+});
+
+
+</script>
+
+{%- endblock %}

@@ -1,0 +1,135 @@
+{# This simple template derives from ``base.html``. See ``base.html`` for
+more information about template inheritance. #}
+{%- extends "base.html" %}
+
+{% block title %}
+Jamming &mdash; D-Cube
+{%- endblock %}
+
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{{url_for("static",filename="vis-timeline/vis-timeline-graph2d.min.css")}}">
+
+<style type="text/css">
+#graph {
+    height: 400px;
+}
+</style>
+
+{{super()}}
+{%- endblock %}
+
+{# Inside the ``content`` is where you should place most of your own stuff.
+This will keep scripts at the page end and a navbar you add on later
+intact. #}
+{% block content %}
+<div class="container">
+    <div class="container">
+        <h1>Jamming</h1>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="input-group">
+		    <div class="input-group-prepend">
+                    <span class="input-group-text" id="level-addon">Level</span>
+		    </div>
+                    <select class="form-control" id="composition" name="composition" aria-describedby="category-addon">
+                        {% for c in compositions %}
+                        <option {% if composition.id ==c.id %}selected="selected"{% endif %}value="{{c.id}}">{{c.name}}</option>
+                        {% endfor%}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-sm-12">
+                <div id="timeline"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{%- endblock %}
+
+{% block scripts %}
+{{super()}}
+
+<script src="{{url_for("static",filename="vis-timeline/vis-timeline-graph2d.min.js")}}"></script>
+<script src="{{url_for("static",filename="js/handlebars.min.js")}}"></script>
+
+<script>
+Handlebars.registerHelper("formatUnix", function(dateobject) {
+    d=new Date(dateobject)
+        return d.getTime();
+});
+</script>
+
+<script id="item-template" type="text/x-handlebars-template">
+{%raw%}
+    <table class="score">
+      <tr>
+        <th colspan="2" class="description">{{content}}</th>
+      </tr>
+    </table>
+{%endraw%}
+</script>
+
+<script>
+var template = Handlebars.compile(document.getElementById('item-template').innerHTML);
+var timeline = document.getElementById('timeline');
+var tt = new vis.DataSet({{preview_dict['items']|tojson}});
+var tg = new vis.DataSet({{preview_dict['groups']|tojson}});
+
+var options = {
+    align: "left",
+    showMajorLabels: false,
+    groupOrder: 'rpi',
+    showCurrentTime: false,
+    min: new Date(0),
+    template: template,
+    editable: {
+        add: false,
+        updateTime: false,
+        updateGroup: false,
+        remove: false
+    },
+    moment: function(date) {
+        return vis.moment(date).utc();
+    },
+    format: {
+        minorLabels: {
+            millisecond:'x[m]',
+            second:     'X',
+            minute:     'X',
+            hour:       'X',
+            weekday:    'X',
+            day:        'X',
+            week:       'X',
+            month:      'X',
+            year:       'X'
+        },
+        majorLabels: {
+            millisecond:'',
+            second:     '',
+            minute:     '',
+            hour:       '',
+            weekday:    '',
+            day:        '',
+            week:       '',
+            month:      '',
+            year:       ''
+        }
+    }
+};
+var tl = new vis.Timeline(timeline, tt, options);
+tl.setGroups(tg);
+
+$("#composition").on('change', update_composition);
+
+function update_composition(){
+    comp=$("#composition").val();
+    window.open("/jamming?composition="+comp,"_self");
+}
+
+
+
+</script>
+
+{%- endblock %}

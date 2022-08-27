@@ -1,0 +1,18 @@
+{% macro render_nav_dropdown_toggle(id,text) %}
+    <a class="nav-link dropdown-toggle" href="#" id="{{ id }}" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        {{ text }}
+    </a>
+{% endmacro %}
+
+{% macro render_nav_dropdown_item(endpoint,text) %}
+    <a class="{% if request.endpoint and request.endpoint == endpoint %}active{% endif %} dropdown-item" href="{{ url_for(endpoint, **kwargs) }}">
+        {{ text }}
+    </a>
+{% endmacro %}
+
+{% macro render_nav_dropdown_item_plus(endpoint,text,active) %}
+    <a class="{% if (request.endpoint and request.endpoint == endpoint) and (request.path in url_for(endpoint, root_path=request.url_root, **kwargs)) %}active{% endif %} dropdown-item" href="{{ url_for(endpoint, **kwargs) }}">
+	    {{ text }}
+    </a>
+{% endmacro %}
+

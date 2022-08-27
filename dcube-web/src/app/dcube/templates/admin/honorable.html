@@ -1,0 +1,165 @@
+{# This simple template derives from ``base.html``. See ``base.html`` for
+   more information about template inheritance. #}
+{%- extends "base.html" %}
+
+{# Inside the ``content`` is where you should place most of your own stuff.
+   This will keep scripts at the page end and a navbar you add on later
+   intact. #}
+{% block head %}
+{{super()}}
+<style>
+html{
+  overflow-y: scroll;
+}
+</style>
+</style>
+{% endblock %} 
+
+{% block content %}
+  <div class="container" id="stats">
+    <div class="row">
+      <div class="col-sm-2">
+      <div class="input-group">
+          <label class="input-group-addon" id="jamming-addon">J</label>
+        <select class="form-control" id="jamming" name="jamming" aria-describedby="jamming-addon">
+          {% for i in range(0,jamming_max+1) %}
+          <option {% if i==jamming|int %}selected="selected"{% endif %}value={{i}}>{% if i==0%}None{% else %}Level {% if i>3 %}D{{i-3}}{% else %}{{i}}{% endif %}{% endif%}</option>
+          {% endfor%}
+          <option {% if jamming=="super"%} selected="selected"{% endif %}value="super">AVGALL-NOINT</option>
+          <option {% if jamming=="any"%} selected="selected"{% endif %}value="any">AVG-ALL</option>
+        </select>
+    </div>
+    </div>
+      <div class="col-sm-2">
+      <div class="input-group">
+          <label class="input-group-addon" id="reference-addon">Ref.</label>
+        <select class="form-control" id="reference" name="reference" aria-describedby="reference-addon">
+          {% for i in teams %}
+          <option {% if i==reference %}selected="selected"{% endif %}value={{i}}>{{i}}</option>
+          {% endfor%}
+        </select>
+      </div>
+      </div>
+
+      <div class="col-sm-3">
+      <div class="input-group">
+          <label class="input-group-addon" id="scenario-addon">S</label>
+        <select class="form-control" id="scenario" name="scenario" aria-describedby="scenario-addon">
+          <optgroup label="Point-to-point">
+            <option {% if scenario=="p2p" %} selected {% endif %} value="p2p">All Point-to-point</option>
+            <option {% if scenario=="p2p1" %} selected {% endif %} value="p2p1">118 - 209</option>
+            <option {% if scenario=="p2p2" %} selected {% endif %} value="p2p2">206 - 210</option>
+            <option {% if scenario=="p2p3" %} selected {% endif %} value="p2p3">213 - 225</option>
+          </optgroup>
+          <optgroup label="Multipoint-to-point">
+            <option {% if scenario=="mp2p" %} selected {% endif %} value="mp2p">All Multipoint-to-point</option>
+            <option {% if scenario=="mp2p1" %} selected {% endif %} value="mp2p1">(117,207,226) - 222</option>
+            <option {% if scenario=="mp2p2" %} selected {% endif %} value="mp2p2">(219,110) - 220</option>
+          </optgroup>
+          <optgroup label="Point-to-multipoint">
+            <option {% if scenario=="p2mp" %} selected {% endif %} value="p2mp">All Point-to-multipoint</option>
+            <option {% if scenario=="p2mp1" %} selected {% endif %} value="p2mp1">119 - (217,224)</option>
+            <option {% if scenario=="p2mp2" %} selected {% endif %} value="p2mp2">213 - (108,200)</option>
+            <option {% if scenario=="p2mp3" %} selected {% endif %} value="p2mp3">201 - (209,211,224,225)</option>
+          </optgroup>
+        </select>
+    </div>
+    </div>
+    <div class="col-sm-5">
+    <div class="row">
+      <div class="col-sm-4">
+      <div class="input-group">
+        <label class="input-group-addon" id="energy-addon">K_E</label>
+        <input type=number class="form-control" id="coeff_energy" name="coeff_energy" aria-describedby="energy-addon" value="{{coeff_energy}}">
+        </input>
+      </div>
+      </div>
+      <div class="col-sm-4">
+      <div class="input-group">
+        <label class="input-group-addon" id="latency-addon">K_L</label>
+        <input type=number class="form-control" id="coeff_latency" name="coeff_latency" aria-describedby="latency-addon" value="{{coeff_latency}}">
+        </input>
+      </div>
+      </div>
+      <div class="col-sm-4">
+      <div class="input-group">
+        <label class="input-group-addon" id="rel-addon">K_R</label>
+        <input type=number class="form-control" id="coeff_rel" name="coeff_rel" aria-describedby="rel-addon" value="{{coeff_rel}}">
+        </input>
+      </div>
+      </div>
+  </div>
+  </div>
+
+  </div>
+
+  <div class="container">
+    <h1>Honorable Leaderboard</h1>
+        <table class="table-hover table">
+          <thead>
+            <tr>
+              <th>T</th>
+              <th>abs E[J]</th>
+              <th>rel E[%]</th>
+              <th>abs R[%]</th>
+              <th>rel R[%]</th>
+              <th>abs L[ms]</th>
+              <th>rel L[%]</th>
+              <th>rel Total[%]</th>
+              <th># of runs</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for index,metric in df.iterrows() %}
+            <tr class='clickable-row' data-team="{{metric['description']}}">
+              <td>{{metric['description']}}</td>
+              <td>{{'%0.2f' | format(metric['energy'])}} &plusmn; {{'%0.2f' | format(metric['energy_std'])}}</td>
+              <td>{{'%0.2f' | format(metric['rel_energy'])}}</td>
+              <td>{{'%0.2f' | format(metric['reliability'])}} &plusmn; {{'%0.2f' | format(metric['reliability_std'])}}</td>
+              <td>{{'%0.2f' | format(metric['rel_reliability'])}}</td>
+              <td>{{'%0.2f' | format(metric['latency'])}} &plusmn; {{'%0.2f' | format(metric['latency_std'])}}</td>
+              <td>{{'%0.2f' | format(metric['rel_latency'])}}</td>
+              <td>{{'%0.2f' | format(metric['total'])}}</td>
+              <td>{{'%d' | format(metric['count'])}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+  </div>
+{%- endblock %}
+
+{% block scripts %}
+{{super()}}
+  <script>
+    $('.clickable-row' ).click(function() {
+        j=$("#jamming").val();
+        s=$("#scenario").val();
+        r=$("#reference").val();
+        k_e=$("#coeff_energy").val();
+        k_l=$("#coeff_latency").val();
+        k_r=$("#coeff_rel").val();
+
+
+    window.open("/admin/honorable?jamming="+j+"&reference="+$(this).data("team")+"&scenario="+s,"_self");
+    window.open("/admin/honorable?jamming="+j+"&reference="+$(this).data("team")+"&scenario="+s+"&coeff_energy="+k_e+"+&coeff_latency="+k_l+"&coeff_rel="+k_r,"_self");
+    });
+
+    $("#jamming").on('change', update);
+    $("#scenario").on('change', update);
+    $("#reference").on('change', update);
+    $("#coeff_energy").on('change', update);
+    $("#coeff_latency").on('change', update);
+    $("#coeff_rel").on('change', update);
+
+    function update(){
+        j=$("#jamming").val();
+        s=$("#scenario").val();
+        r=$("#reference").val();
+        k_e=$("#coeff_energy").val();
+        k_l=$("#coeff_latency").val();
+        k_r=$("#coeff_rel").val();
+
+    window.open("/admin/honorable?jamming="+j+"&reference="+r+"&scenario="+s+"&coeff_energy="+k_e+"+&coeff_latency="+k_l+"&coeff_rel="+k_r,"_self");
+    }
+  </script>
+{% endblock %} 

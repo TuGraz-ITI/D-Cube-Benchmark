@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<testbedconfig>
+    <section name="testbedconfig" address="0x99000" endianness="little" bits="32">
+        <int bits="8"  offset="0x0">node_id</int>
+	<array name="pattern" count="8" offset="0x4" size="0x20">
+        <int bits="8"  offset="0x0">traffic_pattern</int>
+        <array name="sources" count="8" offset="0x1" size="0x1">
+            <int bits="8" offset="0x0">source_id</int>
+        </array>
+        <array name="sinks" count="8" offset="0x9" size="0x1">
+            <int bits="8" offset="0x0">sink_id</int>
+        </array>
+        <int bits="8"  offset="0x11">message_length</int>
+        <int bits="8"  offset="0x12">message_offsetH</int>
+        <int bits="8"  offset="0x13">message_offsetL</int>
+        <int bits="32"  offset="0x14">period</int>
+        <int bits="32"  offset="0x18">upper_bound</int>
+        <int bits="32"  offset="0x1C">lower_bound</int>
+	</array>
+    </section>
+</testbedconfig>

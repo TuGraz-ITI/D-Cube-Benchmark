@@ -1,0 +1,159 @@
+{# This simple template derives from ``base.html``. See ``base.html`` for
+   more information about template inheritance. #}
+{%- extends "base.html" %}
+
+{# Inside the ``content`` is where you should place most of your own stuff.
+   This will keep scripts at the page end and a navbar you add on later
+   intact. #}
+{% block content %}
+  <div class="container">
+    <div class="container">
+      <h1>Roles</h1>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Members</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {%- for role in roles %}
+              <tr>
+                <td>{{role.id}}</td>
+                <td>{{role.name}}</td>
+                <td>
+                  {%- for user in role.users %}
+                  {{user.username}}{% if not loop.last %}, {% endif %}
+                  {%- endfor %}
+                </td>
+                <td>
+                    <a class="btn btn-sm btn-danger" href="{{url_for("admin.delete_role",name=role.name)}}" role="button">  <span class="fas fa-times" aria-hidden="true"></span></a>
+                </td>
+              </tr>
+          {%- endfor %}
+        </tbody>
+    </table>
+
+    <div class="container">
+      <!-- Trigger the modal with a button -->
+      <div class="btn-group">
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#assignRole">Assign User to Role</button>
+        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#unassignRole">Remove User from Role</button>
+        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#createRole">Create Role</button>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- Modal -->
+      <div class="modal fade" id="assignRole" role="dialog">
+        <div class="modal-dialog">
+
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="col-12 text-center">Assign User to Role
+	      <button type="button" class="close" data-dismiss="modal">&times;</button></h1>
+            </div>
+            <div class="modal-body">
+                <form action="{{url_for("admin.assign_role_post")}}" method="post">
+                <div class="form-group required"><label class="control-label" for="user">User</label>
+                  <select class="form-control" id="user" name="username" required>
+                    {%- for user in users %}
+                    <option value="{{user.username}}">{{user.username}}</option>
+                    {%- endfor %}
+                  </select>
+                </div>
+
+                <div class="form-group required"><label class="control-label" for="role">Role</label>
+                  <select class="form-control" id="role" name="rolename" required>
+                    {%- for role in roles %}
+                    <option value="{{role.name}}">{{role.name}}</option>
+                    {%- endfor %}
+                  </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+              <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Assign">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- Modal -->
+      <div class="modal fade" id="unassignRole" role="dialog">
+        <div class="modal-dialog">
+
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="col-12 text-center">Remove User from Role
+	      <button type="button" class="close" data-dismiss="modal">&times;</button></h1>
+            </div>
+            <div class="modal-body">
+                <form action="{{url_for("admin.unassign_role_post")}}" method="post">
+                <div class="form-group required"><label class="control-label" for="user">User</label>
+                  <select class="form-control" id="user" name="username" required>
+                    {%- for user in users %}
+                    <option value="{{user.username}}">{{user.username}}</option>
+                    {%- endfor %}
+                  </select>
+                </div>
+
+                <div class="form-group required"><label class="control-label" for="role">Role</label>
+                  <select class="form-control" id="role" name="rolename" required>
+                    {%- for role in roles %}
+                    <option value="{{role.name}}">{{role.name}}</option>
+                    {%- endfor %}
+                  </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+              <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Remove">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <!-- Modal -->
+      <div class="modal fade" id="createRole" role="dialog">
+        <div class="modal-dialog">
+
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="col-12 text-center">Create Role
+	      <button type="button" class="close" data-dismiss="modal">&times;</button></h1>
+            </div>
+            <div class="modal-body">
+              <form action="{{url_for("admin.create_role_post")}}" method="post">
+                <div class="form-role required"><label class="control-label" for="name" maxlength="255">Name</label>
+                  <input class="form-control" id="name" name="name" required type="text" value="">
+                </div>
+            </div>
+            <div class="modal-footer">
+              <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Create">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    </div>
+   </div>
+{%- endblock %}

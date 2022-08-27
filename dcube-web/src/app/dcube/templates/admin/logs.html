@@ -1,0 +1,45 @@
+{# This simple template derives from ``base.html``. See ``base.html`` for
+   more information about template inheritance. #}
+{%- extends "base.html" %}
+
+{# Inside the ``content`` is where you should place most of your own stuff.
+   This will keep scripts at the page end and a navbar you add on later
+   intact. #}
+{% block content %}
+  <div class="container">
+    <div class="container">
+      <h1>Logs</h1>
+      <table id="refreshing" class="table" style="table-layout:fixed;">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th style="min-width:100px;">Job</th>
+            <th class="mw-75 w-75">Text</th>
+          </tr>
+        </thead>
+        <tbody>
+          {%- for log in logs %}
+              <tr>
+                <td>{{log.job.id}}</td>
+                <td class="text-break">{{log.job.name}}</td>
+                <td><pre class="bg-light rounded border border-secondary p-2">{{log.text}}</pre></td>
+              </tr>
+          {%- endfor %}
+        </tbody>
+    </table>
+    </div>
+   </div>
+{%- endblock %}
+
+{% block scripts %}
+{{super()}}
+<script>
+$( document ).ready(function() {
+setInterval(function()
+{
+    $('#refreshing').load(document.URL +  ' #refreshing>*','');
+}, 1000);
+
+});
+</script>
+{%- endblock %}

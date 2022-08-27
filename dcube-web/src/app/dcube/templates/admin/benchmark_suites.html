@@ -1,0 +1,564 @@
+{# This simple template derives from ``base.html``. See ``base.html`` for
+more information about template inheritance. #}
+{%- extends "base.html" %}
+
+{% block head %}
+<link href="{{url_for("static",filename="bootstrap4-toggle/css/bootstrap4-toggle.min.css")}}" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="{{url_for("static",filename="vis-network/vis-network.min.css")}}">
+
+<style type="text/css">
+#graph {
+  height: 400px;
+}
+</style>
+
+{{super()}}
+{%- endblock %}
+
+{# Inside the ``content`` is where you should place most of your own stuff.
+This will keep scripts at the page end and a navbar you add on later
+intact. #}
+{% block content %}
+<div class="container">
+  <div class="container">
+    <h1>Benchmark Suite Configuration</h1>
+
+    <div class="row is-table-row">
+      <div class="col-sm-5">
+	<div class="card">
+	  <div class="input-group card-header">
+	    <div class="input-group-prepend">
+	      <span class="input-group-text" id="benchmark_suite-addon">Benchmark Suite</span>
+	    </div>
+	    <select class="form-control" id="benchmark_suite" name="benchmark_suite" aria-describedby="benchmark_suite-addon">
+	      {% for bs in benchmark_suites %}
+	      <option {% if benchmark_suite and benchmark_suite.id ==bs.id %}selected="selected"{% endif %}value="{{bs.id}}">{{bs.name}}</option>
+	      {% endfor%}
+	    </select>
+	    <span class="input-group-append">
+		    {%if benchmark_suite %}
+		    <a class="btn btn-primary" href="#" role="button" data-benchmark_suite-id="{{benchmark_suite.id}}" data-benchmark_suite-name="{{benchmark_suite.name}}" data-benchmark_suite-short="{{benchmark_suite.short}}" data-benchmark_suite-node="{{benchmark_suite.node}}" data-benchmark_suite-energy="{{benchmark_suite.energy}}" data-benchmark_suite-latency="{{benchmark_suite.latency}}" data-benchmark_suite-reliability="{{benchmark_suite.reliability}}" data-toggle="modal" data-target="#editBenchmarkSuite"><span class="fas fa-edit" aria-hidden="true"></span></a>
+		    {%else%}
+		    <a class="btn btn-primary" href="#" disable role="button"><span class="fas fa-edit" aria-hidden="true"></span></a>
+		    {%endif%}
+
+	      <a class="btn btn-success" href="{{url_for("admin.admin_create_benchmark_suite")}}" role="button"><span class="fas fa-plus" aria-hidden="true"></span></a>
+	      <a class="btn btn-danger" href="{%if benchmark_suite%}{{url_for("admin.admin_delete_benchmark_suite",id=benchmark_suite.id)}}{%else%}#{%endif%}" role="button">  <span class="fas fa-times" aria-hidden="true"></span></a>
+	    </span>
+
+	  </div>
+	  <div class="card-body">
+	    <table class="table">    
+	      <thead>
+		<tr>
+		  <th>Attribute</th>
+		  <th>Value</th>
+		</tr>
+	      </thead>
+	      <tbody>
+		<tr>
+		  <td>ID</td>
+		  <td>{{benchmark_suite.id}}
+		</tr>
+		<tr>
+		  <td>Short</td>
+		  <td>{{benchmark_suite.short}}</td>
+		</tr>
+		<tr>
+		  <td>Node</td>
+		  <td>{% if benchmark_suite and  benchmark_suite.node %}{{benchmark_suite.node.name}}{%else%}-{%endif%}</td>
+		</tr>
+		<tr>
+		  <td>Has Energy Metric</td>
+		  <td>{{benchmark_suite.energy|checkboxify|safe}}</td>
+		</tr>
+		<tr>
+		  <td>Has Latency Metric</td>
+		  <td>{{benchmark_suite.latency|checkboxify|safe}}</td>
+		</tr>
+		<tr>
+		  <td>Has Reliablity Metric</td>
+		  <td>{{benchmark_suite.reliability|checkboxify|safe}}</td>
+		</tr>
+	    </table>
+	  </div>
+	</div>
+
+	<div class="card">
+	  <div class="input-group card-header">
+	    <div class="input-group-prepend">
+	      <span class="input-group-text" id="composition-addon">Node Placement</span>
+	    </div>
+	    <select class="form-control" id="composition" name="composition" aria-describedby="composition-addon">
+	      {% for c in compositions %}
+	      <option {% if composition.id ==c.id %}selected="selected"{% endif %}value="{{c.id}}">{{c.name}}</option>
+	      {% endfor%}
+	    </select>
+	    <span class="input-group-append">
+	      <a class="btn btn-primary" href="#" role="button" data-layout-id="{{composition.id}}" data-layout-name="{{composition.name}}" data-layout-short="{{composition.short}}" data-toggle="modal" data-target="#editLayout"><span class="fas fa-edit" aria-hidden="true"></span></a>
+
+	      <a class="btn btn-success" href="{%if benchmark_suite%}{{url_for("admin.admin_create_layout", benchmark_suite_id=benchmark_suite.id)}}{%else%}#{%endif%}" role="button"><span class="fas fa-plus" aria-hidden="true"></span></a>
+	      <a class="btn btn-danger" href="{%if benchmark_suite and composition%}{{url_for("admin.admin_delete_layout", id=composition.id)}}{%else%}#{%endif%}" role="button">  <span class="fas fa-times" aria-hidden="true"></span></a>
+	    </span>
+
+	  </div>
+	  <div class="card-body">
+	    <table class="table">    
+	      <thead>
+		<tr>
+		  <th>Attribute</th>
+		  <th>Value</th>
+		</tr>
+	      </thead>
+	      <tbody>
+		<tr>
+		  <td>ID</td>
+		  <td>{{composition.id}}
+		</tr>
+		<tr>
+		  <td>Short</td>
+		  <td>{{composition.short}}</td>
+		</tr>
+	    </table>
+	  </div>
+	</div>
+
+	<div class="card">
+	  <div class="card-header">
+	    <div class="input-group">
+	      <div class="input-group-prepend">
+		<span class="input-group-text" id="pi-addon">Node</span>
+	      </div>
+	      <select class="form-control" id="pi" name="pi" aria-describedby="pi-addon">
+		{% for p in pis %}
+		<option {% if pi.id ==p.id %}selected="selected"{% endif %}value="{{p.id}}">{{p.rpi}}</option>
+		{% endfor%}
+	      </select>
+	      <span class="input-group-append">
+		<a class="btn btn-primary" href="#" role="button" data-node-id="{{pi.id}}" data-node-rpi="{{pi.rpi}}" data-node-group="{{pi.group}}" data-node-role="{{pi.role}}"data-node-command="{{pi.command}}"  data-toggle="modal" data-target="#editNode"><span class="fas fa-edit" aria-hidden="true"></span></a>
+
+		<a class="btn btn-success" href="{%if composition%}{{url_for("admin.admin_create_pi",composition_id=composition.id)}}{%else%}#{%endif%}" role="button"><span class="fas fa-plus" aria-hidden="true"></span></a>
+		<a class="btn btn-danger" href="{%if pi%}{{url_for("admin.admin_delete_pi",id=pi.id)}}{%else%}#{%endif%}" role="button">  <span class="fas fa-times" aria-hidden="true"></span></a>
+	      </span>
+
+	    </div>
+	  </div>
+	  <div class="card-body">
+	    <table class="table">    
+	      <thead>
+		<tr>
+		  <th>Attribute</th>
+		  <th>Value</th>
+		</tr>
+	      </thead>
+	      <tbody>
+		<tr>
+		  <td>ID</td>
+		  <td>{{pi.id}}
+		</tr>
+		<tr>
+		  <td>Raspberry Pi</td>
+		  <td>{{pi.rpi}}</td>
+		</tr>
+		<tr>
+		  <td>Group</td>
+		  <td>{{pi.group}}</td>
+		</tr>
+		<tr>
+		  <td>Role</td>
+		  <td>{{pi.role}}</td>
+		</tr>
+		<tr>
+		  <td>Command</td>
+		  <td><span class="text-break">{{pi.command}}</span></td>
+		</tr>
+	    </table>
+	  </div>
+	</div>
+
+	<div class="card">
+	  <div class="card-header">
+	    <div class="input-group">
+	      <div class="input-group-prepend">
+		<span class="input-group-text" id="benchmark_config-addon">Config</span>
+	      </div>
+	      <select class="form-control" id="benchmark_config" name="benchmark_config" aria-describedby="benchmark_config-addon">
+		{% for b in benchmark_configs %}
+		<option {% if benchmark_config.id ==b.id %}selected="selected"{% endif %}value="{{b.id}}">{{b.key}}</option>
+		{% endfor%}
+	      </select>
+	      <span class="input-group-append">
+		<a class="btn btn-primary" href="#" role="button" data-config-id="{{benchmark_config.id}}" data-config-key="{{benchmark_config.key}}" data-config-value="{{benchmark_config.value}}"  data-toggle="modal" data-target="#editConfig"><span class="fas fa-edit" aria-hidden="true"></span></a>
+
+		<a class="btn btn-success" href="{%if composition%}{{url_for("admin.admin_create_benchmark_config",benchmark_suite_id=benchmark_suite.id)}}{%else%}#{%endif%}" role="button"><span class="fas fa-plus" aria-hidden="true"></span></a>
+		<a class="btn btn-danger" href="{%if pi%}{{url_for("admin.admin_delete_pi",id=pi.id)}}{%else%}#{%endif%}" role="button">  <span class="fas fa-times" aria-hidden="true"></span></a>
+	      </span>
+
+	    </div>
+	  </div>
+	  <div class="card-body">
+	    <table class="table">    
+	      <thead>
+		<tr>
+		  <th>Attribute</th>
+		  <th>Value</th>
+		</tr>
+	      </thead>
+	      <tbody>
+		<tr>
+		  <td>ID</td>
+		  <td>{{benchmark_config.id}}
+		</tr>
+		<tr>
+		  <td>Key</td>
+		  <td>{{benchmark_config.key}}</td>
+		</tr>
+		<tr>
+		  <td>Value</td>
+		  <td>{{benchmark_config.value}}</td>
+		</tr>
+	    </table>
+	  </div>
+	</div>
+
+
+
+      </div>
+      <div class="col-sm-7">
+	<div class="card">
+	  <div class="card-header">
+	    <h4>Preview
+	    <button class="btn btn-secondary float-right" href="#" role="button" onclick="network.fit()"><span class="fas fa-search-minus" aria-hidden="true"></span></button></h4>
+	  </div>
+	  <div class="card-body">
+	    <div id="graph"></div>
+	  </div>
+	</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Trigger the modal with a button -->
+
+  <!-- Modal -->
+  <div class="modal fade" id="editLayout" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+	<form id="updateLayoutForm" action="update_layout" enctype="multipart/form-data" method="post">
+	  <div class="modal-header">
+	    <h1 class="col-12 text-center">Edit Layout
+	    <button type="button" class="close" data-dismiss="modal">&times;</button>
+	    </h1>
+	  </div>
+	  <div class="modal-body">
+	    <div class="form-group required"><label class="control-label" required for="name">Name</label>
+	      <input class="form-control" id="name" name="name" type="text" value="" maxlength="255">
+	    </div>
+	    <div class="form-group required"><label class="control-label" required for="short">Short Name</label>
+	      <input class="form-control" id="short" name="short" type="text" value="" maxlength="255"></input>
+	    </div>
+	  </div>
+	  <div class="modal-footer">
+	    <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Update">
+	    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+	  </div>
+	</form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Trigger the modal with a button -->
+
+  <!-- Modal -->
+  <div class="modal fade" id="editConfig" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+	<form id="updateConfigForm" action="update_config" enctype="multipart/form-data" method="post">
+	  <div class="modal-header">
+	    <h1 class="col-12 text-center">Edit Benchmark Config
+	    <button type="button" class="close" data-dismiss="modal">&times;</button>
+	    </h1>
+	  </div>
+	  <div class="modal-body">
+	    <div class="form-group required"><label class="control-label" required for="name">Key</label>
+	      <input class="form-control" id="key" name="key" type="text" value="" maxlength="255">
+	    </div>
+	    <div class="form-group required"><label class="control-label" required for="short">Value</label>
+	      <input class="form-control" id="value" name="value" type="text" value="" maxlength="255"></input>
+	    </div>
+	  </div>
+	  <div class="modal-footer">
+	    <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Update">
+	    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+	  </div>
+	</form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="container">
+  <!-- Trigger the modal with a button -->
+
+  <!-- Modal -->
+  <div class="modal fade" id="editBenchmarkSuite" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+	<form id="updateBenchmarkSuiteForm" action="update_benchmark_suite" enctype="multipart/form-data" method="post">
+	  <div class="modal-header">
+	    <h1 class="col-12 text-center">Edit Benchmark Suite
+	    <button type="button" class="close" data-dismiss="modal">&times;</button>
+	    </h1>
+	  </div>
+	  <div class="modal-body">
+	    <div class="form-group required"><label class="control-label" required for="name">Name</label>
+	      <input class="form-control" id="name" name="name" type="text" value="" maxlength="255">
+	    </div>
+	    <div class="form-group required"><label class="control-label" required for="short">Short Name</label>
+	      <input class="form-control" id="short" name="short" type="text" value="" maxlength="255"></input>
+	    </div>
+	    <div class="form-group required"><label class="control-label" required for="node">Node</label>
+	      <select class="form-control" id="node" name="node" aria-describedby="node-addon">
+	        {% for n in nodes %}
+	        <option {% if (benchmark_suite and benchmark_suite.node)  and (benchmark_suite.node.id ==n.id) %}selected="selected"{% endif %}value="{{n.id}}">{{n.name}}</option>
+	        {% endfor%}
+	      </select>
+	    </div>
+            <div class="form-group">
+              <label><input type="checkbox" id="energy" name="energy" checked data-toggle="toggle" data-size="small">
+                Has Energy Metric
+              </label>
+            </div>
+            <div class="form-group">
+              <label><input type="checkbox" id="latency" name="latency" checked data-toggle="toggle" data-size="small">
+                Has Latency Metric
+              </label>
+            </div>
+            <div class="form-group">
+              <label><input type="checkbox" id="reliability" name="reliability" checked data-toggle="toggle" data-size="small">
+                Has Reliability Metric
+              </label>
+            </div>
+	  </div>
+	  <div class="modal-footer">
+	    <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Update">
+	    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+	  </div>
+	</form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Trigger the modal with a button -->
+
+  <!-- Modal -->
+  <div class="modal fade" id="editNode" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+	<form id="updateNodeForm" action="update_node" enctype="multipart/form-data" method="post">
+	  <div class="modal-header">
+	    <h1 class="col-12 text-center">Edit Node
+	    <button type="button" class="close" data-dismiss="modal">&times;</button>
+	    </h1>
+	  </div>
+	  <div class="modal-body">
+	    <div class="form-group required"><label class="control-label" required for="rpi">Raspberry Pi</label>
+	      <input class="form-control" id="rpi" name="rpi" type="text" value="" maxlength="255">
+	    </div>
+	    <div class="form-group required"><label class="control-label" required for="group">Group</label>
+	      <input class="form-control" id="group" name="group" type="text" value="" maxlength="255"></input>
+	    </div>
+	    <div class="form-group required"><label class="control-label" for="role">Role</label>
+	      <select class="form-control" id="role" name="role">
+		{% for i in ("None", "source", "sink") %}
+		<option {% if i=="None" %}selected="selected"{% endif %}value={{i}}>{{i}}</option>
+		{% endfor%}
+	      </select>
+	    </div>
+
+	    <div class="form-group required"><label class="control-label" required for="command">Command</label>
+	      <input class="form-control" id="command" name="command" type="text" value="" maxlength="255"></input>
+	    </div>
+	  </div>
+	  <div class="modal-footer">
+	    <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Update">
+	    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+	  </div>
+	</form>
+      </div>
+    </div>
+  </div>
+</div>
+{%- endblock %}
+
+{% block scripts %}
+{{super()}}
+
+<script src="{{url_for("static",filename="bootstrap4-toggle/js/bootstrap4-toggle.min.js")}}"></script>
+<script src="{{url_for("static",filename="vis-network/vis-network.min.js")}}"></script>
+
+<script>
+
+  {%if (not layout_dict==None)  %}
+var nodes = new vis.DataSet({{layout_dict['nodes']|tojson}});
+//var nodes = new vis.DataSet([{}]);
+var edges = new vis.DataSet({{layout_dict['edges']|tojson}});
+//var edges = new vis.DataSet([{}]);
+var container = document.getElementById('graph');
+var data = { nodes: nodes, edges:edges };
+var layoutMethod = "directed";
+
+
+var options={
+  layout: {
+    randomSeed: 1
+  },
+  edges: {
+    smooth: true,
+    arrows: {to : true }
+  }
+};
+var network=new vis.Network(container,data,options);
+
+//var selection = new vis.DataSet( { id:"{{pi.rpi}}" } )
+{%if not pi==None %}
+network.setSelection({nodes:["{{pi.id}}"]});
+{%endif%}
+{%endif%}
+
+network.on("selectNode",function (params) {
+  cat=$("#benchmark_suite").val();
+  comp=$("#composition").val();
+  pi=params.nodes[0];
+  window.open("{{url_for("admin.admin_benchmark_suite")}}?benchmark_suite="+cat+"&composition="+comp+"&pi="+pi,"_self");
+});
+
+$("#benchmark_suite").on('change', update_benchmark_suite);
+$("#composition").on('change', update_composition);
+$("#pi").on('change', update_pi);
+$("#benchmark_config").on('change', update_benchmark_config);
+
+function update_benchmark_config(){
+  cat=$("#benchmark_suite").val();
+  config=$("#benchmark_config").val();
+  window.open("{{url_for("admin.admin_benchmark_suite")}}?benchmark_suite="+cat+"&benchmark_config="+config,"_self");
+}
+
+function update_pi(){
+  cat=$("#benchmark_suite").val();
+  comp=$("#composition").val();
+  pi=$("#pi").val();
+  window.open("{{url_for("admin.admin_benchmark_suite")}}?benchmark_suite="+cat+"&composition="+comp+"&pi="+pi,"_self");
+}
+
+function update_composition(){
+  cat=$("#benchmark_suite").val();
+  comp=$("#composition").val();
+  window.open("{{url_for("admin.admin_benchmark_suite")}}?benchmark_suite="+cat+"&composition="+comp,"_self");
+}
+
+function update_benchmark_suite(){
+  cat=$("#benchmark_suite").val();
+  window.open("{{url_for("admin.admin_benchmark_suite")}}?benchmark_suite="+cat,"_self");
+}
+
+$('#editNode').on('show.bs.modal', function(e) {
+
+  //get data-id attribute of the clicked element
+  var id = $(e.relatedTarget).data('node-id');
+  var rpi = $(e.relatedTarget).data('node-rpi');
+  var group = $(e.relatedTarget).data('node-group');
+  var role = $(e.relatedTarget).data('node-role');
+  var command = $(e.relatedTarget).data('node-command');
+
+  $('#updateNodeForm').attr("action","{{url_for("admin.admin_update_pi")}}"+id);
+  $(e.currentTarget).find('input[name="rpi"]').val(rpi);
+  $(e.currentTarget).find('input[name="group"]').val(group);
+  //$(e.currentTarget).find('select[name="role"]').val(role)
+  $('#role').val(role);
+  $(e.currentTarget).find('input[name="command"]').val(command);
+
+});
+
+$('#editConfig').on('show.bs.modal', function(e) {
+
+  //get data-id attribute of the clicked element
+  var id = $(e.relatedTarget).data('config-id');
+  var key = $(e.relatedTarget).data('config-key');
+  var value = $(e.relatedTarget).data('config-value');
+
+  $('#updateConfigForm').attr("action","{{url_for("admin.admin_update_benchmark_config")}}"+id);
+  $(e.currentTarget).find('input[name="key"]').val(key);
+  $(e.currentTarget).find('input[name="value"]').val(value);
+});
+
+$('#editLayout').on('show.bs.modal', function(e) {
+
+  //get data-id attribute of the clicked element
+  var id = $(e.relatedTarget).data('layout-id');
+  var name = $(e.relatedTarget).data('layout-name');
+  var short = $(e.relatedTarget).data('layout-short');
+
+  $('#updateLayoutForm').attr("action","{{url_for("admin.admin_update_layout")}}"+id);
+  $(e.currentTarget).find('input[name="name"]').val(name);
+  $(e.currentTarget).find('input[name="short"]').val(short);
+
+});
+
+$('#editBenchmarkSuite').on('show.bs.modal', function(e) {
+
+  //get data-id attribute of the clicked element
+  var id = $(e.relatedTarget).data('benchmark_suite-id');
+  var name = $(e.relatedTarget).data('benchmark_suite-name');
+  var short = $(e.relatedTarget).data('benchmark_suite-short');
+  var node = $(e.relatedTarget).data('benchmark_suite-node');
+
+  var h_e = $(e.relatedTarget).data('benchmark_suite-energy');
+  var h_l = $(e.relatedTarget).data('benchmark_suite-latency');
+  var h_r = $(e.relatedTarget).data('benchmark_suite-reliability');
+
+  $('#updateBenchmarkSuiteForm').attr("action","{{url_for("admin.admin_update_benchmark_suite")}}"+id);
+  $(e.currentTarget).find('input[name="name"]').val(name);
+  $(e.currentTarget).find('input[name="short"]').val(short);
+  $(e.currentTarget).find('input[name="node"]').val(node);
+
+  if(h_e == "True")
+    $(e.currentTarget).find('input[name="energy"]').bootstrapToggle('on');
+  else
+    $(e.currentTarget).find('input[name="energy"]').bootstrapToggle('off');
+
+  if(h_l == "True")
+    $(e.currentTarget).find('input[name="latency"]').bootstrapToggle('on');
+  else
+    $(e.currentTarget).find('input[name="latency"]').bootstrapToggle('off');
+
+  if(h_r == "True")
+    $(e.currentTarget).find('input[name="reliability"]').bootstrapToggle('on');
+  else
+    $(e.currentTarget).find('input[name="reliability"]').bootstrapToggle('off');
+
+
+});
+
+
+
+</script>
+
+{%- endblock %}

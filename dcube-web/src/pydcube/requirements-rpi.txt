@@ -1,0 +1,7 @@
+enum34==1.1.6
+pika==1.1.0
+pyelftools==0.25
+pysystemd==1.0.3
+pyudev==0.21.0
+pyusb==1.0.2
+requests==2.22.0

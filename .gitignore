@@ -1,0 +1,7 @@
+storage/mysql/*
+storage/rabbitmq/*
+storage/web/*
+storage/influxdb/*
+storage/grafana/*
+storage/wiki/*
+storage/wiki-mysql/*

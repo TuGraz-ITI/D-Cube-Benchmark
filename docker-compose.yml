@@ -1,0 +1,70 @@
+version: '3.9'
+services:
+        web:
+                hostname: dcube-web
+                restart: always 
+                container_name: dcube-web
+                build: 
+                        context: dcube-web/.
+                depends_on:
+                        - gui
+                        - db
+                        - broker
+                ports: 
+                        - 80:80
+                volumes: 
+                        - ./storage/web:/storage
+
+        db:
+                hostname: mysql
+                restart: always 
+                container_name: mysql
+                image: mysql 
+                volumes: 
+                        - ./storage/mysql:/var/lib/mysql
+                environment:
+                        - MYSQL_ROOT_PASSWORD=4AHVDpFx
+                        - MYSQL_DATABASE=dcube
+                        - MYSQL_USER=dcube
+                        - MYSQL_PASSWORD=YzqmVQt9
+
+        tsdb:
+                hostname: influx
+                restart: always 
+                container_name: influx
+                image: influxdb:1.8
+                volumes: 
+                        - ./storage/influxdb/etc/influxdb.conf:/etc/influxdb/influxdb.conf:ro
+                        - ./storage/influxdb/var:/var/lib/influxdb
+                ports:
+                        - 8089:8089/udp
+                        - 8086:8086
+
+        broker:
+                hostname: rabbitmq
+                restart: always 
+                container_name: rabbitmq
+                image: rabbitmq:management
+                security_opt:
+                        - seccomp:unconfined
+                ports:
+                        - 5672:5672
+                environment:
+                        - RABBITMQ_DEFAULT_USER=dcube
+                        - RABBITMQ_DEFAULT_PASS=GWcq43x2
+                volumes:
+                        - ./storage/rabbitmq:/var/lib/rabbitmq
+
+        gui:
+                hostname: grafana
+                restart: always 
+                container_name: grafana
+                image: grafana/grafana
+                volumes:
+                        - ./storage/grafana/var:/var/lib/grafana
+                        - ./storage/grafana/etc/provisioning:/etc/grafana/provisioning
+                environment:
+                        - GF_SECURITY_ADMIN_PASSWORD=NFN4DMxV
+                        - GF_AUTH_ANONYMOUS_ENABLED=true
+                        - GF_USERS_DEFAULT_THEME=light
+                        - GF_SERVER_ROOT_URL=http://localhost/grafana/

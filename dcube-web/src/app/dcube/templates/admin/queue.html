@@ -1,0 +1,222 @@
+{# This simple template derives from ``base.html``. See ``base.html`` for
+   more information about template inheritance. #}
+{%- extends "base.html" %}
+
+{% from "bootstrap/pagination.html" import render_pagination %}
+
+{% block styles %}
+{{super()}}
+<link href="{{url_for("static",filename="bootstrap4-toggle/css/bootstrap4-toggle.min.css")}}" rel="stylesheet">
+{% endblock %}
+
+{# Inside the ``content`` is where you should place most of your own stuff.
+   This will keep scripts at the page end and a navbar you add on later
+   intact. #}
+{% block content %}
+  <div class="container">
+    <div class="container">
+      <h1>Jobs</h1>
+      {{render_pagination(jobs)}}
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th class="d-none d-md-table-cell">Name</th>
+            <th>Group</th>
+            <th class="d-none d-lg-table-cell">Description</th>
+            <th class="d-none d-sm-table-cell">Scheduled</th>
+            <th class="d-none d-md-table-cell">Duration</th>
+            <th class="d-none d-xl-table-cell">Node</th>
+            <th>Flags</th>
+            <th class="d-none d-xl-table-cell">File</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {%- for job in jobs.items %}
+              <tr>
+                <td>{{job.id}}</td>
+                <td class="d-none d-md-table-cell">{{job.name}}</td>
+                <td>{{job.group.name}}</td>
+                <td class="d-none d-lg-table-cell" style="overflow:hidden;max-width:200px">{{job.description}}</td>
+                <td class="d-none d-sm-table-cell">{{job.scheduled|datetimefilter}}</td>
+                <td class="d-none d-md-table-cell">{{job.duration}}</td>
+                <td class="d-none d-xl-table-cell">{{job.node}}</td>
+	        <td class="flag-group">
+                  {% if job.running %}
+               	  <span class="fas fa-play" aria-hidden="true" title="job running"></span>
+               	  {% endif %}
+               	  {% if job.failed %}
+               	  <span class="fas fa-times" aria-hidden="true" title="job failed"></span>
+               	  {% endif %}
+               	  {% if job.finished %}
+               	  <span class="fas fa-check" aria-hidden="true" title="job finished"></span>
+               	  {% endif %}
+                  {% if job.evaluated %}
+                  <span class="fas fa-search" aria-hidden="true" title="evaluation available"></span>
+                  {% endif %}
+               	  {% if job.priority %}
+               	  <span class="fas fa-star" aria-hidden="true" title="high priority job"></span>
+               	  {% endif %}
+               	  {% if job.reboot %}
+               	  <span class="fas fa-redo" aria-hidden="true" title="rebooting"></span>
+               	  {% endif %}
+               	  {% if job.logs %}
+               	  <span class="fas fa-align-justify" aria-hidden="true" title="logs enabled"></span>
+               	  {% endif %}
+               	  {% if job.patch %}
+               	  <span class="fas fa-cog" aria-hidden="true" title="patching enabled"></span>
+               	  {% endif %}
+               	  {% if job.cpatch %}
+               	  <span class="fas fa-users-cog" aria-hidden="true" title="custom patching enabled"></span>
+               	  {% endif %}
+               	  {% if job.jamming_composition_id > 1%}
+               	  <span class="fas fa-bolt" aria-hidden="true" title="jamming enabled"></span><sub>{{job.jamming_composition.short}}</sub>
+               	  {% endif %}
+                </td>
+                <td class="d-none d-xl-table-cell" style="overflow:hidden;max-width:200px">{{job.firmware.filename}}</td>
+                <td>
+                  <div class="btn-group float-left">
+			  <a class="btn btn-sm btn-danger" href="{{url_for("admin.admin_delete_job",id=job.id)}}" role="button">  <span class="fas fa-times" aria-hidden="true"></span></a>
+                  <a class="btn btn-sm btn-primary" href="#" role="button" data-job-finished="{{job.finished}}" data-job-evaluated="{{job.evaluated}}" data-job-priority="{{job.priority}}" data-job-id="{{job.id}}"data-job-name="{{job.name}}" data-job-description="{{job.description}}" data-job-failed="{{job.failed}}" data-job-running="{{job.running}}" data-job-logs="{{job.logs}}" data-toggle="modal" data-target="#editJob"><span class="fas fa-edit" aria-hidden="true"></span></a>
+                  {% if job.logs and job.finished and not job.failed%}
+		  <a class="btn btn-sm btn-secondary" href="{{url_for("admin.download_job_logs",id=job.id)}}" role="button" title="download serial logs"><span class="fas fa-align-justify" aria-hidden="true"></span></a>
+                  {% endif %}
+                  {% if job.failed %}
+		  <a class="btn btn-sm btn-success" href="{{url_for("admin.admin_rerun_job",id=job.id)}}" role="button" 
+                    title="rerun job"><span class="fas fa-redo" aria-hidden="true"></span></a> 
+                  {% endif %}
+                  </div>
+                </td>
+              </tr>
+          {%- endfor %}
+        </tbody>
+    </table>
+    </div>
+
+    <div class="container">
+      <!-- Trigger the modal with a button -->
+
+      <!-- Modal -->
+      <div class="modal fade" id="editJob" role="dialog">
+        <div class="modal-dialog">
+
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="col-12 text-center">Edit Job
+	      <button type="button" class="close" data-dismiss="modal">&times;</button></h1>
+            </div>
+            <div class="modal-body">
+              <form id="updateForm" action="update_job" enctype="multipart/form-data" method="post">
+                <div class="form-group required"><label class="control-label" for="name">Name</label>
+                  <input class="form-control" id="name" name="name" required type="text" value="" maxlength="255">
+                </div>
+                <div class="form-group required"><label class="control-label" for="description">Description</label>
+                  <textarea class="form-control" id="description" name="description" type="text" value="" maxlength="255"></textarea>
+                </div>
+                <div class="form-group">
+                  <label><input type="checkbox" id="logs" name="logs" checked data-toggle="toggle" data-size="small">
+                    Logs
+                  </label>
+                </div>
+                <div class="form-group">
+                  <label><input type="checkbox" id="evaluated" name="evaluated" checked data-toggle="toggle" data-size="small">
+                    Job is evaluated
+                  </label>
+                </div>
+                <div class="form-group">
+                  <label><input type="checkbox" id="failed" name="failed" checked data-toggle="toggle" data-size="small">
+                    Job has failed
+                  </label>
+                </div>
+                <div class="form-group">
+                  <label><input type="checkbox" id="running" name="running" checked data-toggle="toggle" data-size="small">
+                    Job is running
+                  </label>
+                </div>
+                <div class="form-group">
+                  <label><input type="checkbox" id="finished" name="finished"  checked data-toggle="toggle" data-size="small">
+                    Job is finished
+                  </label>
+                </div>
+                <div class="form-group">
+                  <label><input type="checkbox" id="priority" name="priority"  checked data-toggle="toggle" data-size="small">
+                    High priority
+                  </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+              <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Update">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    </div>
+
+   </div>
+{%- endblock %}
+
+
+{% block scripts %}
+{{super()}}
+<script src="{{url_for("static",filename="bootstrap4-toggle/js/bootstrap4-toggle.min.js")}}"></script>
+<script>
+$('#editJob').on('show.bs.modal', function(e) {
+
+    //get data-id attribute of the clicked element
+    var id = $(e.relatedTarget).data('job-id');
+    var name = $(e.relatedTarget).data('job-name');
+    var description = $(e.relatedTarget).data('job-description');
+    var logs = $(e.relatedTarget).data('job-logs');
+    var failed = $(e.relatedTarget).data('job-failed');
+    var finished = $(e.relatedTarget).data('job-finished');
+    var running = $(e.relatedTarget).data('job-running');
+    var priority = $(e.relatedTarget).data('job-priority');
+    var evaluated = $(e.relatedTarget).data('job-evaluated');
+
+
+    $('#updateForm').attr("action","update_job/"+id);
+    $(e.currentTarget).find('textarea[name="description"]').val(description);
+    $(e.currentTarget).find('input[name="name"]').val(name);
+
+    if(logs == "False")
+        $(e.currentTarget).find('input[name="logs"]').bootstrapToggle('off');
+    else if(logs == "True")
+        $(e.currentTarget).find('input[name="logs"]').bootstrapToggle('on');
+
+    if(failed == "False")
+        $(e.currentTarget).find('input[name="failed"]').bootstrapToggle('off');
+    else if(failed == "True")
+        $(e.currentTarget).find('input[name="failed"]').bootstrapToggle('on');
+
+    if(running == "False")
+        $(e.currentTarget).find('input[name="running"]').bootstrapToggle('off');
+    else if(running == "True")
+        $(e.currentTarget).find('input[name="running"]').bootstrapToggle('on');
+
+    if(finished == "False")
+        $(e.currentTarget).find('input[name="finished"]').bootstrapToggle('off');
+    else if(finished == "True")
+        $(e.currentTarget).find('input[name="finished"]').bootstrapToggle('on');
+
+    if(priority == "False")
+        $(e.currentTarget).find('input[name="priority"]').bootstrapToggle('off');
+    else if(priority == "True")
+        $(e.currentTarget).find('input[name="priority"]').bootstrapToggle('on');
+
+    if(evaluated == "False")
+        $(e.currentTarget).find('input[name="evaluated"]').bootstrapToggle('off');
+    else if(evaluated == "True")
+        $(e.currentTarget).find('input[name="evaluated"]').bootstrapToggle('on');
+
+});
+
+</script>
+{%- endblock %}

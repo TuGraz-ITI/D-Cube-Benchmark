@@ -1,0 +1,41 @@
+{# This simple template derives from ``base.html``. See ``base.html`` for
+   more information about template inheritance. #}
+{%- extends "base.html" %}
+
+{# Inside the ``content`` is where you should place most of your own stuff.
+   This will keep scripts at the page end and a navbar you add on later
+   intact. #}
+{% block content %}
+  <div class="container">
+      <div class="row">
+      <h1 class="col-sm-6"><span class="d-inline-block d-sm-none d-md-inline-block">Testbed </span> Statistics</h1>
+      <div class="col-sm-6">
+      <div class="btn-group float-right">
+        <a href="#" class="btn btn-lg btn-primary disabled">~{{total_usage}}</a>
+      </div>
+      </div>
+      </div>
+      </div>
+  <div class="container mt-2">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Group</th>
+            <th>Number of jobs</th>
+            <th>Total time on testbed</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for group in groups %}
+	        {% if group.count > 0 %}
+              <tr>
+                <td>{{group.name}}</td>
+                <td>{{group.count}}</td>
+                <td>{{group.total_time}}</td>
+              </tr>
+          {% endif %}
+          {% endfor %}
+        </tbody>
+    </table>
+  </div>
+{%- endblock %}

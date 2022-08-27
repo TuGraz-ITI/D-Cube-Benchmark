@@ -1,0 +1,135 @@
+{# This simple template derives from ``base.html``. See ``base.html`` for
+   more information about template inheritance. #}
+{%- extends "base.html" %}
+
+{# Inside the ``content`` is where you should place most of your own stuff.
+   This will keep scripts at the page end and a navbar you add on later
+   intact. #}
+{% block head %}
+{{super()}}
+<style>
+html{
+  overflow-y: scroll;
+}
+</style>
+</style>
+{% endblock %} 
+
+{% block content %}
+  <div class="container" id="stats">
+    <div class="row">
+      <div class="col-sm-3">
+      <div class="input-group">
+          <label class="input-group-addon" id="jamming-addon">Jamming</label>
+        <select class="form-control" id="jamming" name="jamming" aria-describedby="jamming-addon">
+          {% for i in range(0,jamming_max+1) %}
+          <option {% if i==jamming|int %}selected="selected"{% endif %}value={{i}}>{% if i==0%}None{% else %}Level {% if i>3 %}D{{i-3}}{% else %}{{i}}{% endif %}{% endif%}</option>
+          {% endfor%}
+          <option {% if jamming=="super"%} selected="selected"{% endif %}value="super">AVGALL-NOINT</option>
+          <option {% if jamming=="any"%} selected="selected"{% endif %}value="any">AVG-ALL</option>
+        </select>
+      </div>
+      </div>
+      <div class="col-sm-3">
+      <div class="input-group">
+          <label class="input-group-addon" id="reference-addon">Reference</label>
+        <select class="form-control" id="reference" name="reference" aria-describedby="reference-addon">
+          {% for i in teams %}
+          <option {% if i==reference %}selected="selected"{% endif %}value={{i}}>{{i}}</option>
+          {% endfor%}
+        </select>
+      </div>
+      </div>
+      <div class="col-sm-2">
+      <div class="input-group">
+        <label class="input-group-addon" id="energy-addon">K_E</label>
+        <input type=number class="form-control" id="coeff_energy" name="coeff_energy" aria-describedby="energy-addon" value="{{coeff_energy}}">
+        </input>
+      </div>
+      </div>
+      <div class="col-sm-2">
+      <div class="input-group">
+        <label class="input-group-addon" id="latency-addon">K_L</label>
+        <input type=number class="form-control" id="coeff_latency" name="coeff_latency" aria-describedby="latency-addon" value="{{coeff_latency}}">
+        </input>
+      </div>
+      </div>
+      <div class="col-sm-2">
+      <div class="input-group">
+        <label class="input-group-addon" id="rel-addon">K_R</label>
+        <input type=number class="form-control" id="coeff_rel" name="coeff_rel" aria-describedby="rel-addon" value="{{coeff_rel}}">
+        </input>
+      </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <div class="container">
+    <h1>Super Secret Leaderboard</h1>
+    <h4>Best: Energy={{min_energy}} Realiability={{max_reliability}} Latency={{min_latency}} with Jamming={{jamming}}</h4>
+        <table class="table-hover table">
+          <thead>
+            <tr>
+              <th>T</th>
+              <th>abs E[J]</th>
+              <th>rel E[%]</th>
+              <th>abs R[%]</th>
+              <th>rel R[%]</th>
+              <th>abs L[ms]</th>
+              <th>rel L[%]</th>
+              <th>T[%]</th>
+              <th># of runs</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for index,metric in df.iterrows() %}
+            <tr class='clickable-row' data-team="{{metric['description']}}">
+              <td>{{metric['description']}}</td>
+              <td>{{'%0.2f' | format(metric['abs_energy_mean'])}} &plusmn; {{'%0.2f' | format(metric['abs_energy_std'])}}</td>
+              <td>{{'%0.2f' | format(metric['energy_mean']*100)}}</td>
+              <td>{{'%0.2f' | format(metric['abs_reliability_mean'])}} &plusmn; {{'%0.2f' | format(metric['abs_reliability_std'])}}</td>
+              <td>{{'%0.2f' | format(metric['reliability_mean']*100)}}</td>
+              <td>{{'%0.2f' | format(metric['abs_latency_mean'])}} &plusmn; {{'%0.2f' | format(metric['abs_latency_std'])}}</td>
+              <td>{{'%0.2f' | format(metric['latency_mean']*100)}}</td>
+              <td>{{'%0.2f' | format(metric['total_mean']*100)}}</td>
+              <td>{{'%d' | format(metric['count'])}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+  </div>
+{%- endblock %}
+
+{% block scripts %}
+{{super()}}
+  <script>
+    $('.clickable-row' ).click(function() {
+//      window.document.location = $(this).data("href");
+        j=$("#jamming").val();
+        k_e=$("#coeff_energy").val();
+        k_l=$("#coeff_latency").val();
+        k_r=$("#coeff_rel").val();
+    window.open("/admin/finals?jamming="+j+"&reference="+$(this).data("team")+"&coeff_energy="+k_e+"+&coeff_latency="+k_l+"&coeff_rel="+k_r,"_self");
+
+    });
+    //$( document ).ready(function() {
+    //  $("html").css("overflow-y","scroll");
+    //});
+    $("#jamming").on('change', update);
+    $("#reference").on('change', update);
+    $("#coeff_energy").on('change', update);
+    $("#coeff_latency").on('change', update);
+    $("#coeff_rel").on('change', update);
+
+    function update(){
+        j=$("#jamming").val();
+        r=$("#reference").val();
+        k_e=$("#coeff_energy").val();
+        k_l=$("#coeff_latency").val();
+        k_r=$("#coeff_rel").val();
+    window.open("/admin/finals?jamming="+j+"&reference="+r+"&coeff_energy="+k_e+"+&coeff_latency="+k_l+"&coeff_rel="+k_r,"_self");
+    }
+  </script>
+{% endblock %} 

@@ -1,0 +1,342 @@
+{# This simple template derives from ``base.html``. See ``base.html`` for
+more information about template inheritance. #}
+{%- extends "base.html" %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{{url_for("static",filename="vis-timeline/vis-timeline-graph2d.min.css")}}">
+
+<style type="text/css">
+#graph {
+    height: 100%;
+}
+
+    li.item {
+        list-style: none;
+        width: 100%;
+        color: #1A1A1A;
+        background-color: #D5DDF6;
+        border: 1px solid #97B0F8;
+        border-radius: 2px;
+        margin-bottom: 5px;
+        padding: 5px 12px;
+    }
+    li.item:before {
+        content: "≣";
+        font-family: Arial, sans-serif;
+        display: inline-block;
+        font-size: inherit;
+        cursor: move;
+    }
+    li.object-item {
+        list-style: none;
+        width: 150px;
+        color: #1A1A1A;
+        background-color: #D5DDF6;
+        border: 1px solid #97B0F8;
+        border-radius: 2px;
+        margin-bottom: 5px;
+        padding: 5px 12px;
+    }
+    li.object-item:before {
+        content: "≣";
+        font-family: Arial, sans-serif;
+        display: inline-block;
+        font-size: inherit;
+        cursor: move;
+    }
+    .items-panel {
+        display: flex;
+        margin-top: 15px;
+        justify-content: space-around;
+    }
+
+</style>
+
+{{super()}}
+{%- endblock %}
+
+{# Inside the ``content`` is where you should place most of your own stuff.
+This will keep scripts at the page end and a navbar you add on later
+intact. #}
+{% block content %}
+<div class="container">
+    <div class="container">
+        <h1>Jamming Scenario "{{scenario.name}}[{{scenario.id}}]"</h1>
+
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Configs
+                            <a class="float-right btn btn-success" href="/admin/jamming/create_config?scenario={{scenario.id}}" role="button"><span class="fas fa-plus" aria-hidden="true"></span></a>
+			</h4>
+                    </div>
+
+                    <div class="items-body">
+                    <div class="items-panel">
+                        <ul class="items container">
+                            {% for config in configs %}
+                            <li draggable="true" class="item">
+                                <b>{{config.id}} - {{config.name}} </b>
+                                <a class="btn btn-sm btn-secondary float-right" href="#" role="button"  data-toggle="modal" data-target="#editConfig" data-config-id="{{config.id}}" data-config-name="{{config.name}}" data-config-channel="{{config.channel}}" data-config-power="{{config.power}}" data-config-length="{{config.length}}" data-config-period="{{config.periode}}"><span class="fas fa-edit" aria-hidden="true"></span></a>
+                                <br>
+                                Channel {{config.channel}} <br>
+                                Power {{config.power}} <br>
+                                Length {{config.length}} <br>
+                                Period {{config.periode}} <br>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-9">
+                <div class="card">
+                    <div class="card-header">
+			<h4>Timeline
+			<div class="btn-group float-right">
+                            <button class="btn btn-secondary" href="#" role="button" onclick="timeline.fit()"><span class="fas fa-search-minus" aria-hidden="true"></span></button>
+			    <button class="btn btn-success" href="#" role="button" onclick="saveData()"><span class="fas fa-save" aria-hidden="true"></span></button>
+                        </div>
+			</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="graph"></div>
+                    </div>
+
+                    <form id="updateForm" method="post" action="{{scenario.id}}/update">
+                        <input type="hidden" name="timings" value="" />
+                    </form>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Trigger the modal with a button -->
+
+        <!-- Modal -->
+        <div class="modal fade" id="editConfig" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <form id="updateConfigForm" action="update_config" enctype="multipart/form-data" method="post">
+                        <div class="modal-header">
+                            <h1 class="col-12 text-center">Edit Config
+                            <button type="button" class="close" data-dismiss="modal">&times;</button></h1>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group required"><label class="control-label" required for="rpi">Name</label>
+                                <input class="form-control" id="name" name="name" type="text" value="" maxlength="255">
+                            </div>
+                            <div class="form-group required"><label class="control-label" required for="rpi">Channel</label>
+                                <input class="form-control" id="channel" name="channel" type="number" value=0 min=0 max=14>
+                            </div>
+                            <div class="form-group required"><label class="control-label" required for="rpi">Power</label>
+                                <input class="form-control" id="power" name="power" type="number" value=0 min=0 max=1000>
+                            </div>
+                            <div class="form-group required"><label class="control-label" required for="rpi">Length</label>
+                                <input class="form-control" id="length" name="length" type="number" value=0 min=16 max=1526>
+                            </div>
+                            <div class="form-group required"><label class="control-label" required for="rpi">Period</label>
+                                <input class="form-control" id="period" name="period" type="number" value=0 min=0 max=1000>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Update">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{%- endblock %}
+
+{% block scripts %}
+{{super()}}
+
+<script src="{{url_for("static",filename="vis-timeline/vis-timeline-graph2d.min.js")}}"></script>
+<script src="{{url_for("static",filename="js/handlebars.min.js")}}"></script>
+
+<script>
+Handlebars.registerHelper("formatUnix", function(dateobject) {
+    d=new Date(dateobject)
+        return d.getTime();
+});
+</script>
+
+<script id="item-template" type="text/x-handlebars-template">
+{%raw%}
+    <table class="score">
+      <tr>
+        <th colspan="2" class="description">{{cid}} - {{content}}</th>
+      </tr>
+      <tr>
+        <th colspan="2" class="timestamp">@{{formatUnix start}}</th>
+      </tr>
+      <tr>
+        <td>Channel</td>
+        <td>{{jam_channel}}</td>
+      </tr>
+      <tr>
+        <td>Power</td>
+        <td>{{jam_power}}</td>
+      </tr>
+      <tr>
+        <td>Length</td>
+        <td>{{jam_length}}</td>
+      </tr>
+      <tr>
+        <td>Period</td>
+        <td>{{jam_period}}</td>
+      </tr>
+    </table>
+{%endraw%}
+</script>
+
+<script>
+$('#editConfig').on('show.bs.modal', function(e) {
+    
+    var id = $(e.relatedTarget).data('config-id');
+    var name = $(e.relatedTarget).data('config-name');
+    var channel = $(e.relatedTarget).data('config-channel');
+    var power = $(e.relatedTarget).data('config-power');
+    var length = $(e.relatedTarget).data('config-length');
+    var period = $(e.relatedTarget).data('config-period');
+
+    $('#updateConfigForm').attr("action","/admin/jamming/update_config/"+id+"?scenario={{scenario.id}}");
+    $(e.currentTarget).find('input[name="name"]').val(name);
+    $(e.currentTarget).find('input[name="channel"]').val(channel);
+    $(e.currentTarget).find('input[name="power"]').val(power);
+    $(e.currentTarget).find('input[name="length"]').val(length);
+    $(e.currentTarget).find('input[name="period"]').val(period);
+});
+
+
+
+var container = document.getElementById('graph');
+var it = new vis.DataSet({{jamming_scenario_dict|tojson}});
+//it.add({id:999,content:"test",start:new Date(90000)});
+
+var template = Handlebars.compile(document.getElementById('item-template').innerHTML);
+
+function handleDragStart(event) {
+    var dragSrcEl = event.target;
+
+    var options = { editable: { } };
+    options.editable["add"]=true;
+    timeline.setOptions(options);
+
+    event.dataTransfer.effectAllowed = 'move';
+    var configs={{jamming_config_dict|tojson}};
+    var req=event.target.innerHTML.trim().split("-")[0].substring(3).trim();
+    console.log(req)
+    var cfg;
+    $.each(configs,function(index, value){
+        if (value['id']==req){
+            cfg=value;
+        }
+    });
+    console.log(cfg);
+    var item = {
+        id: "dummy-" + (new Date()).getTime(),
+        cid: cfg['cid'],
+        content: cfg['content'],
+        jam_power: cfg['jam_power'],
+        jam_channel: cfg['jam_channel'],
+        jam_length: cfg['jam_length'],
+        jam_period: cfg['jam_period'],
+    };
+
+    event.dataTransfer.setData("text", JSON.stringify(item));
+}
+
+var items = document.querySelectorAll('.items .item');
+
+for (var i = items.length - 1; i >= 0; i--) {
+    var item = items[i];
+    item.addEventListener('dragstart', handleDragStart.bind(this), false);
+}
+
+var options = {
+    align: "left",
+    height: "400px",
+    showMajorLabels: false,
+    showCurrentTime: false,
+    min: new Date(0),
+    template: template,
+    editable: {
+        add: false,
+        updateTime: true,
+        updateGroup: false,
+        remove: true
+    },
+    moment: function(date) {
+        return vis.moment(date).utc();
+    },
+    format: {
+        minorLabels: {
+            millisecond:'x[m]',
+            second:     'X',
+            minute:     'X',
+            hour:       'X',
+            weekday:    'X',
+            day:        'X',
+            week:       'X',
+            month:      'X',
+            year:       'X'
+        },
+        majorLabels: {
+            millisecond:'',
+            second:     '',
+            minute:     '',
+            hour:       '',
+            weekday:    '',
+            day:        '',
+            week:       '',
+            month:      '',
+            year:       ''
+        }
+    },
+    onDropObjectOnItem: function(objectData, item, callback) {
+        if (!item) { return; }
+        alert('dropped object with content: "' + objectData.content + '" to item: "' + item.content + '"');
+    }
+};
+var timeline = new vis.Timeline(container, it, options);
+
+it.on('add', function (properties) {
+    var options = { editable: { } };
+    options.editable["add"]=false;
+    timeline.setOptions(options);
+
+});
+
+if (it.length<2){
+    timeline.setWindow(new Date(0),new Date(60000));
+}
+
+function saveData() {
+    var data = it.get({
+        type: {
+            start: 'Number',
+            end: 'Number'
+        }
+    });
+    s=JSON.stringify(data, null, 2)
+        var f = document.getElementById('updateForm');
+    f.timings.value=s;
+    f.submit();
+
+    //window.open("{{scenario.id}}/update?timings="+window.btoa(s),"_self");
+
+}
+</script>
+
+{%- endblock %}

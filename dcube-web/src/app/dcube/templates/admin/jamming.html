@@ -1,0 +1,514 @@
+{# This simple template derives from ``base.html``. See ``base.html`` for
+more information about template inheritance. #}
+{%- extends "base.html" %}
+
+{% block styles %}
+{{super()}}
+<link rel="stylesheet" type="text/css" href="{{url_for("static",filename="vis-network/vis-network.min.css")}}">
+<link rel="stylesheet" type="text/css" href="{{url_for("static",filename="vis-timeline/vis-timeline-graph2d.min.css")}}">
+<link href="{{url_for("static",filename="bootstrap4-toggle/css/bootstrap4-toggle.min.css")}}" rel="stylesheet">
+
+<style type="text/css">
+#graph {
+  height: 400px;
+}
+</style>
+
+{%- endblock %}
+
+{# Inside the ``content`` is where you should place most of your own stuff.
+This will keep scripts at the page end and a navbar you add on later
+intact. #}
+{% block content %}
+<div class="container">
+  <div class="container">
+    <h1>Jamming</h1>
+
+    <div class="row is-table-row">
+      <div class="col-sm-5">
+	<div class="card">
+	  <div class="input-group card-header">
+	    <div class="input-group-prepend">
+	      <span class="input-group-text" id="composition-addon">Level</span>
+	    </div>
+	    <select class="form-control" id="composition" name="composition" aria-describedby="composition-addon">
+	      {% for c in compositions %}
+	      <option {% if composition.id ==c.id %}selected="selected"{% endif %}value="{{c.id}}">{{c.name}}</option>
+	      {% endfor%}
+	    </select>
+	    <span class="input-group-append">
+	      <a class="btn btn-primary" href="#" role="button" data-composition-id="{{composition.id}}" data-composition-name="{{composition.name}}" data-composition-short="{{composition.short}}" data-composition-public="{{composition.public}}" data-toggle="modal" data-target="#editComposition"><span class="fas fa-edit" aria-hidden="true"></span></a>
+
+	      <a class="btn btn-success" href="/admin/jamming/create_composition" role="button"><span class="fas fa-plus" aria-hidden="true"></span></a>
+	      <a class="btn btn-danger" href="/admin/jamming/delete_composition/{{composition.id}}" role="button">  <span class="fas fa-times" aria-hidden="true"></span></a>
+	    </span>
+
+	  </div>
+	  <div class="card-body">
+	    <table class="table">    
+	      <thead>
+		<tr>
+		  <th>Attribute</th>
+		  <th>Value</th>
+		</tr>
+	      </thead>
+	      <tbody>
+		<tr>
+		  <td>ID</td>
+		  <td>{{composition.id}}
+		</tr>
+		<tr>
+		  <td>Name</td>
+		  <td>{{composition.name}}</td>
+		</tr>
+		<tr>
+		  <td>Short</td>
+		  <td>{{composition.short}}</td>
+		</tr>
+		<tr>
+		  <td>Public</td>
+		  <td>{{composition.public}}</td>
+		</tr>
+
+	    </table>
+	  </div>
+	</div>
+
+
+	<div class="card">
+	  <div class="card-header">
+	    <div class="input-group">
+	      <div class="input-group-prepend">
+		<span class="input-group-text" id="scenario-addon">Scenario</span>
+	      </div>
+	      <select class="form-control" id="scenario" name="scenario" aria-describedby="scenario-addon">
+		{% for s in scenarios %}
+		<option {% if scenario.id ==s.id %}selected="selected"{% endif %}value="{{s.id}}">{{s.name}}</option>
+		{% endfor%}
+	      </select>
+	      <span class="input-group-append">
+		<a class="btn btn-secondary {% if scenario==None %} disabled{%endif%}" href="jamming/edit_scenario/{{scenario.id}}" role="button"><span class="fas fa-share-alt" aria-hidden="true"></span></a>
+		<a class="btn btn-primary {% if scenario==None %} disabled{%endif%}" href="#" role="button" data-scenario-id="{{scenario.id}}" data-scenario-name="{{scenario.name}}"  data-toggle="modal" data-target="#editScenario"><span class="fas fa-edit" aria-hidden="true"></span></a>
+
+		<a class="btn btn-success" href="/admin/jamming/create_scenario?composition={{composition.id}}{% if not pi==None %}&pi={{pi.id}}{%endif%}" role="button"><span class="fas fa-plus" aria-hidden="true"></span></a>
+		<a class="btn btn-danger {% if scenario==None %} disabled{%endif%}" href="/admin/jamming/delete_scenario/{{scenario.id}}{%if composition%}?composition={{composition.id}}{% if not pi==None %}&pi={{pi.id}}{%endif%}{%endif%}" role="button">  <span class="fas fa-times" aria-hidden="true"></span></a>
+	      </span>
+
+	    </div>
+	  </div>
+	  <div class="card-body">
+	    <table class="table">    
+	      <thead>
+		<tr>
+		  <th>Attribute</th>
+		  <th>Value</th>
+		</tr>
+	      </thead>
+	      <tbody>
+		<tr>
+		  <td>ID</td>
+		  <td>{{scenario.id}}
+		</tr>
+		<tr>
+		  <td>Name</td>
+		  <td>{{scenario.name}}</td>
+		</tr>
+	    </table>
+	  </div>
+	</div>
+
+	<div class="card">
+	  <div class="card-header">
+	    <div class="input-group">
+	      <div class="input-group-prepend">
+		<label class="input-group-text" id="pi-addon">Node</label>
+	      </div>
+	      <select class="form-control" id="pi" name="pi" aria-describedby="pi-addon">
+		{% for p in pis %}
+		<option {% if pi.id ==p.id %}selected="selected"{% endif %}value="{{p.id}}">{{p.rpi}}</option>
+		{% endfor%}
+	      </select>
+	      <span class="input-group-append">
+		<a class="btn btn-primary {% if pi==None %} disabled{%endif%}" href="#" role="button" data-node-id="{{pi.id}}" data-node-rpi="{{pi.rpi}}" data-node-relative="{{pi.relative}}" data-node-sync="{{pi.sync}}" data-toggle="modal" data-target="#editNode"><span class="fas fa-edit" aria-hidden="true"></span></a>
+
+		<a class="btn btn-success {% if scenario==None or composition==None %} disabled{%endif%} " href="/admin/jamming/create_node/{{composition.id}}/{{scenario.id}}" role="button"><span class="fas fa-plus" aria-hidden="true"></span></a>
+		<a class="btn btn-danger {% if pi==None %} disabled{%endif%}" href="/admin/jamming/delete_node/{{pi.id}}?composition={{composition.id}}{% if not scenario==None %}&scenario={{scenario.id}}{%endif%}" role="button">  <span class="fas fa-times" aria-hidden="true"></span></a>
+	      </span>
+
+	    </div>
+	  </div>
+	  <div class="card-body">
+	    <table class="table">    
+	      <thead>
+		<tr>
+		  <th>Attribute</th>
+		  <th>Value</th>
+		</tr>
+	      </thead>
+	      <tbody>
+		<tr>
+		  <td>ID</td>
+		  <td>{{pi.id}}
+		</tr>
+		<tr>
+		  <td>Raspberry Pi</td>
+		  <td>{{pi.rpi}}</td>
+		</tr>
+		<tr>
+		  <td>Relative</td>
+		  <td>{{pi.relative}}</td>
+		</tr>
+		<tr>
+		  <td>Sync</td>
+		  <td>{{pi.sync}}</td>
+		</tr>
+	    </table>
+	  </div>
+	</div>
+
+
+      </div>
+      <div class="col-sm-7">
+	<div class="card">
+	  <div class="card-header">
+	    <h4>Preview
+	    <button class="btn btn-secondary float-right" href="#" role="button" onclick="network.fit()"><span class="fas fa-search-minus" aria-hidden="true"></span></button></h4>
+	  </div>
+	  <div class="card-body">
+	    <div id="graph"></div>
+	  </div>
+	</div>
+      </div>
+
+    </div>
+    <div class="row">
+      <div class="col-sm-12">
+	<div class="card">
+	  <div class="card-header">
+	    <h4>Timeline
+	    <button class="btn btn-secondary float-right" href="#" role="button" onclick="tl.fit()"><span class="fas fa-search-minus" aria-hidden="true"></span></button></h4>
+	  </div>
+	  <div class="card-body">
+	    <div id="timeline"></div>
+	  </div>
+	</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container">
+  <!-- Trigger the modal with a button -->
+
+  <!-- Modal -->
+  <div class="modal fade" id="editComposition" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+	<form id="updateCompositionForm" action="update_composition" enctype="multipart/form-data" method="post">
+	  <div class="modal-header">
+	    <h1 class="col-12 text-center">Edit Level
+	      <button type="button" class="close" data-dismiss="modal">&times;</button></h1>
+	  </div>
+	  <div class="modal-body">
+	    <div class="form-group required"><label class="control-label" required for="name">Name</label>
+	      <input class="form-control" id="name" name="name" type="text" value="" maxlength="255">
+	    </div>
+	    <div class="form-group required"><label class="control-label" required for="short">Short</label>
+	      <input class="form-control" id="short" name="short" type="text" value="" maxlength="255">
+	    </div>
+	    <div class="form-group">
+	      <label><input type="checkbox" id="public" name="public" checked data-toggle="toggle" data-size="small">
+		Public
+	      </label>
+	    </div>
+	  </div>
+	  <div class="modal-footer">
+	    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	    <input class="btn btn-success" id="submit" name="submit" type="submit" value="Update">
+	  </div>
+	</form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Trigger the modal with a button -->
+
+  <!-- Modal -->
+  <div class="modal fade" id="editScenario" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+	<form id="updateScenarioForm" action="update_scenario" enctype="multipart/form-data" method="post">
+	  <div class="modal-header">
+	    <h1 class="col-12 text-center">Edit Scenario
+	      <button type="button" class="close" data-dismiss="modal">&times;</button></h1>
+	  </div>
+	  <div class="modal-body">
+	    <div class="form-group required"><label class="control-label" required for="name">Name</label>
+	      <input class="form-control" id="name" name="name" type="text" value="" maxlength="255">
+	    </div>
+	  </div>
+	  <div class="modal-footer">
+	    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	    <input class="btn btn-success" id="submit" name="submit" type="submit" value="Update">
+	  </div>
+	</form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Trigger the modal with a button -->
+
+  <!-- Modal -->
+  <div class="modal fade" id="editNode" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+	<form id="updateNodeForm" action="update_node" enctype="multipart/form-data" method="post">
+	  <div class="modal-header">
+	    <h1 class="col-12 text-center">Edit Node
+	      <button type="button" class="close" data-dismiss="modal">&times;</button></h1>
+	  </div>
+	  <div class="modal-body">
+	    <div class="form-group required"><label class="control-label" required for="rpi">Raspberry Pi</label>
+	      <input class="form-control" id="rpi" name="rpi" type="text" value="" maxlength="255">
+	    </div>
+	    <div class="form-group">
+	      <label><input type="checkbox" id="relative" name="relative" checked data-toggle="toggle" data-size="small">
+		Relative
+	      </label>
+	    </div>
+	    <div class="form-group">
+	      <label><input type="checkbox" id="sync" name="sync" checked data-toggle="toggle" data-size="small">
+		Sync
+	      </label>
+	    </div>
+	  </div>
+	  <div class="modal-footer">
+	    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	    <input class="btn btn-success" id="submit" name="submit" type="submit" value="Update">
+	  </div>
+	</form>
+      </div>
+    </div>
+  </div>
+</div>
+{%- endblock %}
+
+{% block scripts %}
+{{super()}}
+<script src="{{url_for("static",filename="bootstrap4-toggle/js/bootstrap4-toggle.min.js")}}"></script>
+<script src="{{url_for("static",filename="vis-network/vis-network.min.js")}}"></script>
+<script src="{{url_for("static",filename="js/handlebars.min.js")}}"></script>
+
+<script>
+
+  {%if (not jamming_dict==None)  %}
+var nodes = new vis.DataSet({{jamming_dict['nodes']|tojson}});
+var edges = new vis.DataSet({{jamming_dict['edges']|tojson}});
+var container = document.getElementById('graph');
+var data = { nodes: nodes, edges:edges };
+var layoutMethod = "directed";
+
+
+var options={
+  layout: {
+    randomSeed: 1
+  },
+  edges: {
+    smooth: true,
+    arrows: {to : true }
+  }
+};
+var network=new vis.Network(container,data,options);
+
+{%endif%}
+
+
+$("#composition").on('change', update_composition);
+$("#scenario").on('change', update_composition);
+$("#pi").on('change', update_composition);
+
+function update_composition(){
+  comp=$("#composition").val();
+  var q="/admin/jamming?composition="+comp
+  scenario=$("#scenario").val();
+  if(scenario)
+    q+="&scenario="+scenario
+  pi=$("#pi").val();
+  if(pi)
+    q+="&pi="+pi
+
+  window.open(q,"_self");
+}
+
+$('#editComposition').on('show.bs.modal', function(e) {
+
+  //get data-id attribute of the clicked element
+  var id = $(e.relatedTarget).data('composition-id');
+  var name = $(e.relatedTarget).data('composition-name');
+  var short = $(e.relatedTarget).data('composition-short');
+  var public = $(e.relatedTarget).data('composition-public');
+
+  {% if (pi==None and scenario==None) %}
+  var ref="";
+  {% elif (pi==None) and (not scenario==None) %}
+  var ref="?scenario={{scenario.id}}";
+  {% elif (not pi==None) and (scenario==None) %}
+  var ref="?pi={{pi.id}}";
+  {% elif (not pi==None) and (not scenario==None) %}
+  var ref="?scenario={{scenario.id}}&pi={{pi.id}}";
+  {% endif %}
+
+  $('#updateCompositionForm').attr("action","/admin/jamming/update_composition/"+id+ref);
+  $(e.currentTarget).find('input[name="name"]').val(name);
+  $(e.currentTarget).find('input[name="short"]').val(short);
+
+  if(public == "False")
+    $(e.currentTarget).find('input[name="public"]').bootstrapToggle('off');
+  else if(public == "True")
+    $(e.currentTarget).find('input[name="public"]').bootstrapToggle('on');
+});
+
+$('#editScenario').on('show.bs.modal', function(e) {
+
+  //get data-id attribute of the clicked element
+  var id = $(e.relatedTarget).data('scenario-id');
+  var name = $(e.relatedTarget).data('scenario-name');
+
+  {% if (pi==None and composition==None) %}
+  var ref="";
+  {% elif (pi==None) and (not composition==None) %}
+  var ref="?composition={{composition.id}}";
+  {% elif (not pi==None) and (composition==None) %}
+  var ref="?pi={{pi.id}}";
+  {% elif (not pi==None) and (not composition==None) %}
+  var ref="?composition={{composition.id}}&pi={{pi.id}}";
+  {% endif %}
+
+  $('#updateScenarioForm').attr("action","/admin/jamming/update_scenario/"+id+ref);
+  $(e.currentTarget).find('input[name="name"]').val(name);
+});
+
+$('#editNode').on('show.bs.modal', function(e) {
+
+  //get data-id attribute of the clicked element
+  var id = $(e.relatedTarget).data('node-id');
+  var rpi = $(e.relatedTarget).data('node-rpi');
+  var rel = $(e.relatedTarget).data('node-relative');
+  var sync = $(e.relatedTarget).data('node-sync');
+
+  $('#updateNodeForm').attr("action","/admin/jamming/update_node/"+id);
+  $(e.currentTarget).find('input[name="rpi"]').val(rpi);
+
+  if(rel == "False")
+    $(e.currentTarget).find('input[name="relative"]').bootstrapToggle('off');
+  else if(rel == "True")
+    $(e.currentTarget).find('input[name="relative"]').bootstrapToggle('on');
+
+  if(sync == "False")
+    $(e.currentTarget).find('input[name="sync"]').bootstrapToggle('off');
+  else if(sync == "True")
+    $(e.currentTarget).find('input[name="sync"]').bootstrapToggle('on');
+
+});
+
+network.on("selectNode",function (params) {
+
+  scenario=$("#scenario").val();
+  composition=$("#composition").val();
+  pi=$("#pi").val();
+
+  clicked=params.nodes[0]
+  if(clicked>=1000)
+    scenario=clicked/1000;
+  else
+    pi=clicked;
+
+  window.open("/admin/jamming?scenario="+scenario+"&composition="+composition+"&pi="+pi,"_self");
+});
+
+</script>
+
+<script>
+  Handlebars.registerHelper("formatUnix", function(dateobject) {
+    d=new Date(dateobject)
+    return d.getTime();
+  });
+</script>
+
+<script id="item-template" type="text/x-handlebars-template">
+  {%raw%}
+    <table class="score">
+      <tr>
+	<th colspan="2" class="description">{{content}}</th>
+      </tr>
+    </table>
+{%endraw%}
+</script>
+
+
+<script src="{{url_for("static",filename="vis-timeline/vis-timeline-graph2d.min.js")}}"></script>
+
+<script>
+  var template = Handlebars.compile(document.getElementById('item-template').innerHTML);
+var timeline = document.getElementById('timeline');
+var tt = new vis.DataSet({{preview_dict['items']|tojson}});
+var tg = new vis.DataSet({{preview_dict['groups']|tojson}});
+
+var options = {
+  align: "left",
+  height: "400px",
+  showMajorLabels: false,
+  groupOrder: 'rpi',
+  showCurrentTime: false,
+  min: new Date(0),
+  template: template,
+  editable: {
+    add: false,
+    updateTime: false,
+    updateGroup: false,
+    remove: false
+  },
+  moment: function(date) {
+    return vis.moment(date).utc();
+  },
+  format: {
+    minorLabels: {
+      millisecond:'x[m]',
+      second:     'X',
+      minute:     'X',
+      hour:       'X',
+      weekday:    'X',
+      day:        'X',
+      week:       'X',
+      month:      'X',
+      year:       'X'
+    },
+    majorLabels: {
+      millisecond:'',
+      second:     '',
+      minute:     '',
+      hour:       '',
+      weekday:    '',
+      day:        '',
+      week:       '',
+      month:      '',
+      year:       ''
+    }
+  }
+};
+var tl = new vis.Timeline(timeline, tt, options);
+tl.setGroups(tg);
+
+
+</script>
+
+{%- endblock %}

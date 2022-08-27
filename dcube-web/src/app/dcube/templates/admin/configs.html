@@ -1,0 +1,207 @@
+{# This simple template derives from ``base.html``. See ``base.html`` for
+more information about template inheritance. #}
+{%- extends "base.html" %}
+
+{% block styles %}
+{{super()}}
+<link href="{{url_for("static",filename="bootstrap4-toggle/css/bootstrap4-toggle.min.css")}}" rel="stylesheet">
+{% endblock %}
+
+{# Inside the ``content`` is where you should place most of your own stuff.
+This will keep scripts at the page end and a navbar you add on later
+intact. #}
+{% block content %}
+<div class="container">
+  <div class="container">
+    <div class="row">
+      <h1 class="col-sm-4">Configuration</h1>
+      <div class="col-sm-4 col-lg-2 offset-sm-4 offset-lg-6">
+	<div class="input-group pull-right">
+	  <input type="checkbox" id="scheduler_stop" name="scheduler_stop" {% if not scheduler_stop==None and scheduler_stop.value=="on" %}checked{% endif %} data-off="Stop Execution" data-on="Continue Execution" data-onstyle="success" data-offstyle="danger" data-toggle="toggle" data-size="large">
+	</div>
+      </div>
+    </div>
+
+
+    <table class="table mt-2">
+      <thead>
+	<tr>
+	  <th>#</th>
+	  <th>Key</th>
+	  <th>Value</th>
+	  <th></th>
+	</tr>
+      </thead>
+      <tbody>
+	{%- for config in configs %}
+	<tr>
+	  <td>{{config.id}}</td>
+	  <td>{{config.key}}</td>
+	  <td>{{config.value}}</td>
+	  <td>
+	    <a class="btn btn-sm btn-danger" href="/admin/configs/delete_config/{{config.id}}" role="button">  <span class="fas fa-times" aria-hidden="true"></span></a>
+	  </td>
+	</tr>
+	{%- endfor %}
+      </tbody>
+    </table>
+    <div class="btn-group">
+      <button type="button" class="btn btn-lg btn-success" data-toggle="modal" data-target="#changeConfig">Configure</button>
+    </div>
+    <div class="container">
+      <!-- Modal -->
+      <div class="modal fade" id="changeConfig" role="dialog">
+	<div class="modal-dialog">
+
+	  <!-- Modal content-->
+	  <div class="modal-content">
+	    <div class="modal-header">
+	      <h1 class="col-12 text-center">Change Configuration
+		<button type="button" class="close" data-dismiss="modal">&times;</button></h1>
+	    </div>
+	    <div class="modal-body">
+
+	      <ul class="nav nav-tabs" id="tabContent" role="tablist">
+		<li class="nav-item"><a class="nav-link active" href="#Maintenance" data-toggle="tab">Maintenance</a></li>
+		<li class="nav-item"><a class="nav-link" href="#Pagetitle" data-toggle="tab">Title</a></li>
+		<li class="nav-item"><a class="nav-link" href="#Leaderboard" data-toggle="tab">Nav</a></li>
+		<li class="nav-item"><a class="nav-link" href="#Job" data-toggle="tab">Job</a></li>
+		<li class="nav-item"><a class="nav-link" href="#Jamming" data-toggle="tab">Jam</a></li>
+		<li class="nav-item"><a class="nav-link" href="#Scheduler" data-toggle="tab">Sched</a></li>
+	      </ul>
+	      <div class="tab-content">
+		<div class="tab-pane active" id="Maintenance">
+		  <form action="maintenance" enctype="multipart/form-data" method="post">
+		    <div class="form-group required"><label class="control-label" for="maintenance_msg">Maintenance message</label>
+		      <input class="form-control" id="maintenance_msg" name="maintenance_msg" type="text" value=
+		      "{% for config in configs %}{% if config.key=="maintenance_msg"%}{{config.value}}{% endif %}{% endfor %}">
+		    </div>
+		    <div class="form-group">
+		      <label><input type="checkbox" id="maintenance" name="maintenance"
+								     {% for config in configs %}{% if config.key=="maintenance" and config.value=="True" %}checked{% endif %}{% endfor %}
+								     data-toggle="toggle" data-size="small">
+			Maintenance Mode
+		      </label>
+		    </div>
+		    <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Change">
+		  </form>
+		</div>
+		<div class="tab-pane" id="Job">
+		  <form action="duration" enctype="multipart/form-data" method="post">
+		    <div class="form-group required"><label class="control-label" for="max_duration">Max User Duration</label>
+		      <div class="input-group">
+			<input class="form-control" id="max_duration" name="max_duration" type="number"
+											  value="{% for config in configs %}{% if config.key=="max_duration"%}{{config.value}}{% endif %}{% endfor %}"
+											  min="30" max="36000">
+			<span class="input-group-addon">Seconds</span>
+		      </div>
+		    </div>
+		    <div class="form-group required"><label class="control-label" for="def_duration">Default Duration</label>
+		      <div class="input-group">
+			<input class="form-control" id="def_duration" name="def_duration" type="number"
+											  value="{% for config in configs %}{% if config.key=="def_duration"%}{{config.value}}{% endif %}{% endfor %}"
+											  min="30" max="36000">
+			<span class="input-group-addon">Seconds</span>
+		      </div>
+		    </div>
+		    <div class="form-group required"><label class="control-label" for="durations">Durations</label>
+		      <div class="input-group">
+			<input class="form-control" id="durations" name="durations" type="text"
+										    value="{% for config in configs %}{% if config.key=="durations"%}{{config.value}}{% endif %}{% endfor %}">
+		      </div>
+		    </div>
+		    <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Change">
+		  </form>
+		</div>
+		<div class="tab-pane" id="Jamming">
+		  <form action="jamming" enctype="multipart/form-data" method="post">
+		    <div class="form-group">
+		      <label><input type="checkbox" id="jamming" name="jamming"
+								 {% for config in configs %}{% if config.key=="jamming_available" and config.value=="True" %}checked{% endif %}{% endfor %}
+								 data-toggle="toggle" data-size="small">
+			Jamming allowed
+		      </label>
+		    </div>
+		    <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Change">
+		  </form>
+		</div>
+		<div class="tab-pane" id="Leaderboard">
+		  <form action="leaderboard" enctype="multipart/form-data" method="post">
+		    <div class="form-group">
+		      <label><input type="checkbox" id="leaderboard" name="leaderboard"
+								     {% for config in configs %}{% if config.key=="leaderboard" and config.value=="True" %}checked{% endif %}{% endfor %}
+								     data-toggle="toggle" data-size="small">
+			Leaderboard
+		      </label>
+		    </div>
+		    <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Change">
+		  </form>
+		</div>
+		<div class="tab-pane" id="Pagetitle">
+		  <form action="pagetitle" enctype="multipart/form-data" method="post">
+		    <div class="form-group">
+		      <div class="form-group required"><label class="control-label" for="pagetitle">Pagetitle</label>
+			<input class="form-control" id="pagetitle" name="pagetitle" type="text" value=
+			"{% for config in configs %}{% if config.key=="pagetitle"%}{{config.value}}{% endif %}{% endfor %}">
+		      </div>
+		      <div class="form-group required"><label class="control-label" for="pagesubtitle">Pagesubtitle</label>
+			<input class="form-control" id="pagesubtitle" name="pagesubtitle" type="text" value=
+			"{% for config in configs %}{% if config.key=="pagesubtitle"%}{{config.value}}{% endif %}{% endfor %}">
+		      </div>
+		    </div>
+
+		    <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Change">
+		  </form>
+		</div>
+		<div class="tab-pane" id="Scheduler">
+		  <form action="scheduler_time" enctype="multipart/form-data" method="post">
+		    <div class="form-group">
+		      <div class="form-group required"><label class="control-label" for="scheduler_start">Start</label>
+			<input class="form-control" id="scheduler_start" name="scheduler_start" type="text" value=
+			"{% for config in configs %}{% if config.key=="scheduler_time_start"%}{{config.value}}{% endif %}{% endfor %}">
+		      </div>
+		      <div class="form-group required"><label class="control-label" for="pagesubtitle">Stop</label>
+			<input class="form-control" id="scheduler_stop" name="scheduler_stop" type="text" value=
+			"{% for config in configs %}{% if config.key=="scheduler_time_stop"%}{{config.value}}{% endif %}{% endfor %}">
+		      </div>
+
+		      <div class="form-group required"><label class="control-label" for="scheduler_start">Jamming Start</label>
+			<input class="form-control" id="jamming_start" name="jamming_start" type="text" value=
+			"{% for config in configs %}{% if config.key=="jamming_time_start"%}{{config.value}}{% endif %}{% endfor %}">
+		      </div>
+		      <div class="form-group required"><label class="control-label" for="pagesubtitle">Jamming Stop</label>
+			<input class="form-control" id="jamming_stop" name="jamming_stop" type="text" value=
+			"{% for config in configs %}{% if config.key=="jamming_time_stop"%}{{config.value}}{% endif %}{% endfor %}">
+		      </div>
+
+		    </div>
+
+		    <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Change">
+		  </form>
+		</div>
+
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+		</div>
+	      </div>
+	    </div>
+	    {%- endblock %}
+
+	    {% block scripts %}
+	    {{super()}}
+	    <script src="{{url_for("static",filename="bootstrap4-toggle/js/bootstrap4-toggle.min.js")}}"></script>
+
+	    <script>
+	      $('#scheduler_stop').change(function(){
+		if($(this).is(':checked')){
+		  $.get( "/admin/queue/scheduler/on", function( data ) {
+		  });
+		} else {
+		  $.get( "/admin/queue/scheduler/off", function( data ) {
+		  });
+		}
+	      });
+	    </script>
+
+	    {%- endblock %}

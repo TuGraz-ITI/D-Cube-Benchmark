@@ -1,0 +1,75 @@
+{# This simple template derives from ``base.html``. See ``base.html`` for
+   more information about template inheritance. #}
+{%- extends "base.html" %}
+
+{# Inside the ``content`` is where you should place most of your own stuff.
+   This will keep scripts at the page end and a navbar you add on later
+   intact. #}
+{% block content %}
+  <div class="container">
+    <div class="container">
+      <h1>Groups</h1>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Members</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {%- for group in groups %}
+              <tr>
+                <td>{{group.id}}</td>
+                <td>{{group.name}}</td>
+                <td>
+                  {%- for user in group.users %}
+                  {{user.username}}{% if not loop.last %}, {% endif %}
+                  {%- endfor %}
+                </td>
+                <td>
+                  <a class="btn btn-sm btn-danger" href="/admin/delete_group/{{group.name}}" role="button">  <span class="fas fa-times" aria-hidden="true"></span></a>
+                </td>
+              </tr>
+          {%- endfor %}
+        </tbody>
+    </table>
+
+    <div class="container">
+      <!-- Trigger the modal with a button -->
+      <div class="btn-group">
+      <button type="button" class="btn btn-success" data-toggle="modal" data-target="#createGroup">Create Group</button>
+      </div>
+
+      <!-- Modal -->
+      <div class="modal fade" id="createGroup" role="dialog">
+        <div class="modal-dialog">
+
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="col-12 text-center">Create Group
+	      <button type="button" class="close" data-dismiss="modal">&times;</button></h1>
+            </div>
+            <div class="modal-body">
+              <form action="create_group" method="post">
+                <div class="form-group required"><label class="control-label" for="name" maxlength="255">Name</label>
+                  <input class="form-control" id="name" name="name" required type="text" value="">
+                </div>
+            </div>
+            <div class="modal-footer">
+              <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Create">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    </div>
+   </div>
+{%- endblock %}
