@@ -1,3 +1,26 @@
+#
+# MIT License
+#
+# Copyright (c) 2022 Graz University of Technology
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
 import bleach
 
 class Config(object):
@@ -10,17 +33,6 @@ class Config(object):
     
     DATABASE_URI = 'sqlite:///:memory:'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    
-    BLOGGING_URL_PREFIX = "/blog"
-    BLOGGING_SITEURL = "http://localhost"
-    BLOGGING_SITENAME = "D-Cube Testbed"
-    BLOGGING_PERMISSIONS = True
-    BLOGGING_PERMISSIONNAME = "admins"
-    BLOGGING_ALLOW_FILEUPLOAD = True
-    FILEUPLOAD_PREFIX = "/fileupload"
-    FILEUPLOAD_LOCALSTORAGE_STATIC = "/storage"
-    FILEUPLOAD_LOCALSTORAGE_IMG_FOLDER = "fileupload"
-    FILEUPLOAD_ALLOWED_EXTENSIONS = ["png", "jpg", "jpeg", "gif", "pdf", "ppt", "pptx", "txt", "zip"]
     
     # Because we're security-conscious developers, we also hard-code disabling
     # the CDN support (this might become a default in later versions):
