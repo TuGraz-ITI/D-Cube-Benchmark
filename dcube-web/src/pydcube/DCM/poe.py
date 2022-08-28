@@ -21,11 +21,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-import paramiko
 import time
 import logging
 import enum
 import re
+import warnings 
+
+warnings.filterwarnings(action='ignore',module='.*paramiko.*')
+logging.getLogger("paramiko").setLevel(logging.WARNING)
+
+import paramiko
 
 class PoEClient:
     def __init__(self,topology):
@@ -78,7 +83,6 @@ class PoE:
     def __init__(self,hostname,username,password,port=22):
         self.hostname=hostname
         self.logger=logging.getLogger("PoE Client")
-        logging.getLogger("paramiko").setLevel(logging.WARNING)
         self.username=username
         self.password=password
         self.port=port

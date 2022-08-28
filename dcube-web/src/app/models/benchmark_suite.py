@@ -29,7 +29,7 @@ class BenchmarkSuite(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     short = db.Column(db.String(255))
     name = db.Column(db.String(255))
-    composition = db.relationship('LayoutComposition', lazy='dynamic')#, back_populates="benchmark_suite")
+    #composition = db.relationship('LayoutComposition', lazy='dynamic')#, back_populates="benchmark_suite")
     node_id = db.Column(db.Integer, db.ForeignKey('node.id'))
     node = db.relationship('Node', uselist=False)
     #config = db.relationship(
