@@ -866,20 +866,12 @@ def admin_download_firmware(id=None):
         current_app.config['UPLOAD_FOLDER']))
 
     if os.path.isfile(new_path):
-        return send_from_directory(directory=new_dir, filename=firmware.filename, as_attachment=True,
-                                   attachment_filename='firmware_'+str(id)+".ihex")
+        return send_from_directory(directory=new_dir, path=firmware.filename, as_attachment=True,
+                                   download_name='firmware_'+str(id)+".ihex")
 
     if ((firmware.job == None) or (firmware.job.group == None)):
         abort(404)
 
-    old_path = os.path.join(os.path.abspath(
-        current_app.config['OLD_FIRMWARE_PREFIX']+firmware.job.group.name), firmware.filename)
-    old_dir = os.path.join(os.path.abspath(
-        current_app.config['OLD_FIRMWARE_PREFIX']+firmware.job.group.name))
-
-    if os.path.isfile(old_path):
-        return send_from_directory(directory=old_dir, filename=firmware.filename, as_attachment=True,
-                                   attachment_filename='firmware_'+str(id)+".ihex")
     abort(404)
 
 
@@ -941,9 +933,9 @@ def download_job_logs(id=None):
     if dl_dir is None:
         abort(404)
     return send_from_directory(directory=dl_dir, 
-                               filename='logs.zip',
+                               path='logs.zip',
                                as_attachment=True,
-                               attachment_filename='logs_%s.zip'%(id))
+                               download_name='logs_%s.zip'%(id))
 
 
 @admin.route('/queue/reeval_all', methods=['GET'])

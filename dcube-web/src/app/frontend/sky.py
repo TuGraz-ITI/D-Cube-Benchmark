@@ -229,8 +229,8 @@ def download_job_evaluation(id=None):
         abort(404)
     if (current_user.is_authenticated and (current_user.has_role(
             "admins") or (job.group_id == current_user.group_id))):
-        return send_from_directory(directory=dl_dir, filename='report_' + str(
-            id) + '.pdf', as_attachment=True, attachment_filename='report_' + str(id) + ".pdf")
+        return send_from_directory(directory=dl_dir, path='report_' + str(
+            id) + '.pdf', as_attachment=True, download_name='report_' + str(id) + ".pdf")
     else:
         abort(401)
 
@@ -248,8 +248,8 @@ def download_job_logs(id=None):
         abort(404)
     if (current_user.is_authenticated and (current_user.has_role(
             "admins") or job.group_id == current_user.group_id)):
-        return send_from_directory(directory=dl_dir, filename='logs.zip',
-                                   as_attachment=True, attachment_filename='logs_' + str(id) + ".zip")
+        return send_from_directory(directory=dl_dir, path='logs.zip',
+                                   as_attachment=True, download_name='logs_' + str(id) + ".zip")
     else:
         abort(401)
 

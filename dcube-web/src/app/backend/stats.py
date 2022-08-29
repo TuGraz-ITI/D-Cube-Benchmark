@@ -492,13 +492,14 @@ class Stats:
         self.client.switch_database(DBNAME)
 
         #TODO read from topology
-        south=range(150,154)
-        south=[]
-        north_anchor=range(100,116)
-        north=range(116,120)
-        first_floor=range(200,220)
-        ground_floor=range(220,228)
-        ids = list(north_anchor) + list(north) + list(south) + list(first_floor) + list(ground_floor)
+        #south=range(150,154)
+        #south=[]
+        #north_anchor=range(100,116)
+        #north=range(116,120)
+        #first_floor=range(200,220)
+        #ground_floor=range(220,228)
+        #ids = list(north_anchor) + list(north) + list(south) + list(first_floor) + list(ground_floor)
+        ids = [100,101]
 
         self.motes = [str(i) for i in ids]
         self.evaluations=[]

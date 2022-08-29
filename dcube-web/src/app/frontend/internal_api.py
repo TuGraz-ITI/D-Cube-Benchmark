@@ -218,20 +218,12 @@ def download_firmware(job_id):
         current_app.config['UPLOAD_FOLDER']))
 
     if os.path.isfile(new_path):
-        return send_from_directory(directory=new_dir, filename=firmware.filename, as_attachment=True,
-                                   attachment_filename='firmware_'+str(job_id)+".ihex")
+        return send_from_directory(directory=new_dir, path=firmware.filename, as_attachment=True,
+                                   download_name='firmware_'+str(job_id)+".ihex")
 
     if ((firmware.job == None) or (firmware.job.group == None)):
         abort(404)
 
-    old_path = os.path.join(os.path.abspath(
-        current_app.config['OLD_FIRMWARE_PREFIX']+firmware.job.group.name), firmware.filename)
-    old_dir = os.path.join(os.path.abspath(
-        current_app.config['OLD_FIRMWARE_PREFIX']+firmware.job.group.name))
-
-    if os.path.isfile(old_path):
-        return send_from_directory(directory=old_dir, filename=firmware.filename, as_attachment=True,
-                                   attachment_filename='firmware_'+str(job_id)+".ihex")
     abort(404)
 
 
@@ -333,8 +325,8 @@ def get_templab_profile_csv(job_id):
         print("looking up profile_filepath")
 
         if os.path.isfile(profile_filepath):
-            return send_from_directory(directory=current_app.config['TEMPLAB_FOLDER'], filename=profile_filename, as_attachment=True,
-                                       attachment_filename="temperature.csv")
+            return send_from_directory(directory=current_app.config['TEMPLAB_FOLDER'], path=profile_filename, as_attachment=True,
+                                       download_name="temperature.csv")
     abort(404)
 
 
@@ -353,8 +345,8 @@ def get_custom_patch_xml(job_id, rpi):
         patch_filepath = os.path.join(patch_upload_dir, patch_filename)
 
         if os.path.isfile(patch_filepath):
-            return send_from_directory(directory=current_app.config['PATCH_FOLDER'], filename=patch_filename, as_attachment=True,
-                                       attachment_filename="custom.xml")
+            return send_from_directory(directory=current_app.config['PATCH_FOLDER'], path=patch_filename, as_attachment=True,
+                                       download_name="custom.xml")
     abort(404)
 
 
@@ -386,8 +378,8 @@ def get_patch_xml(job_id, rpi):
             directory=os.path.join(current_app.static_folder,"benchmark_suites")
 
         print("sending file %s from directory %s"%(filename,directory))
-        return send_from_directory(directory=directory, filename=filename, as_attachment=True,
-                               attachment_filename="testbed.xml")
+        return send_from_directory(directory=directory, path=filename, as_attachment=True,
+                               download_name="testbed.xml")
     abort(404)
 
 

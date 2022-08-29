@@ -41,8 +41,8 @@ class Config(object):
     UPLOAD_FOLDER = '/storage/firmwares'
     ALLOWED_EXTENSIONS = set(['ihex','hex'])
     
-    GRAFANA_URL="/grafana"
-    GRAFANA_DASHBOARD_FOLDER = "?folderIds=3"
+    GRAFANA_URL = "/grafana"
+    GRAFANA_DASHBOARD_FOLDER = "?folderIds=1"
     
     LOGFILE_FOLDER = '/storage/logfiles/'
     EVALUATION_FOLDER = '/storage/evaluations/'
@@ -64,7 +64,6 @@ class Config(object):
     # import uuid; salt = uuid.uuid4().hex
     SECURITY_PASSWORD_SALT = '5d99d5d942024a86bf15427a3a1685e9'
     SECURITY_USER_IDENTITY_ATTRIBUTES = [{'username':{"mapper":uia_username_mapper}}]
-    GRAFANA_DASHBOARD_FOLDER = "?folderIds=3"
 
     PYTHON_PATH = "/usr/bin/python3" 
     DCM_PATH = "/testbed/pydcube"

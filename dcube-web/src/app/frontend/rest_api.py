@@ -377,7 +377,7 @@ def download_logs(job_id):
     if dl_dir == None:
         abort(404)
     if (user.has_role("admins") or job.group_id == user.group_id):
-        return send_from_directory(directory=dl_dir, filename='logs.zip', as_attachment=True, attachment_filename='logs_'+str(job_id)+".zip")
+        return send_from_directory(directory=dl_dir, path='logs.zip', as_attachment=True, download_name='logs_'+str(job_id)+".zip")
     else:
         abort(401)
 
