@@ -1,0 +1,9 @@
+- name: 'default'                                 # name of this dashboard configuration (not dashboard itself)
+  org_id: 1                                       # id of the org to hold the dashboard
+  folder: 'Measure'                               # name of the folder to put the dashboard (http://docs.grafana.org/v5.0/reference/dashboard_folders/)
+  folderUid: 'measure'
+  disableDeletion: true
+  updateIntervalSeconds: 0
+  type: 'file'                                    # type of dashboard description (json files)
+  options:
+    folder: '/var/lib/grafana/dashboards/measure' # where dashboards are

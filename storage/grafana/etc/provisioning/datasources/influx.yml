@@ -1,0 +1,14 @@
+datasources:
+  - name: 'InfluxDB'                      # name of the datasource
+    type: 'influxdb'                      # type of the data source
+    access: 'proxy'                       # make grafana perform the requests
+    is_default: true                      # whether this should be the default DS
+    org_id: 1                             # id of the organization to tie this datasource to
+    url: 'http://influx:8086'             # url of the prom instance
+    database: 'testbed'                   # name of the database
+    user: 'root'                          # username for the database
+    password: 'root'                      # password for the database
+    jsonData:                             #
+      httpMode: GET                       # JSON method to query influxdb database
+    version: 1                            # version number
+    editable: false                       # this datasource is hardcoded
