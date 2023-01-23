@@ -410,7 +410,7 @@ intact. #}
 	    </div>
 	    <div class="form-group required"><label class="control-label" for="role">Role</label>
 	      <select class="form-control" id="role" name="role">
-		{% for i in ("None", "source", "sink") %}
+		{% for i in ("None", "source", "sink", "border_router") %}
 		<option {% if i=="None" %}selected="selected"{% endif %}value={{i}}>{{i}}</option>
 		{% endfor%}
 	      </select>

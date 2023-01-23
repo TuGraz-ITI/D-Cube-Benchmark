@@ -358,6 +358,19 @@ def get_custom_patch_json(job_id, rpi):
         return job.overrides
     abort(404)
 
+@internal_api.route("/border_routers/<int:job_id>")
+def get_border_routers(job_id):
+    job = Job.query.filter_by(id=job_id).first()
+    if not job == None:
+        border_routers=[]
+        brs = LayoutPi.query.filter_by(
+            composition_id=job.layout_composition_id, role="border_router").all()
+
+        for br in brs:
+            border_routers.append(br.rpi)
+
+        return json.dumps(border_routers)
+    abort(404)
 
 @internal_api.route("/patch/<int:job_id>/xml/rpi<rpi>")
 @internal_api.route("/patch/<int:job_id>/xml/<rpi>")
@@ -381,7 +394,6 @@ def get_patch_xml(job_id, rpi):
         return send_from_directory(directory=directory, path=filename, as_attachment=True,
                                download_name="testbed.xml")
     abort(404)
-
 
 @internal_api.route("/patch/<int:job_id>/json/rpi<rpi>")
 @internal_api.route("/patch/<int:job_id>/json/<rpi>")

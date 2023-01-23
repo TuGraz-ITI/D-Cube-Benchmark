@@ -499,7 +499,7 @@ class Stats:
         #first_floor=range(200,220)
         #ground_floor=range(220,228)
         #ids = list(north_anchor) + list(north) + list(south) + list(first_floor) + list(ground_floor)
-        ids = [100,101]
+        ids = [80,81]
 
         self.motes = [str(i) for i in ids]
         self.evaluations=[]

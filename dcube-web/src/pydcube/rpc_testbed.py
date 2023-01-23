@@ -383,16 +383,47 @@ while((not len(COPY)==0) and count < PROGRAM_RETRY_MAX):
     
     #start jamming
     dcube.jamming(servers=COPY)
+
+    if job["node"]=="Nordic-All":
+        brs=rest.get_border_routers(JOB)
+
+        if(len(brs)):
+            LIST_BRS=list()
+            for br in brs:
+                LIST_BRS.append("rpi%s"%br)
+
+            dcube.mote_power(state=DCM.CommandState.OFF,servers=LIST_BRS)
+            dcube.sleep(1)
+            dcube.mote_select(mote="nrf52840dk-native",servers=LIST_BRS)
+            dcube.sleep(1)
+            dcube.mote_power(state=DCM.CommandState.ON,servers=LIST_BRS)
+            dcube.sleep(10)
+            dcube.mote_reset(state=DCM.CommandState.OFF,servers=LIST_BRS)
+            dcube.sleep(10)
+
     
     #start blinkers
     dcube.blinker(servers=COPY)
     
     #if logs are enabled, start traces
     if(job["logs"]==True):
+        
+        LOG_COPY=list(COPY)
+        brs=rest.get_border_routers(JOB)
+        if(len(brs)):
+            for br in brs:
+                if br in LOG_COPY:
+                    LOG_COPY.remove(br)
+                    logger.info("Excluding border router %s from logs ..."%br)
+                elif "rpi%s"%br in LOG_COPY:
+                    LOG_COPY.remove("rpi%s"%br)
+                    logger.info("Excluding border router %s from logs ..."%br)
+
+
         try:
-            dcube.trace(state=DCM.CommandState.ON,servers=COPY)
+            dcube.trace(state=DCM.CommandState.ON,servers=LOG_COPY)
         except DCM.CommandFailedException as e:
-            r=dcube.check_responses(servers=COPY)
+            r=dcube.check_responses(servers=LOG_COPY)
 
             #recovery loop, if nodes are missing perform reboot
             if (("missing" in r) and (not len(r["missing"])==0)) or \
@@ -504,8 +535,18 @@ if job["templab"]:
 
 #stopping the traces will automatically also collect the logs
 if(job["logs"]==True):
+
+    LOG_COPY=list(SERVERS)
+    brs=rest.get_border_routers(JOB)
+    if(len(brs)):
+        for br in brs:
+            if br in LOG_COPY:
+                LOG_COPY.remove(br)
+            elif "rpi%s"%br in LOG_COPY:
+                LOG_COPY.remove("rpi%s"%br)
+
     logger.info("Collecting Logfiles ...")
-    r=dcube.trace(state=DCM.CommandState.OFF)
+    r=dcube.trace(state=DCM.CommandState.OFF,servers=LOG_COPY)
 
     if not os.path.exists(LOGFILEPATH):
         os.mkdir(LOGFILEPATH)

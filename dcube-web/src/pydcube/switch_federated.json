@@ -1,0 +1,80 @@
+[
+{
+	"switch":"192.168.101.42",
+	"type":"Mikrotik",
+	"nodes":[
+		{
+		"hostname":"rpi80",
+		"ip":"192.168.103.80",
+		"port":"ether2"
+		},
+		{
+		"hostname":"rpi81",
+		"ip":"192.168.103.81",
+		"port":"ether3"
+		}
+	]
+},
+{
+        "switch":"127.0.0.1",
+        "type":"Dummy",
+        "nodes":[
+                {
+                "hostname":"rpi50",
+                "ip":"192.168.101.50",
+                "port":"ether1"
+                },
+                {
+                "hostname":"rpi51",
+                "ip":"192.168.101.51",
+                "port":"ether2"
+                },
+                {
+                "hostname":"rpi52",
+                "ip":"192.168.101.52",
+                "port":"ether3"
+                },
+                {
+                "hostname":"rpi53",
+                "ip":"192.168.101.53",
+                "port":"ether4"
+                },
+                {
+                "hostname":"rpi54",
+                "ip":"192.168.101.54",
+                "port":"ether5"
+                },
+                {
+                "hostname":"rpi55",
+                "ip":"192.168.101.55",
+                "port":"ether6"
+                },
+                {
+                "hostname":"rpi56",
+                "ip":"192.168.101.56",
+                "port":"ether7"
+                },
+                {
+                "hostname":"rpi58",
+                "ip":"192.168.101.58",
+                "port":"ether9"
+                },
+                {
+                "hostname":"rpi59",
+                "ip":"192.168.101.59",
+                "port":"ether10"
+                },
+                {
+                "hostname":"rpi60",
+                "ip":"192.168.101.60",
+                "port":"ether11"
+                },
+                {
+                "hostname":"rpi61",
+                "ip":"192.168.101.61",
+                "port":"ether12"
+                }
+        ]
+}
+]
+

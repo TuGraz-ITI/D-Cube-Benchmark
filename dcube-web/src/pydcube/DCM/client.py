@@ -220,13 +220,13 @@ class Client:
             raise CommandFailedException(r["missing"])
 
     #ping servers
-    def ping(self,servers=None,listen=True):
+    def ping(self,servers=None,listen=True,timeout=5):
         servers = self.servers if servers==None else servers
         command={}
         command["servers"]=servers
         command["type"]=CommandType.PING
         
-        self.send(command,servers,listen=listen)
+        self.send(command,servers,listen=listen,timeout=timeout)
         if listen:
             r=self.check_responses(servers=servers)
             self.__raise(r)

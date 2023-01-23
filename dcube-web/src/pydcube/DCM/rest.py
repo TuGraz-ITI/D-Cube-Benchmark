@@ -49,6 +49,7 @@ class RESTClient:
         self.FIRMWARE_ENDPOINT="firmware/"
         self.LAYOUT_ENDPOINT="layout/"
         self.JAMMING_ENDPOINT="jamming/"
+        self.BORDER_ROUTERS_ENDPOINT="border_routers/"
         self.PATCH_ENDPOINT="patch/"
         self.CUSTOM_PATCH_ENDPOINT="patch/custom/"
         self.TEMPLAB_ENDPOINT="templab/"
@@ -88,6 +89,14 @@ class RESTClient:
             r.raise_for_status()
             d[ep]=r.content
         return d
+
+    def get_border_routers(self,job_id):
+        r=self.requests_retry_session().get("%s%s%s%d"%(self.url,self.INTERNAL_API_ENDPOINT,self.BORDER_ROUTERS_ENDPOINT,job_id))
+        self.logger.debug(r)
+        r.raise_for_status()
+        j=r.json()
+        self.logger.debug(j)
+        return j
 
     def get_patch(self,job_id,host_id):
         d={}

@@ -49,6 +49,48 @@ import pytz
 import smtplib
 import ssl
 
+from cryptography.hazmat.primitives import serialization as crypto_serialization
+from cryptography.hazmat.primitives import hashes as crypto_hashes
+from cryptography.hazmat.primitives.asymmetric import rsa, padding
+from cryptography.hazmat.backends import default_backend as crypto_default_backend
+from cryptography.exceptions import InvalidSignature
+
+import json
+import hashlib
+import base64
+
+import requests
+
+PATH="/testbed/app/keys"
+E2E_URL="http://10.100.1.2/e2e/api"
+
+def request_e2e_slot(job):
+    #job={"name":"e2e_first","description":"myfirsttest","duration":"600"}
+    request={}
+    request["name"]=job.name
+    request["description"]=job.description
+    request["duration"]=job.duration
+
+    with open(os.path.join(PATH,"privkey"),"rb") as f:
+        pub_keydata=f.read()
+    public_key=crypto_serialization.load_pem_private_key(pub_keydata,
+                                                        backend=crypto_default_backend(),
+                                                        password = None
+    )
+
+    message=json.dumps(request).encode("ascii")
+    prehashed = hashlib.sha256(message).hexdigest().encode("ascii")
+
+    sig = public_key.sign(
+        prehashed,
+        padding.PSS(
+            mgf=padding.MGF1(crypto_hashes.SHA256()),
+            salt_length=padding.PSS.MAX_LENGTH),
+        crypto_hashes.SHA256())
+
+    request["sig"]=base64.b64encode(sig).decode("ascii")
+    #signed_message=json.dumps(job).encode("ascii")
+    return request
 
 EMAIL_PORT = 465
 EMAIL_TEXT = "Subject: [ITI-Testbed] Testbed failure\n\nDear testbed technician,\n\nthe testbed has failed and ended execution of experiments to prevent further damage.\n\nBest Regards,\nMarkus Schuss"
@@ -283,6 +325,35 @@ class Scheduler:
                     db.session.commit()
                     name=next.firmware.filename
                     start_time=datetime.utcnow()
+
+                    if ("E2E" in next.protocol.benchmark_suite.name):
+                        print("requesting")
+                        e2e_req = request_e2e_slot(next)
+                        r = requests.post(E2E_URL+"/request", json=e2e_req)
+                        print(r.status_code)
+                        print(r.json())
+
+                        c={}
+                        j=r.json()
+                        E2E_TOKEN=j["token"]
+                        c["token"]=E2E_TOKEN
+
+                        print("checking")
+                        while(True):
+                            if check_kill()==True:
+                                print("aborting")
+                                break
+                            r = requests.get(E2E_URL+"/ready/%s"%E2E_TOKEN)
+                            if not r.status_code == 200:
+                                print("api error (%d)!"%r.status_code)
+                                break
+                            res=r.json()
+                            if res["state"]==False:
+                                print("not ready yet (%s)"%r.text)
+                                sleep(1)
+                            else:
+                                break
+
     
                     if ((next.protocol.benchmark_suite.node.name=="Sky-All") or (next.protocol.benchmark_suite.node.name=="Nordic-All")) :
                         py_path = current_app.config['PYTHON_PATH']
@@ -291,6 +362,8 @@ class Scheduler:
                         dcm_broker = current_app.config['DCM_BROKER']
                         if next.temp_profile:
                             switch_config = current_app.config['TEMPLAB_SWITCH_CONFIG']
+                        elif next.protocol.benchmark_suite.id==5:
+                            switch_config = "switch_federated.json"
                         else:
                             switch_config = current_app.config['SWITCH_CONFIG']
                         #current_task=Popen(['/usr/bin/python3',"/testbed/pydcube/rpc_testbed.py", "--job_id", str(next.id),"--topology", "switch.json"], stderr=PIPE, stdin=PIPE, stdout=PIPE,cwd="/testbed/pydcube")
@@ -383,6 +456,8 @@ class Scheduler:
                     next.finished=True
                     next.running=False
                     end_time=datetime.utcnow()
+                    if ("E2E" in next.protocol.benchmark_suite.name):
+                        r = requests.post(E2E_URL+"/done/%s"%E2E_TOKEN)
                     try:
                             result=Result(start_time,end_time,next.id)
                             db.session.add(result)

@@ -4,14 +4,14 @@
 	"type":"Mikrotik",
 	"nodes":[
 		{
-		"hostname":"rpi100",
-		"ip":"192.168.101.100",
-		"port":"ether15"
+		"hostname":"rpi80",
+		"ip":"192.168.103.80",
+		"port":"ether2"
 		},
 		{
-		"hostname":"rpi101",
-		"ip":"192.168.101.101",
-		"port":"ether16"
+		"hostname":"rpi81",
+		"ip":"192.168.103.81",
+		"port":"ether3"
 		}
 	]
 }

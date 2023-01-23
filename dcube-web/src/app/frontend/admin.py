@@ -1038,6 +1038,17 @@ def build_layout_dict(composition, rpi=None, show_unused=True):
     nodes = []
     edges = []
     for p in patterns:
+        br_nodes = []
+        border_routers = LayoutPi.query.filter_by(
+            composition_id=composition.id, group=p.group, role="border_router").all()
+        for br in border_routers:
+            node = {"id": br.id, "label": br.rpi,
+                    "color": "rgb(67,172,106)", "value": 10}
+            if(br.rpi == rpi):
+                node['font'] = {"size": 20}
+                node['value'] = 20
+            br_nodes.append(node)
+
         s_nodes = []
         sources = LayoutPi.query.filter_by(
             composition_id=composition.id, group=p.group, role="source").all()
@@ -1063,7 +1074,7 @@ def build_layout_dict(composition, rpi=None, show_unused=True):
         u_nodes = []
         if(show_unused == True):
             unused = LayoutPi.query.filter_by(composition_id=composition.id, group=p.group).filter(
-                LayoutPi.role != "sink").filter(LayoutPi.role != "source").all()
+                LayoutPi.role != "sink").filter(LayoutPi.role != "source").filter(LayoutPi.role != "border_router").all()
             for u in unused:
                 node = {"id": u.id, "label": u.rpi,
                         "color": "rgb(236,236,236)", "value": 10}
@@ -1072,12 +1083,19 @@ def build_layout_dict(composition, rpi=None, show_unused=True):
                     node['value'] = 20
                 u_nodes.append(node)
 
+        for br1 in br_nodes:
+            for br2 in br_nodes:
+                if br1==br2:
+                    continue
+                edge = {"from": br1['id'], "to": br2['id']}
+                edges.append(edge)
+
         for s in s_nodes:
             for d in d_nodes:
                 edge = {"from": s['id'], "to": d['id']}
                 edges.append(edge)
 
-        nodes += s_nodes+d_nodes+u_nodes
+        nodes += s_nodes+d_nodes+u_nodes+br_nodes
     return {"nodes": nodes, "edges": edges}
 
 
