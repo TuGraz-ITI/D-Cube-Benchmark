@@ -204,96 +204,105 @@ def show_benchmark_suite(benchmark_suite_id=None):
 #        Metric.job.has(Job.id <= LAST_JOB))
     metrics = metrics.join(Job, (Job.id==Metric.job_id)).join(Protocol, (Protocol.id==Job.protocol_id)).add_columns(Protocol.name.label("protocol")).add_columns(Protocol.id.label("pid"))
 
-    df = pd.read_sql(metrics.statement, metrics.session.bind)
-
-    df['latency'] = df['latency']/1000
-    df['plot_reliability'] = df['reliability']*100
-
-    min_energy = df['energy'].min()
-    min_latency = df['latency'].min()
-    max_reliability = df['reliability'].max()
-
-    df['rel_energy'] = (df['energy']-min_energy)/min_energy
-    df['rel_latency'] = (df['latency']-min_latency)/min_latency
-    df['rel_reliability'] = (max_reliability-df['reliability'])/max_reliability
-
-    df['total'] = df['rel_energy']*COEFF_ENERGY+df['rel_latency'] * \
-        COEFF_LATENCY+df['rel_reliability']*COEFF_REL
-    df = df.sort_values("total")
-    df['plot_total'] = df['total']*100
-    df['points'] = 0
 
     count = request.args.get("count")
-    if (count == None):
-        count = "median"
 
-    if count == "median":
+    try:
+        df = pd.read_sql(metrics.statement, metrics.session.bind)
+    
+        df['latency'] = df['latency']/1000
+        df['plot_reliability'] = df['reliability']*100
+    
+        min_energy = df['energy'].min()
+        min_latency = df['latency'].min()
+        max_reliability = df['reliability'].max()
+    
+        df['rel_energy'] = (df['energy']-min_energy)/min_energy
+        df['rel_latency'] = (df['latency']-min_latency)/min_latency
+        df['rel_reliability'] = (max_reliability-df['reliability'])/max_reliability
+    
+        df['total'] = df['rel_energy']*COEFF_ENERGY+df['rel_latency'] * \
+            COEFF_LATENCY+df['rel_reliability']*COEFF_REL
+        df = df.sort_values("total")
+        df['plot_total'] = df['total']*100
+        df['points'] = 0
+    
+        if (count == None):
+            count = "median"
+    
+        if count == "median":
+            try:
+                df_mean = df.groupby("protocol").agg(
+                    np.median).reset_index(drop=False)
+                df_count = df.groupby("protocol").count().reset_index(drop=False)
+                df_mean["count"] = df_count["total"]
+                df = df_mean
+                df = df[df.reliability >= (THRESHOLD/100.0)]
+                df = df.sort_values("total")
+            except Exception as e:
+                pass
+    
+        else:
+            try:
+                count = int(count)
+            except ValueError:
+                count = 1
+    
+            if not (count == 0):
+                df = df.groupby("protocol").head(count).reset_index(drop=True)
+    
+        df = df.reset_index(drop=True)
+    
         try:
-            df_mean = df.groupby("protocol").agg(
-                np.median).reset_index(drop=False)
-            df_count = df.groupby("protocol").count().reset_index(drop=False)
-            df_mean["count"] = df_count["total"]
-            df = df_mean
-            df = df[df.reliability >= (THRESHOLD/100.0)]
-            df = df.sort_values("total")
-        except Exception as e:
+            df['rel_total'] = df['total']/df['total'].min()
+            df['diff_total'] = df['total']-df['total'].min()
+        except KeyError:
             pass
-
-    else:
+    
         try:
-            count = int(count)
-        except ValueError:
-            count = 1
-
-        if not (count == 0):
-            df = df.groupby("protocol").head(count).reset_index(drop=True)
-
-    df = df.reset_index(drop=True)
-
-    try:
-        df['rel_total'] = df['total']/df['total'].min()
-        df['diff_total'] = df['total']-df['total'].min()
-    except KeyError:
-        pass
-
-    try:
-        df = df.sort_values(["total", "id"])
-    except KeyError:
-        pass
-
-    if(len(df) < NUMBARS):
-
-        try:
-            f, axs = plt.subplots(1, 3)
-            df.plot(ax=axs[0], kind="bar", x="pid", y="energy", figsize=(
-                12, 4), edgecolor="k", legend=False)
-            df.plot(ax=axs[1], kind="bar", x="pid", y="latency", figsize=(
-                12, 4), edgecolor="k", legend=False)
-            df.plot(ax=axs[2], kind="bar", x="pid", y="plot_reliability", figsize=(
-                12, 4), edgecolor="k", legend=False)
-            axs[0].set_ylabel("Energy [J]")
-            axs[0].set_xlabel("Protocol ID")
-            axs[1].set_ylabel("Latency [ms]")
-            axs[1].set_xlabel("Protocol ID")
-            axs[1].set_ylim(0, df['latency'].median()*3)
-            axs[2].set_ylabel("Reliablity [%]")
-            axs[2].set_xlabel("Protocol ID")
-            (min2, max2) = axs[2].set_ylim()
-            axs[2].set_ylim(0, max2)
-            plt.tight_layout()
-            output = io.BytesIO()
-            plt.savefig(output, format='png')
-            plt.close()
-            output.seek(0)
-            png = base64.b64encode(output.getvalue()).decode()
-        except (ValueError,TypeError,KeyError):
+            df = df.sort_values(["total", "id"])
+        except KeyError:
+            pass
+    
+        if(len(df) < NUMBARS):
+    
+            try:
+                f, axs = plt.subplots(1, 3)
+                df.plot(ax=axs[0], kind="bar", x="pid", y="energy", figsize=(
+                    12, 4), edgecolor="k", legend=False)
+                df.plot(ax=axs[1], kind="bar", x="pid", y="latency", figsize=(
+                    12, 4), edgecolor="k", legend=False)
+                df.plot(ax=axs[2], kind="bar", x="pid", y="plot_reliability", figsize=(
+                    12, 4), edgecolor="k", legend=False)
+                axs[0].set_ylabel("Energy [J]")
+                axs[0].set_xlabel("Protocol ID")
+                axs[1].set_ylabel("Latency [ms]")
+                axs[1].set_xlabel("Protocol ID")
+                axs[1].set_ylim(0, df['latency'].median()*3)
+                axs[2].set_ylabel("Reliablity [%]")
+                axs[2].set_xlabel("Protocol ID")
+                (min2, max2) = axs[2].set_ylim()
+                axs[2].set_ylim(0, max2)
+                plt.tight_layout()
+                output = io.BytesIO()
+                plt.savefig(output, format='png')
+                plt.close()
+                output.seek(0)
+                png = base64.b64encode(output.getvalue()).decode()
+            except (ValueError,TypeError,KeyError):
+                png = None
+                plt.close()
+        else:
             png = None
-            plt.close()
-    else:
-        png = None
+    
+    except AttributeError:
+        df=pd.DataFrame()
+        png=None
+        pass
 
     durations_string = Config.get_string("durations", "120 480")
     durations = map(int, durations_string.split())
+
 
     return render_template('shiny_leaderboard.html', df=df, 
                                                      jammings=jammings, 

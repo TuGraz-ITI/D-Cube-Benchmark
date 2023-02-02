@@ -98,13 +98,13 @@ def index_page(page=1):
         results.c.begin.desc())
 
     if(page == -1):
-        xjobs = jobs.paginate(1, 30)
+        xjobs = jobs.paginate(page=1, per_page=30)
         last = xjobs.pages
         if last == 0:
             last = 1
-        jobs = jobs.paginate(last, 30)
+        jobs = jobs.paginate(page=last, per_page=30)
     else:
-        jobs = jobs.paginate(page, 30)
+        jobs = jobs.paginate(page=page, per_page=30)
 
     #jobs = Job.query.join(results).order_by(
     #    results.c.begin.desc()).limit(30).all()

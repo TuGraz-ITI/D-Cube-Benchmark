@@ -149,9 +149,9 @@ def show_queue_page(page=-1):
             jobs=jobs.filter(Job.protocol.has(Protocol.id==pid))
 
     if(page == -1):
-        jobs = jobs.order_by(Job.id.desc()).paginate(1, 50)
+        jobs = jobs.order_by(Job.id.desc()).paginate(page=1, per_page=50)
     else:
-        jobs = jobs.order_by(Job.id.desc()).paginate(page, 50)
+        jobs = jobs.order_by(Job.id.desc()).paginate(page=page, per_page=50)
 
     jammings = JammingComposition.query
     if not (current_user.has_role("admins")):

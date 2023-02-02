@@ -90,11 +90,6 @@ PROGRAM_RETRY_MAX=10
 #POE loop parameters
 POE_RETRY_MAX=5
 
-#List of all servers
-#SERVERS=["rpi%d"%x for x in chain(range(100,120),range(200,228))]
-
-#SERVERS=["rpi%d"%x for x in chain(range(100,102))]
-
 #Local time format
 DATEFORMAT="%a %b %d %H:%M:%S %Z %Y"
 tz=pytz.timezone("CET")
@@ -155,7 +150,6 @@ for switch in topology:
     for node in switch["nodes"]:
         SERVERS.append(node["hostname"])
 
-#templab_nodes=["rpi%d"%x for x in range(120,128)]+ ["rpi129"]
 templab_nodes=["rpi%d"%x for x in range(120,128)]#+ ["rpi129"]
 
 BROKER=args.broker

@@ -23,7 +23,7 @@
 #
 
 #flask-security stuff
-from flask_security import SQLAlchemyUserDatastore
+from flask_security import SQLAlchemyUserDatastore, lookup_identity, LoginForm
 
 from backend.database import db
 from models.user import User
@@ -32,9 +32,17 @@ from models.role import Role
 # Setup Flask-Security
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 
-from flask_security.forms import LoginForm
-from wtforms import StringField
-from wtforms.validators import InputRequired
+#from flask_security.forms import LoginForm
+from wtforms import StringField, validators
 
 class ExtendedLoginForm(LoginForm):
-    email = StringField('Username', [InputRequired()])
+    email = StringField("Username", [validators.data_required()])
+
+    def validate(self, **kwargs):
+        self.user = lookup_identity(self.email.data)
+        # Setting 'ifield' informs the default login form validation
+        # handler that the identity has already been confirmed.
+        self.ifield = self.email
+        if not super().validate(**kwargs):
+            return False
+        return True

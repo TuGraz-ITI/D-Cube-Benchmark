@@ -10,9 +10,7 @@ import json
 import logging
 
 #List of all servers
-SERVERS=["rpi%d"%x for x in chain(range(80,82),range(50,62))]
-SERVERS.remove("rpi57")
-#SERVERS=["rpi%d"%x for x in chain(range(100,120),range(120,128),range(200,228))]
+SERVERS=["rpi%d"%x for x in range(80,82)]
 
 #CLI arguments
 parser=argparse.ArgumentParser(description="D-Cube RPC Client.")
@@ -34,7 +32,7 @@ logging.getLogger("pika").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 #clients
-dcube=DCM.Client("192.168.103.10","master","dcube","GWcq43x2",servers=SERVERS)
+dcube=DCM.Client("broker","master","dcube","GWcq43x2",servers=SERVERS)
 
 #ping all servers
 logger.info("Checking if all %d Raspberry Pi nodes are pingable..."%len(SERVERS))

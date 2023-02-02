@@ -22,8 +22,9 @@
 # SOFTWARE.
 #
 from flask import Flask,redirect
-from flask_bootstrap import Bootstrap
-from flask_security import Security, current_user
+from flask_bootstrap import Bootstrap4
+from flask_security import Security, current_user, uia_username_mapper 
+from flask_migrate import Migrate
 
 from frontend.frontend import frontend
 from frontend.rest_api import rest_api
@@ -44,6 +45,12 @@ from frontend.helpers import check_scheduler_time, check_jamming_time
 from dotenv import load_dotenv
 import os
 
+import logging
+import sys
+level=logging.DEBUG
+FORMAT = "[%(name)16s - %(funcName)12s() ] %(message)s"
+logging.basicConfig(stream=sys.stdout,level=level,format=FORMAT)
+
 def create_app(configfile=None):
     app = Flask("dcube")
 
@@ -61,7 +68,7 @@ def create_app(configfile=None):
     db.init_app(app)
 
     # Install our Bootstrap extension
-    Bootstrap(app)
+    Bootstrap4(app)
 
     # Our application uses blueprints as well; these go well with the
     # application factory. We already imported the blueprint, now we just need
@@ -74,8 +81,15 @@ def create_app(configfile=None):
     app.register_blueprint(internal_api, url_prefix='/internal/api')
     app.register_blueprint(leaderboard, url_prefix='/leaderboard')
 
+    # Allow registration with email, but login only with username
+    app.config["SECURITY_USER_IDENTITY_ATTRIBUTES"] = [
+        {"username": {"mapper": uia_username_mapper}}
+    ]
+
     # We initialize the security context
     Security(app, user_datastore, login_form=ExtendedLoginForm)
+
+    migrate=Migrate(app,db)
 
     # Create a user to test with
     @app.before_first_request

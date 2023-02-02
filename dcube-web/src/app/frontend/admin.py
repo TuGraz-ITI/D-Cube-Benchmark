@@ -22,7 +22,8 @@
 # SOFTWARE.
 #
 from flask import Blueprint, redirect, request, render_template, current_app, url_for, flash, send_from_directory, abort
-from flask_security import login_required, roles_required, current_user
+from flask_security import login_required, roles_required, current_user, hash_password
+
 from werkzeug.utils import secure_filename
 
 from .helpers import *
@@ -101,7 +102,7 @@ def setup_defaults():
     anyone = User.query.first()
     if anyone is None:
         admin = user_datastore.create_user(
-            username="admin", email='admin@admin.net', password='admin')
+            username="admin", email='admin@admin.net', password=hash_password('admin'))
         user_datastore.add_role_to_user(admin, admins)
         user_datastore.add_role_to_user(admin, users)
         group = Group("builtin")
@@ -309,7 +310,7 @@ def create_user_post():
                 flash('Group ' + groupname + ' does not exist!', 'error')
             else:
                 user = user_datastore.create_user(
-                    username=username, email=email, password=password, group_id=group.id)
+                    username=username, email=email, password=hash_password(password), group_id=group.id)
                 users = user_datastore.find_role("users")
                 user_datastore.add_role_to_user(user, users)
                 db.session.commit()
@@ -799,9 +800,9 @@ def admin_queue():
 @roles_required("admins")
 def admin_queue_page(page=-1):
     if(page == -1):
-        jobs = Job.query.order_by(Job.id.desc()).paginate(1, 50)
+        jobs = Job.query.order_by(Job.id.desc()).paginate(page=1, per_page=50)
     else:
-        jobs = Job.query.order_by(Job.id.desc()).paginate(page, 50)
+        jobs = Job.query.order_by(Job.id.desc()).paginate(page=page, per_page=50)
 
     scheduler_stop = Config.query.filter_by(key="scheduler_stop").first()
     return render_template('admin/queue.html', jobs=jobs, scheduler_stop=scheduler_stop)
@@ -840,10 +841,10 @@ def firmwares():
 @roles_required("admins")
 def firmwares_page(page=-1):
     if(page == -1):
-        firmwares = Firmware.query.order_by(Firmware.id.desc()).paginate(1, 50)
+        firmwares = Firmware.query.order_by(Firmware.id.desc()).paginate(page=1, per_page=50)
     else:
         firmwares = Firmware.query.order_by(
-            Firmware.id.desc()).paginate(page, 50)
+            Firmware.id.desc()).paginate(page=page, per_page=50)
 
     return render_template('admin/firmwares.html', firmwares=firmwares)
 

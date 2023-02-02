@@ -1,7 +1,7 @@
 version: '3.9'
 services:
         rpi_80:
-                hostname: rpi_80
+                hostname: rpi80
                 restart: always 
                 container_name: dcube-sim-80
                 build: 
@@ -10,8 +10,8 @@ services:
                 depends_on:
                         - broker
 
-        rpi_80:
-                hostname: rpi_81
+        rpi_81:
+                hostname: rpi81
                 restart: always 
                 container_name: dcube-sim-81
                 build: 
