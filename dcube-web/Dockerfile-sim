@@ -1,0 +1,5 @@
+FROM python:alpine
+ADD ./src/pydcube /testbed
+WORKDIR /testbed
+RUN pip3 install -r requirements-sim.txt
+CMD python3 rpc_sim.py --credentials=credentials.json --nodes=nodes.json --debug
