@@ -1,26 +1,25 @@
-<!--
--- MIT License
---
--- Copyright (c) 2022 Graz University of Technology
---
--- Permission is hereby granted, free of charge, to any person obtaining a copy
--- of this software and associated documentation files (the "Software"), to deal
--- in the Software without restriction, including without limitation the rights
--- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
--- copies of the Software, and to permit persons to whom the Software is
--- furnished to do so, subject to the following conditions:
---
--- The above copyright notice and this permission notice shall be included in all
--- copies or substantial portions of the Software.
---
--- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
--- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
--- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
--- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
--- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
--- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
--- SOFTWARE.
--->
+{# MIT License
+
+  Copyright (c) 2023 Graz University of Technology
+  
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+  
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+  
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE. #}
+  
 {# This simple template derives from ``base.html``. See ``base.html`` for
 more information about template inheritance. #}
 {%- extends "base.html" %}
@@ -45,178 +44,178 @@ intact. #}
 {% block content %}
 <div class="container">
   <div class="container">
-    <h1>Jamming</h1>
+  <h1>Jamming</h1>
 
-    <div class="row is-table-row">
-      <div class="col-sm-5">
-	<div class="card">
-	  <div class="input-group card-header">
-	    <div class="input-group-prepend">
-	      <span class="input-group-text" id="composition-addon">Level</span>
-	    </div>
-	    <select class="form-control" id="composition" name="composition" aria-describedby="composition-addon">
-	      {% for c in compositions %}
-	      <option {% if composition.id ==c.id %}selected="selected"{% endif %}value="{{c.id}}">{{c.name}}</option>
-	      {% endfor%}
-	    </select>
-	    <span class="input-group-append">
-	      <a class="btn btn-primary" href="#" role="button" data-composition-id="{{composition.id}}" data-composition-name="{{composition.name}}" data-composition-short="{{composition.short}}" data-composition-public="{{composition.public}}" data-toggle="modal" data-target="#editComposition"><span class="fas fa-edit" aria-hidden="true"></span></a>
+  <div class="row is-table-row">
+    <div class="col-sm-5">
+  <div class="card">
+    <div class="input-group card-header">
+    <div class="input-group-prepend">
+      <span class="input-group-text" id="composition-addon">Level</span>
+    </div>
+    <select class="form-control" id="composition" name="composition" aria-describedby="composition-addon">
+      {% for c in compositions %}
+      <option {% if composition.id ==c.id %}selected="selected"{% endif %}value="{{c.id}}">{{c.name}}</option>
+      {% endfor%}
+    </select>
+    <span class="input-group-append">
+      <a class="btn btn-primary" href="#" role="button" data-composition-id="{{composition.id}}" data-composition-name="{{composition.name}}" data-composition-short="{{composition.short}}" data-composition-public="{{composition.public}}" data-toggle="modal" data-target="#editComposition"><span class="fas fa-edit" aria-hidden="true"></span></a>
 
-	      <a class="btn btn-success" href="/admin/jamming/create_composition" role="button"><span class="fas fa-plus" aria-hidden="true"></span></a>
-	      <a class="btn btn-danger" href="/admin/jamming/delete_composition/{{composition.id}}" role="button">  <span class="fas fa-times" aria-hidden="true"></span></a>
-	    </span>
-
-	  </div>
-	  <div class="card-body">
-	    <table class="table">    
-	      <thead>
-		<tr>
-		  <th>Attribute</th>
-		  <th>Value</th>
-		</tr>
-	      </thead>
-	      <tbody>
-		<tr>
-		  <td>ID</td>
-		  <td>{{composition.id}}
-		</tr>
-		<tr>
-		  <td>Name</td>
-		  <td>{{composition.name}}</td>
-		</tr>
-		<tr>
-		  <td>Short</td>
-		  <td>{{composition.short}}</td>
-		</tr>
-		<tr>
-		  <td>Public</td>
-		  <td>{{composition.public}}</td>
-		</tr>
-
-	    </table>
-	  </div>
-	</div>
-
-
-	<div class="card">
-	  <div class="card-header">
-	    <div class="input-group">
-	      <div class="input-group-prepend">
-		<span class="input-group-text" id="scenario-addon">Scenario</span>
-	      </div>
-	      <select class="form-control" id="scenario" name="scenario" aria-describedby="scenario-addon">
-		{% for s in scenarios %}
-		<option {% if scenario.id ==s.id %}selected="selected"{% endif %}value="{{s.id}}">{{s.name}}</option>
-		{% endfor%}
-	      </select>
-	      <span class="input-group-append">
-		<a class="btn btn-secondary {% if scenario==None %} disabled{%endif%}" href="jamming/edit_scenario/{{scenario.id}}" role="button"><span class="fas fa-share-alt" aria-hidden="true"></span></a>
-		<a class="btn btn-primary {% if scenario==None %} disabled{%endif%}" href="#" role="button" data-scenario-id="{{scenario.id}}" data-scenario-name="{{scenario.name}}"  data-toggle="modal" data-target="#editScenario"><span class="fas fa-edit" aria-hidden="true"></span></a>
-
-		<a class="btn btn-success" href="/admin/jamming/create_scenario?composition={{composition.id}}{% if not pi==None %}&pi={{pi.id}}{%endif%}" role="button"><span class="fas fa-plus" aria-hidden="true"></span></a>
-		<a class="btn btn-danger {% if scenario==None %} disabled{%endif%}" href="/admin/jamming/delete_scenario/{{scenario.id}}{%if composition%}?composition={{composition.id}}{% if not pi==None %}&pi={{pi.id}}{%endif%}{%endif%}" role="button">  <span class="fas fa-times" aria-hidden="true"></span></a>
-	      </span>
-
-	    </div>
-	  </div>
-	  <div class="card-body">
-	    <table class="table">    
-	      <thead>
-		<tr>
-		  <th>Attribute</th>
-		  <th>Value</th>
-		</tr>
-	      </thead>
-	      <tbody>
-		<tr>
-		  <td>ID</td>
-		  <td>{{scenario.id}}
-		</tr>
-		<tr>
-		  <td>Name</td>
-		  <td>{{scenario.name}}</td>
-		</tr>
-	    </table>
-	  </div>
-	</div>
-
-	<div class="card">
-	  <div class="card-header">
-	    <div class="input-group">
-	      <div class="input-group-prepend">
-		<label class="input-group-text" id="pi-addon">Node</label>
-	      </div>
-	      <select class="form-control" id="pi" name="pi" aria-describedby="pi-addon">
-		{% for p in pis %}
-		<option {% if pi.id ==p.id %}selected="selected"{% endif %}value="{{p.id}}">{{p.rpi}}</option>
-		{% endfor%}
-	      </select>
-	      <span class="input-group-append">
-		<a class="btn btn-primary {% if pi==None %} disabled{%endif%}" href="#" role="button" data-node-id="{{pi.id}}" data-node-rpi="{{pi.rpi}}" data-node-relative="{{pi.relative}}" data-node-sync="{{pi.sync}}" data-toggle="modal" data-target="#editNode"><span class="fas fa-edit" aria-hidden="true"></span></a>
-
-		<a class="btn btn-success {% if scenario==None or composition==None %} disabled{%endif%} " href="/admin/jamming/create_node/{{composition.id}}/{{scenario.id}}" role="button"><span class="fas fa-plus" aria-hidden="true"></span></a>
-		<a class="btn btn-danger {% if pi==None %} disabled{%endif%}" href="/admin/jamming/delete_node/{{pi.id}}?composition={{composition.id}}{% if not scenario==None %}&scenario={{scenario.id}}{%endif%}" role="button">  <span class="fas fa-times" aria-hidden="true"></span></a>
-	      </span>
-
-	    </div>
-	  </div>
-	  <div class="card-body">
-	    <table class="table">    
-	      <thead>
-		<tr>
-		  <th>Attribute</th>
-		  <th>Value</th>
-		</tr>
-	      </thead>
-	      <tbody>
-		<tr>
-		  <td>ID</td>
-		  <td>{{pi.id}}
-		</tr>
-		<tr>
-		  <td>Raspberry Pi</td>
-		  <td>{{pi.rpi}}</td>
-		</tr>
-		<tr>
-		  <td>Relative</td>
-		  <td>{{pi.relative}}</td>
-		</tr>
-		<tr>
-		  <td>Sync</td>
-		  <td>{{pi.sync}}</td>
-		</tr>
-	    </table>
-	  </div>
-	</div>
-
-
-      </div>
-      <div class="col-sm-7">
-	<div class="card">
-	  <div class="card-header">
-	    <h4>Preview
-	    <button class="btn btn-secondary float-right" href="#" role="button" onclick="network.fit()"><span class="fas fa-search-minus" aria-hidden="true"></span></button></h4>
-	  </div>
-	  <div class="card-body">
-	    <div id="graph"></div>
-	  </div>
-	</div>
-      </div>
+      <a class="btn btn-success" href="/admin/jamming/create_composition" role="button"><span class="fas fa-plus" aria-hidden="true"></span></a>
+      <a class="btn btn-danger" href="/admin/jamming/delete_composition/{{composition.id}}" role="button">  <span class="fas fa-times" aria-hidden="true"></span></a>
+    </span>
 
     </div>
-    <div class="row">
-      <div class="col-sm-12">
-	<div class="card">
-	  <div class="card-header">
-	    <h4>Timeline
-	    <button class="btn btn-secondary float-right" href="#" role="button" onclick="tl.fit()"><span class="fas fa-search-minus" aria-hidden="true"></span></button></h4>
-	  </div>
-	  <div class="card-body">
-	    <div id="timeline"></div>
-	  </div>
-	</div>
-      </div>
+    <div class="card-body">
+    <table class="table">    
+      <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>Value</th>
+    </tr>
+      </thead>
+      <tbody>
+    <tr>
+      <td>ID</td>
+      <td>{{composition.id}}
+    </tr>
+    <tr>
+      <td>Name</td>
+      <td>{{composition.name}}</td>
+    </tr>
+    <tr>
+      <td>Short</td>
+      <td>{{composition.short}}</td>
+    </tr>
+    <tr>
+      <td>Public</td>
+      <td>{{composition.public}}</td>
+    </tr>
+
+    </table>
     </div>
+  </div>
+
+
+  <div class="card">
+    <div class="card-header">
+    <div class="input-group">
+      <div class="input-group-prepend">
+    <span class="input-group-text" id="scenario-addon">Scenario</span>
+      </div>
+      <select class="form-control" id="scenario" name="scenario" aria-describedby="scenario-addon">
+    {% for s in scenarios %}
+    <option {% if scenario.id ==s.id %}selected="selected"{% endif %}value="{{s.id}}">{{s.name}}</option>
+    {% endfor%}
+      </select>
+      <span class="input-group-append">
+    <a class="btn btn-secondary {% if scenario==None %} disabled{%endif%}" href="jamming/edit_scenario/{{scenario.id}}" role="button"><span class="fas fa-share-alt" aria-hidden="true"></span></a>
+    <a class="btn btn-primary {% if scenario==None %} disabled{%endif%}" href="#" role="button" data-scenario-id="{{scenario.id}}" data-scenario-name="{{scenario.name}}"  data-toggle="modal" data-target="#editScenario"><span class="fas fa-edit" aria-hidden="true"></span></a>
+
+    <a class="btn btn-success" href="/admin/jamming/create_scenario?composition={{composition.id}}{% if not pi==None %}&pi={{pi.id}}{%endif%}" role="button"><span class="fas fa-plus" aria-hidden="true"></span></a>
+    <a class="btn btn-danger {% if scenario==None %} disabled{%endif%}" href="/admin/jamming/delete_scenario/{{scenario.id}}{%if composition%}?composition={{composition.id}}{% if not pi==None %}&pi={{pi.id}}{%endif%}{%endif%}" role="button">  <span class="fas fa-times" aria-hidden="true"></span></a>
+      </span>
+
+    </div>
+    </div>
+    <div class="card-body">
+    <table class="table">    
+      <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>Value</th>
+    </tr>
+      </thead>
+      <tbody>
+    <tr>
+      <td>ID</td>
+      <td>{{scenario.id}}
+    </tr>
+    <tr>
+      <td>Name</td>
+      <td>{{scenario.name}}</td>
+    </tr>
+    </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+    <div class="input-group">
+      <div class="input-group-prepend">
+    <label class="input-group-text" id="pi-addon">Node</label>
+      </div>
+      <select class="form-control" id="pi" name="pi" aria-describedby="pi-addon">
+    {% for p in pis %}
+    <option {% if pi.id ==p.id %}selected="selected"{% endif %}value="{{p.id}}">{{p.rpi}}</option>
+    {% endfor%}
+      </select>
+      <span class="input-group-append">
+    <a class="btn btn-primary {% if pi==None %} disabled{%endif%}" href="#" role="button" data-node-id="{{pi.id}}" data-node-rpi="{{pi.rpi}}" data-node-relative="{{pi.relative}}" data-node-sync="{{pi.sync}}" data-toggle="modal" data-target="#editNode"><span class="fas fa-edit" aria-hidden="true"></span></a>
+
+    <a class="btn btn-success {% if scenario==None or composition==None %} disabled{%endif%} " href="/admin/jamming/create_node/{{composition.id}}/{{scenario.id}}" role="button"><span class="fas fa-plus" aria-hidden="true"></span></a>
+    <a class="btn btn-danger {% if pi==None %} disabled{%endif%}" href="/admin/jamming/delete_node/{{pi.id}}?composition={{composition.id}}{% if not scenario==None %}&scenario={{scenario.id}}{%endif%}" role="button">  <span class="fas fa-times" aria-hidden="true"></span></a>
+      </span>
+
+    </div>
+    </div>
+    <div class="card-body">
+    <table class="table">    
+      <thead>
+    <tr>
+      <th>Attribute</th>
+      <th>Value</th>
+    </tr>
+      </thead>
+      <tbody>
+    <tr>
+      <td>ID</td>
+      <td>{{pi.id}}
+    </tr>
+    <tr>
+      <td>Raspberry Pi</td>
+      <td>{{pi.rpi}}</td>
+    </tr>
+    <tr>
+      <td>Relative</td>
+      <td>{{pi.relative}}</td>
+    </tr>
+    <tr>
+      <td>Sync</td>
+      <td>{{pi.sync}}</td>
+    </tr>
+    </table>
+    </div>
+  </div>
+
+
+    </div>
+    <div class="col-sm-7">
+  <div class="card">
+    <div class="card-header">
+    <h4>Preview
+    <button class="btn btn-secondary float-right" href="#" role="button" onclick="network.fit()"><span class="fas fa-search-minus" aria-hidden="true"></span></button></h4>
+    </div>
+    <div class="card-body">
+    <div id="graph"></div>
+    </div>
+  </div>
+    </div>
+
+  </div>
+  <div class="row">
+    <div class="col-sm-12">
+  <div class="card">
+    <div class="card-header">
+    <h4>Timeline
+    <button class="btn btn-secondary float-right" href="#" role="button" onclick="tl.fit()"><span class="fas fa-search-minus" aria-hidden="true"></span></button></h4>
+    </div>
+    <div class="card-body">
+    <div id="timeline"></div>
+    </div>
+  </div>
+    </div>
+  </div>
   </div>
 </div>
 <div class="container">
@@ -224,35 +223,35 @@ intact. #}
 
   <!-- Modal -->
   <div class="modal fade" id="editComposition" role="dialog">
-    <div class="modal-dialog">
+  <div class="modal-dialog">
 
-      <!-- Modal content-->
-      <div class="modal-content">
-	<form id="updateCompositionForm" action="update_composition" enctype="multipart/form-data" method="post">
-	  <div class="modal-header">
-	    <h1 class="col-12 text-center">Edit Level
-	      <button type="button" class="close" data-dismiss="modal">&times;</button></h1>
-	  </div>
-	  <div class="modal-body">
-	    <div class="form-group required"><label class="control-label" required for="name">Name</label>
-	      <input class="form-control" id="name" name="name" type="text" value="" maxlength="255">
-	    </div>
-	    <div class="form-group required"><label class="control-label" required for="short">Short</label>
-	      <input class="form-control" id="short" name="short" type="text" value="" maxlength="255">
-	    </div>
-	    <div class="form-group">
-	      <label><input type="checkbox" id="public" name="public" checked data-toggle="toggle" data-size="small">
-		Public
-	      </label>
-	    </div>
-	  </div>
-	  <div class="modal-footer">
-	    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-	    <input class="btn btn-success" id="submit" name="submit" type="submit" value="Update">
-	  </div>
-	</form>
-      </div>
+    <!-- Modal content-->
+    <div class="modal-content">
+  <form id="updateCompositionForm" action="update_composition" enctype="multipart/form-data" method="post">
+    <div class="modal-header">
+    <h1 class="col-12 text-center">Edit Level
+      <button type="button" class="close" data-dismiss="modal">&times;</button></h1>
     </div>
+    <div class="modal-body">
+    <div class="form-group required"><label class="control-label" required for="name">Name</label>
+      <input class="form-control" id="name" name="name" type="text" value="" maxlength="255">
+    </div>
+    <div class="form-group required"><label class="control-label" required for="short">Short</label>
+      <input class="form-control" id="short" name="short" type="text" value="" maxlength="255">
+    </div>
+    <div class="form-group">
+      <label><input type="checkbox" id="public" name="public" checked data-toggle="toggle" data-size="small">
+    Public
+      </label>
+    </div>
+    </div>
+    <div class="modal-footer">
+    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    <input class="btn btn-success" id="submit" name="submit" type="submit" value="Update">
+    </div>
+  </form>
+    </div>
+  </div>
   </div>
 </div>
 
@@ -261,27 +260,27 @@ intact. #}
 
   <!-- Modal -->
   <div class="modal fade" id="editScenario" role="dialog">
-    <div class="modal-dialog">
+  <div class="modal-dialog">
 
-      <!-- Modal content-->
-      <div class="modal-content">
-	<form id="updateScenarioForm" action="update_scenario" enctype="multipart/form-data" method="post">
-	  <div class="modal-header">
-	    <h1 class="col-12 text-center">Edit Scenario
-	      <button type="button" class="close" data-dismiss="modal">&times;</button></h1>
-	  </div>
-	  <div class="modal-body">
-	    <div class="form-group required"><label class="control-label" required for="name">Name</label>
-	      <input class="form-control" id="name" name="name" type="text" value="" maxlength="255">
-	    </div>
-	  </div>
-	  <div class="modal-footer">
-	    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-	    <input class="btn btn-success" id="submit" name="submit" type="submit" value="Update">
-	  </div>
-	</form>
-      </div>
+    <!-- Modal content-->
+    <div class="modal-content">
+  <form id="updateScenarioForm" action="update_scenario" enctype="multipart/form-data" method="post">
+    <div class="modal-header">
+    <h1 class="col-12 text-center">Edit Scenario
+      <button type="button" class="close" data-dismiss="modal">&times;</button></h1>
     </div>
+    <div class="modal-body">
+    <div class="form-group required"><label class="control-label" required for="name">Name</label>
+      <input class="form-control" id="name" name="name" type="text" value="" maxlength="255">
+    </div>
+    </div>
+    <div class="modal-footer">
+    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    <input class="btn btn-success" id="submit" name="submit" type="submit" value="Update">
+    </div>
+  </form>
+    </div>
+  </div>
   </div>
 </div>
 
@@ -290,37 +289,37 @@ intact. #}
 
   <!-- Modal -->
   <div class="modal fade" id="editNode" role="dialog">
-    <div class="modal-dialog">
+  <div class="modal-dialog">
 
-      <!-- Modal content-->
-      <div class="modal-content">
-	<form id="updateNodeForm" action="update_node" enctype="multipart/form-data" method="post">
-	  <div class="modal-header">
-	    <h1 class="col-12 text-center">Edit Node
-	      <button type="button" class="close" data-dismiss="modal">&times;</button></h1>
-	  </div>
-	  <div class="modal-body">
-	    <div class="form-group required"><label class="control-label" required for="rpi">Raspberry Pi</label>
-	      <input class="form-control" id="rpi" name="rpi" type="text" value="" maxlength="255">
-	    </div>
-	    <div class="form-group">
-	      <label><input type="checkbox" id="relative" name="relative" checked data-toggle="toggle" data-size="small">
-		Relative
-	      </label>
-	    </div>
-	    <div class="form-group">
-	      <label><input type="checkbox" id="sync" name="sync" checked data-toggle="toggle" data-size="small">
-		Sync
-	      </label>
-	    </div>
-	  </div>
-	  <div class="modal-footer">
-	    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-	    <input class="btn btn-success" id="submit" name="submit" type="submit" value="Update">
-	  </div>
-	</form>
-      </div>
+    <!-- Modal content-->
+    <div class="modal-content">
+  <form id="updateNodeForm" action="update_node" enctype="multipart/form-data" method="post">
+    <div class="modal-header">
+    <h1 class="col-12 text-center">Edit Node
+      <button type="button" class="close" data-dismiss="modal">&times;</button></h1>
     </div>
+    <div class="modal-body">
+    <div class="form-group required"><label class="control-label" required for="rpi">Raspberry Pi</label>
+      <input class="form-control" id="rpi" name="rpi" type="text" value="" maxlength="255">
+    </div>
+    <div class="form-group">
+      <label><input type="checkbox" id="relative" name="relative" checked data-toggle="toggle" data-size="small">
+    Relative
+      </label>
+    </div>
+    <div class="form-group">
+      <label><input type="checkbox" id="sync" name="sync" checked data-toggle="toggle" data-size="small">
+    Sync
+      </label>
+    </div>
+    </div>
+    <div class="modal-footer">
+    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    <input class="btn btn-success" id="submit" name="submit" type="submit" value="Update">
+    </div>
+  </form>
+    </div>
+  </div>
   </div>
 </div>
 {%- endblock %}
@@ -343,11 +342,11 @@ var layoutMethod = "directed";
 
 var options={
   layout: {
-    randomSeed: 1
+  randomSeed: 1
   },
   edges: {
-    smooth: true,
-    arrows: {to : true }
+  smooth: true,
+  arrows: {to : true }
   }
 };
 var network=new vis.Network(container,data,options);
@@ -364,10 +363,10 @@ function update_composition(){
   var q="/admin/jamming?composition="+comp
   scenario=$("#scenario").val();
   if(scenario)
-    q+="&scenario="+scenario
+  q+="&scenario="+scenario
   pi=$("#pi").val();
   if(pi)
-    q+="&pi="+pi
+  q+="&pi="+pi
 
   window.open(q,"_self");
 }
@@ -395,9 +394,9 @@ $('#editComposition').on('show.bs.modal', function(e) {
   $(e.currentTarget).find('input[name="short"]').val(short);
 
   if(public == "False")
-    $(e.currentTarget).find('input[name="public"]').bootstrapToggle('off');
+  $(e.currentTarget).find('input[name="public"]').bootstrapToggle('off');
   else if(public == "True")
-    $(e.currentTarget).find('input[name="public"]').bootstrapToggle('on');
+  $(e.currentTarget).find('input[name="public"]').bootstrapToggle('on');
 });
 
 $('#editScenario').on('show.bs.modal', function(e) {
@@ -432,14 +431,14 @@ $('#editNode').on('show.bs.modal', function(e) {
   $(e.currentTarget).find('input[name="rpi"]').val(rpi);
 
   if(rel == "False")
-    $(e.currentTarget).find('input[name="relative"]').bootstrapToggle('off');
+  $(e.currentTarget).find('input[name="relative"]').bootstrapToggle('off');
   else if(rel == "True")
-    $(e.currentTarget).find('input[name="relative"]').bootstrapToggle('on');
+  $(e.currentTarget).find('input[name="relative"]').bootstrapToggle('on');
 
   if(sync == "False")
-    $(e.currentTarget).find('input[name="sync"]').bootstrapToggle('off');
+  $(e.currentTarget).find('input[name="sync"]').bootstrapToggle('off');
   else if(sync == "True")
-    $(e.currentTarget).find('input[name="sync"]').bootstrapToggle('on');
+  $(e.currentTarget).find('input[name="sync"]').bootstrapToggle('on');
 
 });
 
@@ -451,9 +450,9 @@ network.on("selectNode",function (params) {
 
   clicked=params.nodes[0]
   if(clicked>=1000)
-    scenario=clicked/1000;
+  scenario=clicked/1000;
   else
-    pi=clicked;
+  pi=clicked;
 
   window.open("/admin/jamming?scenario="+scenario+"&composition="+composition+"&pi="+pi,"_self");
 });
@@ -462,18 +461,18 @@ network.on("selectNode",function (params) {
 
 <script>
   Handlebars.registerHelper("formatUnix", function(dateobject) {
-    d=new Date(dateobject)
-    return d.getTime();
+  d=new Date(dateobject)
+  return d.getTime();
   });
 </script>
 
 <script id="item-template" type="text/x-handlebars-template">
   {%raw%}
-    <table class="score">
-      <tr>
-	<th colspan="2" class="description">{{content}}</th>
-      </tr>
-    </table>
+  <table class="score">
+    <tr>
+  <th colspan="2" class="description">{{content}}</th>
+    </tr>
+  </table>
 {%endraw%}
 </script>
 
@@ -495,37 +494,37 @@ var options = {
   min: new Date(0),
   template: template,
   editable: {
-    add: false,
-    updateTime: false,
-    updateGroup: false,
-    remove: false
+  add: false,
+  updateTime: false,
+  updateGroup: false,
+  remove: false
   },
   moment: function(date) {
-    return vis.moment(date).utc();
+  return vis.moment(date).utc();
   },
   format: {
-    minorLabels: {
-      millisecond:'x[m]',
-      second:     'X',
-      minute:     'X',
-      hour:       'X',
-      weekday:    'X',
-      day:        'X',
-      week:       'X',
-      month:      'X',
-      year:       'X'
-    },
-    majorLabels: {
-      millisecond:'',
-      second:     '',
-      minute:     '',
-      hour:       '',
-      weekday:    '',
-      day:        '',
-      week:       '',
-      month:      '',
-      year:       ''
-    }
+  minorLabels: {
+    millisecond:'x[m]',
+    second:     'X',
+    minute:     'X',
+    hour:       'X',
+    weekday:    'X',
+    day:        'X',
+    week:       'X',
+    month:      'X',
+    year:       'X'
+  },
+  majorLabels: {
+    millisecond:'',
+    second:     '',
+    minute:     '',
+    hour:       '',
+    weekday:    '',
+    day:        '',
+    week:       '',
+    month:      '',
+    year:       ''
+  }
   }
 };
 var tl = new vis.Timeline(timeline, tt, options);

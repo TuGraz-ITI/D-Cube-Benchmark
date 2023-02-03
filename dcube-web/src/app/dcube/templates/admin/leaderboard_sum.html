@@ -1,26 +1,25 @@
-<!--
--- MIT License
---
--- Copyright (c) 2022 Graz University of Technology
---
--- Permission is hereby granted, free of charge, to any person obtaining a copy
--- of this software and associated documentation files (the "Software"), to deal
--- in the Software without restriction, including without limitation the rights
--- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
--- copies of the Software, and to permit persons to whom the Software is
--- furnished to do so, subject to the following conditions:
---
--- The above copyright notice and this permission notice shall be included in all
--- copies or substantial portions of the Software.
---
--- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
--- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
--- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
--- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
--- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
--- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
--- SOFTWARE.
--->
+{# MIT License
+
+  Copyright (c) 2023 Graz University of Technology
+  
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+  
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+  
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE. #}
+  
 {# This simple template derives from ``base.html``. See ``base.html`` for
 more information about template inheritance. #}
 {%- extends "base.html" %}
@@ -32,47 +31,47 @@ intact. #}
 {{super()}}
 <style>
 html{
-    overflow-y: scroll;
+  overflow-y: scroll;
 }
 
 .row.no-pad {
-    margin-right:0;
-    margin-left:0;
+  margin-right:0;
+  margin-left:0;
 }
 
 .row #toggle {
-    padding-top:5px;
+  padding-top:5px;
 }
 
 .row.no-pad > [class*='col-'] {
-    padding-right:2px;
-    padding-left:2px;
+  padding-right:2px;
+  padding-left:2px;
 }
 
 #chart {
-    width:100%;
+  width:100%;
 }
 
 #cluster > thead > tr > th {
-    border: none;
+  border: none;
 }
 
 #cluster .legend {
-    text-align: center;
-    padding-left:1px;
-    padding-right:1px;
+  text-align: center;
+  padding-left:1px;
+  padding-right:1px;
 }
 
 #cluster .value {
-    font-family: monospace; 
-    text-align: center;
-    padding-right:0px;
-    padding-left:0px;
+  font-family: monospace; 
+  text-align: center;
+  padding-right:0px;
+  padding-left:0px;
 
 }
 
 #cluster .bordered {
-    border-left: 1px solid black;
+  border-left: 1px solid black;
 }
 
 </style>
@@ -82,187 +81,187 @@ html{
 {% block content %}
 <div class="container" id="stats">
 
-    <div class="row no-pad collapse" id="controls">
-        <div class="col-sm-2">
-            <label for="duration" id="duration-addon">Duration</label>
-            <div class="input-group-btn">
-                <select multiple class="form-control" id="duration" name="duration" aria-describedby="duration-addon">
-                    {% for d in durations %}
-                    <option{% if d|int==def_duration%} selected{% endif %} value={{d}}>{{d}}</option>
-                    {% endfor%}
-                </select>
-            </div>
-        </div>
-
-        <div class="col-sm-3">
-            <label for="jamming" id="jamming-addon"><span class="hidden-sm">Jamming</span><span class="visible-sm">Jam.</span></label>
-            <div class="input-group-btn">
-                <select multiple class="form-control" id="jamming" name="jamming" aria-describedby="jamming-addon">
-                    {% for j in jammings %}
-                    <option{% if j.short=="0" %} selected{% endif %} value="{{j.id}}">{{j.name}}</option>
-                    {% endfor%}
-                </select>
-            </div>
-        </div>
-
-        {#
-        <div class="col-sm-2">
-            <label for="category" id="category-addon"><span class="hidden-sm">Category</span><span class="visible-sm">Cat.</span></label>
-            <div class="input-group-btn">
-                <select multiple class="form-control" id="category" name="category" aria-describedby="category-addon">
-                    {% for i in categories %}
-                    <option value={{i.id}}>{{i.short}}</option>
-                    {% endfor%}
-                </select>
-            </div>
-        </div>
-        #}
-
-        <div class="col-sm-3">
-            <label for="layout" id="layout-addon">Category | Layout</label>
-            <div class="input-group-btn">
-                <select multiple class="form-control" id="layout" name="layout" aria-describedby="layout-addon">
-                    {% for i in layouts %}
-                    <option value="{{i.category.id}}|{{i.id}}">{{i.category.short}} | {{i.short}}</option>
-                    {% endfor%}
-                </select>
-            </div>
-        </div>
-
-        <div class="col-sm-2">
-            <label for="period" id="period-addon"><span class="hidden-sm">Periodicity</span><span class="visible-sm">Per.</span></label>
-            <div class="input-group-btn">
-                <select multiple class="form-control" id="period" name="period" aria-describedby="period-addon">
-                    {% for i in periods %}
-                    <option value={{i}}>{%if i==0%}Aperiodic{%else%}{{i}}{%endif%}</option>
-                    {% endfor%}
-                </select>
-            </div>
-        </div>
-
-        <div class="col-sm-2">
-            <label for="length" id="length-addon"><span class="hidden-sm">Msg. len.</span><span class="visible-sm">M. len.</span></label>
-            <div class="input-group-btn">
-                {#<label class="input-group-addon" id="layout-addon">Layout</label>#}
-                <select multiple class="form-control" id="length" name="length" aria-describedby="length-addon">
-                    {% for i in lengths %}
-                    <option value={{i}}>{{i}}</option>
-                    {% endfor%}
-                </select>
-            </div>
-        </div>
-
-    </div>
-    <div class="row visible-xs">
-        <div class="col-xs-12" id="toggle">
-            <button class="btn btn-block btn-primary" type="button" data-toggle="collapse" data-target="#controls" aria-expanded="false" aria-controls="controls">Toggle Filters</button>
-        </div>
+  <div class="row no-pad collapse" id="controls">
+    <div class="col-sm-2">
+      <label for="duration" id="duration-addon">Duration</label>
+      <div class="input-group-btn">
+        <select multiple class="form-control" id="duration" name="duration" aria-describedby="duration-addon">
+          {% for d in durations %}
+          <option{% if d|int==def_duration%} selected{% endif %} value={{d}}>{{d}}</option>
+          {% endfor%}
+        </select>
+      </div>
     </div>
 
-    <div class="row no-pad collapse" id="score">
-        <div class="col-sm-1">
-            <label for="count" id="count-addon">Count</label>
-            <div class="input-group-btn">
-                {#<label class="input-group-addon" id="count-addon"><span class="hidden-md hidden-sm">Count</span><span class="visible-md visible-sm">Cnt.</span></label>#}
-                <select class="form-control" id="count" name="count" aria-describedby="count-addon">
-                    <option value="median">Median</option>
-                    <option value="stats">Stats</option>
-                    {% for i in [1] %}
-                    <option value={{i}}>{% if i==0%}All{% else %}{{i}}{% endif%}</option>
-                    {% endfor%}
-                </select>
-            </div>
-        </div>
-
-        <div class="col-sm-1">
-            <label id="energy-addon" for="coeff_energy">K_E</label>
-            <div class="input-group-btn">
-                <input type=number class="form-control" id="coeff_energy" name="coeff_energy" aria-describedby="energy-addon" value="1.0">
-                </input>
-            </div>
-        </div>
-        <div class="col-sm-1">
-            <label id="latency-addon" for="coeff_latency">K_L</label>
-            <div class="input-group-btn">
-                <input type=number class="form-control" id="coeff_latency" name="coeff_latency" aria-describedby="latency-addon" value="1.0">
-                </input>
-            </div>
-        </div>
-        <div class="col-sm-1">
-            <label id="rel-addon" for="coeff_rel">K_R</label>
-            <div class="input-group-btn">
-                <input type=number class="form-control" id="coeff_rel" name="coeff_rel" aria-describedby="rel-addon" value="20.0">
-                </input>
-            </div>
-        </div>
-
-        <div class="col-sm-2">
-            <label id="rel-addon" for="threshold"><span class="hidden-sm">Threshold</span><span class="visible-sm">Thrsh.</span></label>
-            <div class="input-group-btn">
-                <input type=number class="form-control" id="threshold" name="threshold" aria-describedby="rel-addon" value="50.0">
-                </input>
-            </div>
-        </div>
-
-        <div class="col-sm-2">
-            <label id="rel-addon" for="margin">Margin</label>
-            <div class="input-group-btn">
-                <input type=number class="form-control" id="margin" name="margin" aria-describedby="rel-addon" value="20.0">
-                </input>
-            </div>
-        </div>
-
-        <div class="col-sm-4">
-            <label id="rel-addon" for="points">Points</label>
-            <div class="input-group-btn">
-                <input type=text class="form-control" id="points" name="points" aria-describedby="rel-addon" value="5,4,3,2,1">
-                </input>
-            </div>
-        </div>
-    </div>
-    <div class="row visible-xs">
-        <div class="col-xs-12" id="toggle">
-            <button class="btn btn-block btn-primary" type="button" data-toggle="collapse" data-target="#score" aria-expanded="false" aria-controls="score">Toggle Scores</button>
-        </div>
+    <div class="col-sm-3">
+      <label for="jamming" id="jamming-addon"><span class="hidden-sm">Jamming</span><span class="visible-sm">Jam.</span></label>
+      <div class="input-group-btn">
+        <select multiple class="form-control" id="jamming" name="jamming" aria-describedby="jamming-addon">
+          {% for j in jammings %}
+          <option{% if j.short=="0" %} selected{% endif %} value="{{j.id}}">{{j.name}}</option>
+          {% endfor%}
+        </select>
+      </div>
     </div>
 
-
-    <div class="container">
-        <h1>Super Secret Leaderboard
-            <button type="button" class="btn btn-success btn-lg" onclick="update();" ><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span></button>
-        </h1>
-        <div class="progress">
-            <div id="pb" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-        </div>
-        <table id="cluster" class="table-hover table">
-        </table>
+    {#
+    <div class="col-sm-2">
+      <label for="category" id="category-addon"><span class="hidden-sm">Category</span><span class="visible-sm">Cat.</span></label>
+      <div class="input-group-btn">
+        <select multiple class="form-control" id="category" name="category" aria-describedby="category-addon">
+          {% for i in categories %}
+          <option value={{i.id}}>{{i.short}}</option>
+          {% endfor%}
+        </select>
+      </div>
     </div>
-    {%- endblock %}
+    #}
 
-    {% block scripts %}
-    {{super()}}
-    <script>
+    <div class="col-sm-3">
+      <label for="layout" id="layout-addon">Category | Layout</label>
+      <div class="input-group-btn">
+        <select multiple class="form-control" id="layout" name="layout" aria-describedby="layout-addon">
+          {% for i in layouts %}
+          <option value="{{i.category.id}}|{{i.id}}">{{i.category.short}} | {{i.short}}</option>
+          {% endfor%}
+        </select>
+      </div>
+    </div>
+
+    <div class="col-sm-2">
+      <label for="period" id="period-addon"><span class="hidden-sm">Periodicity</span><span class="visible-sm">Per.</span></label>
+      <div class="input-group-btn">
+        <select multiple class="form-control" id="period" name="period" aria-describedby="period-addon">
+          {% for i in periods %}
+          <option value={{i}}>{%if i==0%}Aperiodic{%else%}{{i}}{%endif%}</option>
+          {% endfor%}
+        </select>
+      </div>
+    </div>
+
+    <div class="col-sm-2">
+      <label for="length" id="length-addon"><span class="hidden-sm">Msg. len.</span><span class="visible-sm">M. len.</span></label>
+      <div class="input-group-btn">
+        {#<label class="input-group-addon" id="layout-addon">Layout</label>#}
+        <select multiple class="form-control" id="length" name="length" aria-describedby="length-addon">
+          {% for i in lengths %}
+          <option value={{i}}>{{i}}</option>
+          {% endfor%}
+        </select>
+      </div>
+    </div>
+
+  </div>
+  <div class="row visible-xs">
+    <div class="col-xs-12" id="toggle">
+      <button class="btn btn-block btn-primary" type="button" data-toggle="collapse" data-target="#controls" aria-expanded="false" aria-controls="controls">Toggle Filters</button>
+    </div>
+  </div>
+
+  <div class="row no-pad collapse" id="score">
+    <div class="col-sm-1">
+      <label for="count" id="count-addon">Count</label>
+      <div class="input-group-btn">
+        {#<label class="input-group-addon" id="count-addon"><span class="hidden-md hidden-sm">Count</span><span class="visible-md visible-sm">Cnt.</span></label>#}
+        <select class="form-control" id="count" name="count" aria-describedby="count-addon">
+          <option value="median">Median</option>
+          <option value="stats">Stats</option>
+          {% for i in [1] %}
+          <option value={{i}}>{% if i==0%}All{% else %}{{i}}{% endif%}</option>
+          {% endfor%}
+        </select>
+      </div>
+    </div>
+
+    <div class="col-sm-1">
+      <label id="energy-addon" for="coeff_energy">K_E</label>
+      <div class="input-group-btn">
+        <input type=number class="form-control" id="coeff_energy" name="coeff_energy" aria-describedby="energy-addon" value="1.0">
+        </input>
+      </div>
+    </div>
+    <div class="col-sm-1">
+      <label id="latency-addon" for="coeff_latency">K_L</label>
+      <div class="input-group-btn">
+        <input type=number class="form-control" id="coeff_latency" name="coeff_latency" aria-describedby="latency-addon" value="1.0">
+        </input>
+      </div>
+    </div>
+    <div class="col-sm-1">
+      <label id="rel-addon" for="coeff_rel">K_R</label>
+      <div class="input-group-btn">
+        <input type=number class="form-control" id="coeff_rel" name="coeff_rel" aria-describedby="rel-addon" value="20.0">
+        </input>
+      </div>
+    </div>
+
+    <div class="col-sm-2">
+      <label id="rel-addon" for="threshold"><span class="hidden-sm">Threshold</span><span class="visible-sm">Thrsh.</span></label>
+      <div class="input-group-btn">
+        <input type=number class="form-control" id="threshold" name="threshold" aria-describedby="rel-addon" value="50.0">
+        </input>
+      </div>
+    </div>
+
+    <div class="col-sm-2">
+      <label id="rel-addon" for="margin">Margin</label>
+      <div class="input-group-btn">
+        <input type=number class="form-control" id="margin" name="margin" aria-describedby="rel-addon" value="20.0">
+        </input>
+      </div>
+    </div>
+
+    <div class="col-sm-4">
+      <label id="rel-addon" for="points">Points</label>
+      <div class="input-group-btn">
+        <input type=text class="form-control" id="points" name="points" aria-describedby="rel-addon" value="5,4,3,2,1">
+        </input>
+      </div>
+    </div>
+  </div>
+  <div class="row visible-xs">
+    <div class="col-xs-12" id="toggle">
+      <button class="btn btn-block btn-primary" type="button" data-toggle="collapse" data-target="#score" aria-expanded="false" aria-controls="score">Toggle Scores</button>
+    </div>
+  </div>
+
+
+  <div class="container">
+    <h1>Super Secret Leaderboard
+      <button type="button" class="btn btn-success btn-lg" onclick="update();" ><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span></button>
+    </h1>
+    <div class="progress">
+      <div id="pb" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+    <table id="cluster" class="table-hover table">
+    </table>
+  </div>
+  {%- endblock %}
+
+  {% block scripts %}
+  {{super()}}
+  <script>
 $(document).ready(function () {
-    if (matchMedia) {
-        var mq = window.matchMedia("(min-width: 768px)");
-        mq.addListener(WidthChange);
-        WidthChange(mq);
+  if (matchMedia) {
+    var mq = window.matchMedia("(min-width: 768px)");
+    mq.addListener(WidthChange);
+    WidthChange(mq);
+  }
+  function WidthChange(mq) {
+    if (mq.matches) {
+      $("#controls").addClass("in");
+      $("#score").addClass("in");
+    } else {
+      $("#controls").removeClass("in");
+      $("#score").removeClass("in");
     }
-    function WidthChange(mq) {
-        if (mq.matches) {
-            $("#controls").addClass("in");
-            $("#score").addClass("in");
-        } else {
-            $("#controls").removeClass("in");
-            $("#score").removeClass("in");
-        }
-    }
+  }
 });
 
 
 
 $('.clickable-row' ).click(function() {
-    window.document.location = $(this).data("href");
+  window.document.location = $(this).data("href");
 });
 //$( document ).ready(function() {
 //  $("html").css("overflow-y","scroll");
@@ -274,203 +273,203 @@ var num_exp=0;
 var experiments=[];
 
 function crunch(){
-    highscore={}
-    for (var i=0;i<raw_data.length;i++){
-        for(var j=0;j<Object.keys(raw_data[i].data.job_name).length;j++){
-            if (!(raw_data[i].data.job_name[j] in highscore)) {
-                highscore[raw_data[i].data.job_name[j]]={"points":{},"sum_pts":0,"totals":{},"total":0}
-            }
-            key="";
-            kd=raw_data[i].settings.duration;
-            kj=raw_data[i].settings.jamming;
-            kcat=raw_data[i].settings.category;
-            klay=raw_data[i].settings.layout;
-            kp=raw_data[i].settings.period;
-            kl=raw_data[i].settings.msg_len;
-            key=kd+"|"+kj+"|"+kcat+"|"+klay+"|"+kp+"|"+kl;
+  highscore={}
+  for (var i=0;i<raw_data.length;i++){
+    for(var j=0;j<Object.keys(raw_data[i].data.job_name).length;j++){
+      if (!(raw_data[i].data.job_name[j] in highscore)) {
+        highscore[raw_data[i].data.job_name[j]]={"points":{},"sum_pts":0,"totals":{},"total":0}
+      }
+      key="";
+      kd=raw_data[i].settings.duration;
+      kj=raw_data[i].settings.jamming;
+      kcat=raw_data[i].settings.category;
+      klay=raw_data[i].settings.layout;
+      kp=raw_data[i].settings.period;
+      kl=raw_data[i].settings.msg_len;
+      key=kd+"|"+kj+"|"+kcat+"|"+klay+"|"+kp+"|"+kl;
 
-            highscore[raw_data[i].data.job_name[j]].points[key]=raw_data[i].data.points[j];
-            highscore[raw_data[i].data.job_name[j]].totals[key]=raw_data[i].data.total[j];
-            highscore[raw_data[i].data.job_name[j]].sum_pts+=(raw_data[i].data.points[j]);
-            highscore[raw_data[i].data.job_name[j]].total+=(raw_data[i].data.total[j]);
-        }
+      highscore[raw_data[i].data.job_name[j]].points[key]=raw_data[i].data.points[j];
+      highscore[raw_data[i].data.job_name[j]].totals[key]=raw_data[i].data.total[j];
+      highscore[raw_data[i].data.job_name[j]].sum_pts+=(raw_data[i].data.points[j]);
+      highscore[raw_data[i].data.job_name[j]].total+=(raw_data[i].data.total[j]);
     }
+  }
 }
 
 function clear(){
-    raw_data=[];
-    highscore={};
-    num_exp=0;
-    experiments=[];
+  raw_data=[];
+  highscore={};
+  num_exp=0;
+  experiments=[];
 }
 
 function draw(){
-    $("#cluster").empty();
-    var markup="<thead><tr><th></th>";
+  $("#cluster").empty();
+  var markup="<thead><tr><th></th>";
 
-    //colspan
-    var jam_span=0;
-    var last=-1;
-    var jam_labels=[];
-    var jam_map={
-        {% for j in jammings %}
-        "{{j.id}}": "{{j.short}}",
-        {% endfor %}
+  //colspan
+  var jam_span=0;
+  var last=-1;
+  var jam_labels=[];
+  var jam_map={
+    {% for j in jammings %}
+    "{{j.id}}": "{{j.short}}",
+    {% endfor %}
+  }
+
+  for (var e in experiments){
+    var token=experiments[e].split("|")[1];
+    if (token!=last){
+      jam_labels.push(jam_map[token]);
+      last=token;
+      jam_span=1;
     }
+    else {
+      jam_span++;
+    }
+  }
 
-    for (var e in experiments){
-        var token=experiments[e].split("|")[1];
-        if (token!=last){
-            jam_labels.push(jam_map[token]);
-            last=token;
-            jam_span=1;
+  var lay_span=0;
+  var last=-1;
+  var lay_labels=[];
+  var lay_map={
+    {% for l in layouts %}
+    "{{l.id}}": "{{l.short}}",
+    {% endfor %}
+  }
+
+  for (var e in experiments){
+    var token=experiments[e].split("|")[3];
+    if (token!=last){
+      lay_labels.push(lay_map[token]);
+      last=token;
+      lay_span=1;
+    }
+    else {
+      lay_span++;
+    }
+  }
+
+  for(var e=0;e<num_exp/jam_span;e++){
+    markup+='<th class="bordered legend" colspan='+jam_span+' style="padding:0; text-align: center;">'+jam_labels[e]+'</th>';
+  }
+  markup+='<th class="bordered"></th></tr><th>Team</th>';
+
+  for(var e=0;e<num_exp/lay_span;e++){
+    markup+='<th class="bordered legend" colspan='+lay_span+' style="padding:0; text-align: center;">'+lay_labels[e]+'</th>';
+  }
+  markup+='<th class="bordered legend">Points</th></tr></thead><tbody id="tablebody"></tbody>';
+  $("#cluster").append(markup);
+
+
+  Object.keys( highscore ).sort(function( a,b ) {
+    return highscore[b].sum_pts - highscore[a].sum_pts ;
+  }).forEach(function( key ) {
+    var markup="<tr>";
+    markup+="<td>"+key+"</td>";
+    //markup+="<td>"+highscore[key].points+"</td>";
+    for(var e=0;e<num_exp;e++){
+      var v=highscore[key].points[experiments[e]];
+      var cl="";
+      tt=experiments[e].split("|");
+      tooltip=""
+      //tooltip+="Duration:"+tt[0]+" ";
+      //tooltip+="Jamming:"+tt[1]+" ";
+      //tooltip+="Category:"+tt[2]+" ";
+      //tooltip+="Layout:"+tt[3]+" ";
+      tooltip+="Period:"+tt[4]+" ";
+      tooltip+="Msg. Len.:"+tt[5]+" ";
+
+      if(e%lay_span==0 || e%jam_span==0){
+        cl=" bordered"
+      }
+      if (typeof v === "undefined"){
+        markup+='<td title="'+tooltip+'" class="value'+cl+'">-</td>';
+      } 
+      else {
+        markup+='<td title="'+tooltip+'" class="value'+cl+'" style="background-color: hsl(0,0%,';
+        markup+=(100-((v/p_max)*100));
+        markup+='%);color: hsl(0,0%,';
+        if (((v/p_max)*100) < 50){
+          markup+='0%);">'+v+'</td>';
+        } else {
+          markup+='100%);">'+v+'</td>';
         }
-        else {
-            jam_span++;
-        }
+
+      }
     }
-
-    var lay_span=0;
-    var last=-1;
-    var lay_labels=[];
-    var lay_map={
-        {% for l in layouts %}
-        "{{l.id}}": "{{l.short}}",
-        {% endfor %}
-    }
-
-    for (var e in experiments){
-        var token=experiments[e].split("|")[3];
-        if (token!=last){
-            lay_labels.push(lay_map[token]);
-            last=token;
-            lay_span=1;
-        }
-        else {
-            lay_span++;
-        }
-    }
-
-    for(var e=0;e<num_exp/jam_span;e++){
-        markup+='<th class="bordered legend" colspan='+jam_span+' style="padding:0; text-align: center;">'+jam_labels[e]+'</th>';
-    }
-    markup+='<th class="bordered"></th></tr><th>Team</th>';
-
-    for(var e=0;e<num_exp/lay_span;e++){
-        markup+='<th class="bordered legend" colspan='+lay_span+' style="padding:0; text-align: center;">'+lay_labels[e]+'</th>';
-    }
-    markup+='<th class="bordered legend">Points</th></tr></thead><tbody id="tablebody"></tbody>';
-    $("#cluster").append(markup);
-
-
-    Object.keys( highscore ).sort(function( a,b ) {
-        return highscore[b].sum_pts - highscore[a].sum_pts ;
-    }).forEach(function( key ) {
-        var markup="<tr>";
-        markup+="<td>"+key+"</td>";
-        //markup+="<td>"+highscore[key].points+"</td>";
-        for(var e=0;e<num_exp;e++){
-            var v=highscore[key].points[experiments[e]];
-            var cl="";
-            tt=experiments[e].split("|");
-            tooltip=""
-            //tooltip+="Duration:"+tt[0]+" ";
-            //tooltip+="Jamming:"+tt[1]+" ";
-            //tooltip+="Category:"+tt[2]+" ";
-            //tooltip+="Layout:"+tt[3]+" ";
-            tooltip+="Period:"+tt[4]+" ";
-            tooltip+="Msg. Len.:"+tt[5]+" ";
-
-            if(e%lay_span==0 || e%jam_span==0){
-                cl=" bordered"
-            }
-            if (typeof v === "undefined"){
-                markup+='<td title="'+tooltip+'" class="value'+cl+'">-</td>';
-            } 
-            else {
-                markup+='<td title="'+tooltip+'" class="value'+cl+'" style="background-color: hsl(0,0%,';
-                markup+=(100-((v/p_max)*100));
-                markup+='%);color: hsl(0,0%,';
-                if (((v/p_max)*100) < 50){
-                    markup+='0%);">'+v+'</td>';
-                } else {
-                    markup+='100%);">'+v+'</td>';
-                }
-
-            }
-        }
-        markup+='<td class="bordered">'+highscore[key].sum_pts+"</td>";
+    markup+='<td class="bordered">'+highscore[key].sum_pts+"</td>";
 //        markup+='<td class="bordered">'+(100*highscore[key].total).toFixed(2)+"</td>";
-        markup+="</tr>";
-        $("#tablebody").append(markup);
-    });
+    markup+="</tr>";
+    $("#tablebody").append(markup);
+  });
 }
 
 var prog=0
 
 function donext(){
-    var s=experiments[prog];
-    var tokens=s.split("|");
-    var kd=tokens[0];
-    var kj=tokens[1];
-    var kcat=tokens[2];
-    var klay=tokens[3];
-    var kp=tokens[4];
-    var kl=tokens[5];
+  var s=experiments[prog];
+  var tokens=s.split("|");
+  var kd=tokens[0];
+  var kj=tokens[1];
+  var kcat=tokens[2];
+  var klay=tokens[3];
+  var kp=tokens[4];
+  var kl=tokens[5];
 
-    prog++;
-    var percent=(prog/num_exp)*100;
-    $("#pb").text("running "+prog+"/"+num_exp);
-    $("#pb").attr("aria-valuenow",percent);
-    $("#pb").attr("style","width: "+percent+"%");
+  prog++;
+  var percent=(prog/num_exp)*100;
+  $("#pb").text("running "+prog+"/"+num_exp);
+  $("#pb").attr("aria-valuenow",percent);
+  $("#pb").attr("style","width: "+percent+"%");
 
-    download(kd,kj,count,kcat,klay,kp,kl,k_e,k_l,k_r,threshold,margin,points);
+  download(kd,kj,count,kcat,klay,kp,kl,k_e,k_l,k_r,threshold,margin,points);
 }
 
 var p_max=0;
 
 function start(){
-    p_max=0;
-    ps=points.split(",")
-        for (var p in ps){
-            if (parseInt(ps[p],10)>p_max) {
-                p_max=parseInt(ps[p],10);
-            }
-        }
-    prog=0;
-    donext();
+  p_max=0;
+  ps=points.split(",")
+    for (var p in ps){
+      if (parseInt(ps[p],10)>p_max) {
+        p_max=parseInt(ps[p],10);
+      }
+    }
+  prog=0;
+  donext();
 }
 
 function download(duration,jamming,count,category,layout,period,length,coeff_energy,coeff_latency,coeff_rel,threshold,margin,points){
-    var filters="";
-    filters+="&jamming="+jamming;
-    filters+="&count="+count;
-    filters+="&duration="+duration;
-    filters+="&category="+category;
-    filters+="&layout="+layout;
-    filters+="&period="+period;
-    filters+="&length="+length;
-    filters+="&coeff_energy="+coeff_energy;
-    filters+="&coeff_latency="+coeff_latency;
-    filters+="&coeff_rel="+coeff_rel;
-    filters+="&threshold="+threshold;
-    filters+="&margin="+margin;
-    filters+="&points="+points;
+  var filters="";
+  filters+="&jamming="+jamming;
+  filters+="&count="+count;
+  filters+="&duration="+duration;
+  filters+="&category="+category;
+  filters+="&layout="+layout;
+  filters+="&period="+period;
+  filters+="&length="+length;
+  filters+="&coeff_energy="+coeff_energy;
+  filters+="&coeff_latency="+coeff_latency;
+  filters+="&coeff_rel="+coeff_rel;
+  filters+="&threshold="+threshold;
+  filters+="&margin="+margin;
+  filters+="&points="+points;
 
-    task=$.ajax({
-        url: "/admin/leaderboard?json=True"+filters,
-        success: function(data){
-            raw_data.push(data);
-            crunch();
-            draw();
-            if(prog<num_exp){
-                donext();
-            } else {
-                $("#pb").text("finished");
-            }
-        },
-        async: true
-    });
+  task=$.ajax({
+    url: "/admin/leaderboard?json=True"+filters,
+    success: function(data){
+      raw_data.push(data);
+      crunch();
+      draw();
+      if(prog<num_exp){
+        donext();
+      } else {
+        $("#pb").text("finished");
+      }
+    },
+    async: true
+  });
 }
 
 //global stuff
@@ -483,48 +482,48 @@ var margin=0;
 var points="";
 
 function update(){
-    jam=$("#jamming").val();
-    count=$("#count").val();
-    d=$("#duration").val();
-    cl=$("#layout").val();
+  jam=$("#jamming").val();
+  count=$("#count").val();
+  d=$("#duration").val();
+  cl=$("#layout").val();
 
-    p=$("#period").val();
-    le=$("#length").val();
+  p=$("#period").val();
+  le=$("#length").val();
 
-    k_e=$("#coeff_energy").val();
-    k_l=$("#coeff_latency").val();
-    k_r=$("#coeff_rel").val();
+  k_e=$("#coeff_energy").val();
+  k_l=$("#coeff_latency").val();
+  k_r=$("#coeff_rel").val();
 
-    threshold=$("#threshold").val();
-    margin=$("#margin").val();
-    points=$("#points").val();
+  threshold=$("#threshold").val();
+  margin=$("#margin").val();
+  points=$("#points").val();
 
-    if(jam==null || d==null || cl==null || p==null || le==null)
-        return;
+  if(jam==null || d==null || cl==null || p==null || le==null)
+    return;
 
-    clear();
-    num_exp=jam.length*d.length*cl.length*p.length*le.length
+  clear();
+  num_exp=jam.length*d.length*cl.length*p.length*le.length
 
-        for (var duration in d) {
-            for (var jamming in jam) {
-                for (var catlay in cl){
-                   for (var period in p) {
-                       for (var length in le) {
-                           kd=d[duration];
-                           kj=jam[jamming];
-                           tcl=cl[catlay].split("|");
-                           kcat=tcl[0];
-                           klay=tcl[1];
-                           kp=p[period];
-                           kl=le[length];
-                           key=kd+"|"+kj+"|"+kcat+"|"+klay+"|"+kp+"|"+kl;
-                           experiments.push(key);
-                       }
-                   }
-                }
-            }
+    for (var duration in d) {
+      for (var jamming in jam) {
+        for (var catlay in cl){
+           for (var period in p) {
+             for (var length in le) {
+               kd=d[duration];
+               kj=jam[jamming];
+               tcl=cl[catlay].split("|");
+               kcat=tcl[0];
+               klay=tcl[1];
+               kp=p[period];
+               kl=le[length];
+               key=kd+"|"+kj+"|"+kcat+"|"+klay+"|"+kp+"|"+kl;
+               experiments.push(key);
+             }
+           }
         }
-    start();
+      }
+    }
+  start();
 }
-    </script>
-    {% endblock %} 
+  </script>
+  {% endblock %} 

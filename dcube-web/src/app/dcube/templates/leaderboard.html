@@ -1,26 +1,25 @@
-<!--
--- MIT License
---
--- Copyright (c) 2022 Graz University of Technology
---
--- Permission is hereby granted, free of charge, to any person obtaining a copy
--- of this software and associated documentation files (the "Software"), to deal
--- in the Software without restriction, including without limitation the rights
--- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
--- copies of the Software, and to permit persons to whom the Software is
--- furnished to do so, subject to the following conditions:
---
--- The above copyright notice and this permission notice shall be included in all
--- copies or substantial portions of the Software.
---
--- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
--- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
--- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
--- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
--- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
--- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
--- SOFTWARE.
--->
+{# MIT License
+
+  Copyright (c) 2023 Graz University of Technology
+  
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+  
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+  
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE. #}
+  
 {# This simple template derives from ``base.html``. See ``base.html`` for
 more information about template inheritance. #}
 {%- extends "base.html" %}
@@ -36,17 +35,17 @@ intact. #}
 {{super()}}
 <style>
 .row.no-pad {
-    margin-right:0;
-    margin-left:0;
+  margin-right:0;
+  margin-left:0;
 }
 
 .row #toggle {
-    padding-top:5px;
+  padding-top:5px;
 }
 
 .row.no-pad > [class*='col-'] {
-    padding-right:2px;
-    padding-left:2px;
+  padding-right:2px;
+  padding-left:2px;
 }
 
 </style>
@@ -54,224 +53,224 @@ intact. #}
 
 {% block content %}
 <div class="container" id="stats">
-    <div class="row no-pad collapse" id="controls">
+  <div class="row no-pad collapse" id="controls">
 
-        <div class="col-sm-2">
-            <label for="benchmark_suite" id="benchmark_suite-addon"><span class="d-inline-block d-sm-none d-lg-inline-block">Benchmark Suite</span><span class="d-none d-sm-inline-block d-lg-none">Suite</span></label>
-            <div class="input-group-btn">
-                <select class="form-control" id="benchmark_suite" name="benchmark_suite" aria-describedby="benchmark_suite-addon">
-                    {% if benchmark_suite=="any"%}<option selected="selected" value="any">Any</option>
-                    {% else %}<option value="any">Any</option>{%endif%}
+    <div class="col-sm-2">
+      <label for="benchmark_suite" id="benchmark_suite-addon"><span class="d-inline-block d-sm-none d-lg-inline-block">Benchmark Suite</span><span class="d-none d-sm-inline-block d-lg-none">Suite</span></label>
+      <div class="input-group-btn">
+        <select class="form-control" id="benchmark_suite" name="benchmark_suite" aria-describedby="benchmark_suite-addon">
+          {% if benchmark_suite=="any"%}<option selected="selected" value="any">Any</option>
+          {% else %}<option value="any">Any</option>{%endif%}
 
-                    {% for i in benchmark_suites %}
-                    <option {% if i.id==benchmark_suite|int %}selected="selected"{% endif %}value={{i.id}}>{{i.name}}</option>
-                    {% endfor%}
-                </select>
-            </div>
-        </div>
-
-
-        <div class="col-sm-2">
-            <label for="duration" id="duration-addon"><span class="d-inline-block d-sm-none d-lg-inline-block">Duration</span><span class="d-none d-sm-inline-block d-lg-none">Dur.</span></label>
-            <div class="input-group-btn">
-                <select class="form-control" id="duration" name="duration" aria-describedby="duration-addon">
-                    {% if default_duration=="any"%}<option selected="selected" value="any">Any</option>
-                    {% else %}<option value="any">Any</option>{%endif%}
-                    {% for d in durations %}
-                    <option {% if d==default_duration|int %}selected="selected"{% endif %}value={{d}}>{{d}}</option>
-                    {% endfor%}
-                </select>
-            </div>
-        </div>
-
-        <div class="col-sm-2">
-            <label for="jamming" id="jamming-addon">Jamming</label>
-            <div class="input-group-btn">
-                <select class="form-control" id="jamming" name="jamming" aria-describedby="jamming-addon">
-                    {% if jamming=="any"%}<option selected="selected" value="any">Any</option>
-                    {% else %}<option value="any">Any</option>{%endif%}
-                    {% for j in jammings %}
-                    <option {% if jamming|int ==j.id %}selected="selected"{% endif %}value="{{j.id}}">{{j.name}}</option>
-                    {% endfor%}
-                </select>
-            </div>
-        </div>
-
-        <div class="col-sm-1">
-            <label for="count" id="count-addon">Count</label>
-            <div class="input-group-btn">
-                <select class="form-control" id="count" name="count" aria-describedby="count-addon">
-                    {% for i in [0, 1, 2, 3, 5, 10] %}
-                    <option {% if i==count|int %}selected="selected"{% endif %}value={{i}}>{% if i==0%}All{% else %}{{i}}{% endif%}</option>
-                    {% endfor%}
-                </select>
-            </div>
-        </div>
-
-        <div class="col-sm-1">
-            <label for="layout" id="benchmark_suite-addon"><span class="d-inline-block d-sm-none d-lg-inline-block">Layout</span><span class="d-none d-sm-inline-block d-lg-none">Lay.</span></label>
-            <div class="input-group-btn">
-                <select class="form-control" id="layout" name="layout" aria-describedby="layout-addon">
-                    {% if layout=="any"%}<option selected="selected" value="any">Any</option>
-                    {% else %}<option value="any">Any</option>{%endif%}
-
-                    {% if not benchmark_suite=="any" %}
-                    {% for i in layouts %}
-                    <option {% if i.id==layout|int %}selected="selected"{% endif %}value={{i.id}}>{{i.short}}</option>
-                    {% endfor%}
-                    {%endif%}
-                </select>
-            </div>
-        </div>
-
-        <div class="col-sm-2">
-            <label for="period" id="period-addon">Periodicity</label>
-            <div class="input-group-btn">
-                <select class="form-control" id="period" name="period" aria-describedby="period-addon">
-                    {% if period=="any"%}<option selected="selected" value="any">Any</option>
-                    {% else %}<option value="any">Any</option>{%endif%}
-                    {% for i in periods %}
-                    <option {% if i==period|int and not period=="any" %}selected="selected"{% endif %}value={{i}}>{%if i==0%}Aperiodic{%else%}{{i}}{%endif%}</option>
-                    {% endfor%}
-                </select>
-            </div>
-        </div>
-
-        <div class="col-sm-1">
-            <label for="duration" id="duration-addon"><span class="d-inline-block d-sm-none d-lg-inline-block">Msg. len.</span><span class="d-none d-sm-inline-block d-lg-none">Len.</span></label>
-            <div class="input-group-btn">
-                <select class="form-control" id="length" name="length" aria-describedby="length-addon">
-                    {% if length=="any"%}<option selected="selected" value="any">Any</option>
-                    {% else %}<option value="any">Any</option>{%endif%}
-                    {% for i in lengths %}
-                    <option {% if i==length|int %}selected="selected"{% endif %}value={{i}}>{{i}}</option>
-                    {% endfor%}
-                </select>
-            </div>
-        </div>
-
+          {% for i in benchmark_suites %}
+          <option {% if i.id==benchmark_suite|int %}selected="selected"{% endif %}value={{i.id}}>{{i.name}}</option>
+          {% endfor%}
+        </select>
+      </div>
     </div>
-    <div class="row d-block d-md-none">
-        <div class="col-xs-12" id="toggle">
-            <button class="btn btn-block btn-primary" type="button" data-toggle="collapse" data-target="#controls" aria-expanded="false" aria-controls="controls">Toggle Filters</button>
-        </div>
+
+
+    <div class="col-sm-2">
+      <label for="duration" id="duration-addon"><span class="d-inline-block d-sm-none d-lg-inline-block">Duration</span><span class="d-none d-sm-inline-block d-lg-none">Dur.</span></label>
+      <div class="input-group-btn">
+        <select class="form-control" id="duration" name="duration" aria-describedby="duration-addon">
+          {% if default_duration=="any"%}<option selected="selected" value="any">Any</option>
+          {% else %}<option value="any">Any</option>{%endif%}
+          {% for d in durations %}
+          <option {% if d==default_duration|int %}selected="selected"{% endif %}value={{d}}>{{d}}</option>
+          {% endfor%}
+        </select>
+      </div>
     </div>
+
+    <div class="col-sm-2">
+      <label for="jamming" id="jamming-addon">Jamming</label>
+      <div class="input-group-btn">
+        <select class="form-control" id="jamming" name="jamming" aria-describedby="jamming-addon">
+          {% if jamming=="any"%}<option selected="selected" value="any">Any</option>
+          {% else %}<option value="any">Any</option>{%endif%}
+          {% for j in jammings %}
+          <option {% if jamming|int ==j.id %}selected="selected"{% endif %}value="{{j.id}}">{{j.name}}</option>
+          {% endfor%}
+        </select>
+      </div>
+    </div>
+
+    <div class="col-sm-1">
+      <label for="count" id="count-addon">Count</label>
+      <div class="input-group-btn">
+        <select class="form-control" id="count" name="count" aria-describedby="count-addon">
+          {% for i in [0, 1, 2, 3, 5, 10] %}
+          <option {% if i==count|int %}selected="selected"{% endif %}value={{i}}>{% if i==0%}All{% else %}{{i}}{% endif%}</option>
+          {% endfor%}
+        </select>
+      </div>
+    </div>
+
+    <div class="col-sm-1">
+      <label for="layout" id="benchmark_suite-addon"><span class="d-inline-block d-sm-none d-lg-inline-block">Layout</span><span class="d-none d-sm-inline-block d-lg-none">Lay.</span></label>
+      <div class="input-group-btn">
+        <select class="form-control" id="layout" name="layout" aria-describedby="layout-addon">
+          {% if layout=="any"%}<option selected="selected" value="any">Any</option>
+          {% else %}<option value="any">Any</option>{%endif%}
+
+          {% if not benchmark_suite=="any" %}
+          {% for i in layouts %}
+          <option {% if i.id==layout|int %}selected="selected"{% endif %}value={{i.id}}>{{i.short}}</option>
+          {% endfor%}
+          {%endif%}
+        </select>
+      </div>
+    </div>
+
+    <div class="col-sm-2">
+      <label for="period" id="period-addon">Periodicity</label>
+      <div class="input-group-btn">
+        <select class="form-control" id="period" name="period" aria-describedby="period-addon">
+          {% if period=="any"%}<option selected="selected" value="any">Any</option>
+          {% else %}<option value="any">Any</option>{%endif%}
+          {% for i in periods %}
+          <option {% if i==period|int and not period=="any" %}selected="selected"{% endif %}value={{i}}>{%if i==0%}Aperiodic{%else%}{{i}}{%endif%}</option>
+          {% endfor%}
+        </select>
+      </div>
+    </div>
+
+    <div class="col-sm-1">
+      <label for="duration" id="duration-addon"><span class="d-inline-block d-sm-none d-lg-inline-block">Msg. len.</span><span class="d-none d-sm-inline-block d-lg-none">Len.</span></label>
+      <div class="input-group-btn">
+        <select class="form-control" id="length" name="length" aria-describedby="length-addon">
+          {% if length=="any"%}<option selected="selected" value="any">Any</option>
+          {% else %}<option value="any">Any</option>{%endif%}
+          {% for i in lengths %}
+          <option {% if i==length|int %}selected="selected"{% endif %}value={{i}}>{{i}}</option>
+          {% endfor%}
+        </select>
+      </div>
+    </div>
+
+  </div>
+  <div class="row d-block d-md-none">
+    <div class="col-xs-12" id="toggle">
+      <button class="btn btn-block btn-primary" type="button" data-toggle="collapse" data-target="#controls" aria-expanded="false" aria-controls="controls">Toggle Filters</button>
+    </div>
+  </div>
 
 </div>
 
 <div class="container">
-	<h1>
-    <div class="row mt-2">
-      <span class="col-lg-4 col-sm-6">Leaderboard</span>
-      <div class="col-lg-4 offset-lg-4 col-sm-6">
-        <div class="btn-group float-right">
-	    <div class="tooltip-wrapper" title="Current queue length estimate">
-	    <a id="queue-est" href="#" class="d-none d-sm-inline-block btn btn-lg btn-primary disabled"><span>~{{'%0.1f'|format(est)}}<span class="d-none d-md-inline-block"> min</span></span></a>
-	    </div>
-            <a href="#" class="btn btn-lg btn-secondary disabled">{{jobs}} jobs</a>
-        </div>
-      </div>
+  <h1>
+  <div class="row mt-2">
+    <span class="col-lg-4 col-sm-6">Leaderboard</span>
+    <div class="col-lg-4 offset-lg-4 col-sm-6">
+    <div class="btn-group float-right">
+    <div class="tooltip-wrapper" title="Current queue length estimate">
+    <a id="queue-est" href="#" class="d-none d-sm-inline-block btn btn-lg btn-primary disabled"><span>~{{'%0.1f'|format(est)}}<span class="d-none d-md-inline-block"> min</span></span></a>
     </div>
-	</h1>
-	{{banner}}<br>
-    <strong>Only results with a reliability between {{lower_rel}} and 100% are shown.</strong>
-    <div class="row mt-2">
-        <div class="col-md-12">
-            <h2>Energy</h2>
-            <table class="table-hover table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>P</th>
-                        <th>E[J]</th>
-                        <th>R[%]</th>
-                        <th>L[ms]</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for metric in e_metrics %}
-                    <tr class='clickable-row' data-href="{{url_for(jobdetails(metric.job),id=metric.job.id)}}">
-                        <td>{{metric.job.id}}</td>
-                        <td>{{metric.job.protocol.name}}</td>
-                        {%if metric.job.logs %}
-                        <td><sup>{{'%0.1f' | format(metric.energy) }}</sup>&frasl;<sub>~{{'%0.1f' | format(metric.energy-(metric.job.duration*51*0.108))}}</sub></td>
-                        {% else %}
-                        <td>{{'%0.1f' | format(metric.energy) }}</td>
-                        {% endif %}
-                        <td>{{'%0.1f' | format(metric.reliability * 100) }}</td>
-                        <td>{{'%0.1f'| format(metric.latency / 1000) }}</td>
-                        <td>
-                            {% if metric.job.jamming_composition_id >1 %}
-                            <span class="fas fa-bolt" aria-hidden="true" title="jamming enabled"></span><sub>{{metric.job.jamming_composition.short}}</sub> {% endif %} {% if metric.job.logs %}
-                            <span class="fas fa-align-justify" aria-hidden="true" title="logs enabled"></span> {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <div class="col-md-12">
-            <h2>Reliability</h2>
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>P</th>
-                        <th>E[J]</th>
-                        <th>R[%]</th>
-                        <th>L[ms]</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for metric in r_metrics %}
-                    <tr class='clickable-row' data-href="{{url_for(jobdetails(metric.job),id=metric.job.id)}}">
-                        <td>{{metric.job.id}}</td>
-                        <td>{{metric.job.protocol.name}}</td>
-                        <td>{{'%0.1f' | format(metric.energy) }}</td>
-                        <td>{{'%0.1f' | format(metric.reliability * 100) }}</td>
-                        <td>{{'%0.1f'| format(metric.latency / 1000) }}</td>
-                        <td>
-                            {% if metric.job.jamming_composition_id >1 %}
-                            <span class="fas fa-bolt" aria-hidden="true" title="jamming enabled"></span><sub>{{metric.job.jamming_composition.short}}</sub> {% endif %}
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <div class="col-md-12">
-            <h2>Latency</h2>
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>P</th>
-                        <th>E[J]</th>
-                        <th>R[%]</th>
-                        <th>L[ms]</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for metric in l_metrics %}
-                    <tr class='clickable-row' data-href="{{url_for(jobdetails(metric.job),id=metric.job.id)}}">
-                        <td>{{metric.job.id}}</td>
-                        <td>{{metric.job.protocol.name}}</td>
-                        <td>{{'%0.1f' | format(metric.energy) }}</td>
-                        <td>{{'%0.1f' | format(metric.reliability * 100) }}</td>
-                        <td>{{'%0.1f'| format(metric.latency / 1000) }}</td>
-                        <td>
-                            {% if metric.job.jamming_composition_id > 1 %}
-                            <span class="fas fa-bolt" aria-hidden="true" title="jamming enabled"></span><sub>{{metric.job.jamming_composition.short}}</sub> {% endif %}
-                    </tr>
+      <a href="#" class="btn btn-lg btn-secondary disabled">{{jobs}} jobs</a>
+    </div>
+    </div>
+  </div>
+  </h1>
+  {{banner}}<br>
+  <strong>Only results with a reliability between {{lower_rel}} and 100% are shown.</strong>
+  <div class="row mt-2">
+    <div class="col-md-12">
+      <h2>Energy</h2>
+      <table class="table-hover table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>P</th>
+            <th>E[J]</th>
+            <th>R[%]</th>
+            <th>L[ms]</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for metric in e_metrics %}
+          <tr class='clickable-row' data-href="{{url_for(jobdetails(metric.job),id=metric.job.id)}}">
+            <td>{{metric.job.id}}</td>
+            <td>{{metric.job.protocol.name}}</td>
+            {%if metric.job.logs %}
+            <td><sup>{{'%0.1f' | format(metric.energy) }}</sup>&frasl;<sub>~{{'%0.1f' | format(metric.energy-(metric.job.duration*51*0.108))}}</sub></td>
+            {% else %}
+            <td>{{'%0.1f' | format(metric.energy) }}</td>
+            {% endif %}
+            <td>{{'%0.1f' | format(metric.reliability * 100) }}</td>
+            <td>{{'%0.1f'| format(metric.latency / 1000) }}</td>
+            <td>
+              {% if metric.job.jamming_composition_id >1 %}
+              <span class="fas fa-bolt" aria-hidden="true" title="jamming enabled"></span><sub>{{metric.job.jamming_composition.short}}</sub> {% endif %} {% if metric.job.logs %}
+              <span class="fas fa-align-justify" aria-hidden="true" title="logs enabled"></span> {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="col-md-12">
+      <h2>Reliability</h2>
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>P</th>
+            <th>E[J]</th>
+            <th>R[%]</th>
+            <th>L[ms]</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for metric in r_metrics %}
+          <tr class='clickable-row' data-href="{{url_for(jobdetails(metric.job),id=metric.job.id)}}">
+            <td>{{metric.job.id}}</td>
+            <td>{{metric.job.protocol.name}}</td>
+            <td>{{'%0.1f' | format(metric.energy) }}</td>
+            <td>{{'%0.1f' | format(metric.reliability * 100) }}</td>
+            <td>{{'%0.1f'| format(metric.latency / 1000) }}</td>
+            <td>
+              {% if metric.job.jamming_composition_id >1 %}
+              <span class="fas fa-bolt" aria-hidden="true" title="jamming enabled"></span><sub>{{metric.job.jamming_composition.short}}</sub> {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="col-md-12">
+      <h2>Latency</h2>
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>P</th>
+            <th>E[J]</th>
+            <th>R[%]</th>
+            <th>L[ms]</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for metric in l_metrics %}
+          <tr class='clickable-row' data-href="{{url_for(jobdetails(metric.job),id=metric.job.id)}}">
+            <td>{{metric.job.id}}</td>
+            <td>{{metric.job.protocol.name}}</td>
+            <td>{{'%0.1f' | format(metric.energy) }}</td>
+            <td>{{'%0.1f' | format(metric.reliability * 100) }}</td>
+            <td>{{'%0.1f'| format(metric.latency / 1000) }}</td>
+            <td>
+              {% if metric.job.jamming_composition_id > 1 %}
+              <span class="fas fa-bolt" aria-hidden="true" title="jamming enabled"></span><sub>{{metric.job.jamming_composition.short}}</sub> {% endif %}
+          </tr>
 
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
+  </div>
 </div>
 {%- endblock %}
 
@@ -280,25 +279,25 @@ intact. #}
 <script>
 
 $(document).ready(function () {
-    if (matchMedia) {
-        var mq = window.matchMedia("(min-width: 768px)");
-        mq.addListener(WidthChange);
-        WidthChange(mq);
-    }
-    function WidthChange(mq) {
-        if (mq.matches) {
-            $("#controls").removeClass("collapse");
-            $("#controls").addClass("collapse.show");
-        } else {
-            $("#controls").removeClass("collapse.show");
-            $("#controls").addClass("collapse");
+  if (matchMedia) {
+    var mq = window.matchMedia("(min-width: 768px)");
+    mq.addListener(WidthChange);
+    WidthChange(mq);
+  }
+  function WidthChange(mq) {
+    if (mq.matches) {
+      $("#controls").removeClass("collapse");
+      $("#controls").addClass("collapse.show");
+    } else {
+      $("#controls").removeClass("collapse.show");
+      $("#controls").addClass("collapse");
 
-        }
     }
+  }
 });
 
 $('.clickable-row' ).click(function() {
-    window.document.location = $(this).data("href");
+  window.document.location = $(this).data("href");
 });
 $("#jamming").on('change', update);
 $("#duration").on('change', update);
@@ -309,14 +308,14 @@ $("#period").on('change', update);
 $("#length").on('change', update);
 
 function update(){
-    d=$("#duration").val();
-    j=$("#jamming").val();
-    c=$("#count").val();
-    cat=$("#benchmark_suite").val();
-    l=$("#layout").val();
-    p=$("#period").val();
-    le=$("#length").val();
-    window.open("/leaderboard?duration="+d+"&jamming="+j+"&count="+c+"&benchmark_suite="+cat+"&layout="+l+"&period="+p+"&length="+le,"_self");
+  d=$("#duration").val();
+  j=$("#jamming").val();
+  c=$("#count").val();
+  cat=$("#benchmark_suite").val();
+  l=$("#layout").val();
+  p=$("#period").val();
+  le=$("#length").val();
+  window.open("/leaderboard?duration="+d+"&jamming="+j+"&count="+c+"&benchmark_suite="+cat+"&layout="+l+"&period="+p+"&length="+le,"_self");
 }
 </script>
 {% endblock %} 

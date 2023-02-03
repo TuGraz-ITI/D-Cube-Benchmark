@@ -1,26 +1,25 @@
-<!--
--- MIT License
---
--- Copyright (c) 2022 Graz University of Technology
---
--- Permission is hereby granted, free of charge, to any person obtaining a copy
--- of this software and associated documentation files (the "Software"), to deal
--- in the Software without restriction, including without limitation the rights
--- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
--- copies of the Software, and to permit persons to whom the Software is
--- furnished to do so, subject to the following conditions:
---
--- The above copyright notice and this permission notice shall be included in all
--- copies or substantial portions of the Software.
---
--- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
--- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
--- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
--- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
--- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
--- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
--- SOFTWARE.
--->
+{# MIT License
+
+  Copyright (c) 2023 Graz University of Technology
+  
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+  
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+  
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE. #}
+  
 {# This simple template derives from ``base.html``. See ``base.html`` for
 more information about template inheritance. #}
 {%- extends "base.html" %}
@@ -34,7 +33,7 @@ Jamming &mdash; D-Cube
 
 <style type="text/css">
 #graph {
-    height: 400px;
+  height: 400px;
 }
 </style>
 
@@ -46,28 +45,28 @@ This will keep scripts at the page end and a navbar you add on later
 intact. #}
 {% block content %}
 <div class="container">
-    <div class="container">
-        <h1>Jamming</h1>
-        <div class="row">
-            <div class="col-sm-6">
-                <div class="input-group">
-		    <div class="input-group-prepend">
-                    <span class="input-group-text" id="level-addon">Level</span>
-		    </div>
-                    <select class="form-control" id="composition" name="composition" aria-describedby="category-addon">
-                        {% for c in compositions %}
-                        <option {% if composition.id ==c.id %}selected="selected"{% endif %}value="{{c.id}}">{{c.name}}</option>
-                        {% endfor%}
-                    </select>
-                </div>
-            </div>
+  <div class="container">
+    <h1>Jamming</h1>
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="input-group">
+      <div class="input-group-prepend">
+          <span class="input-group-text" id="level-addon">Level</span>
+      </div>
+          <select class="form-control" id="composition" name="composition" aria-describedby="category-addon">
+            {% for c in compositions %}
+            <option {% if composition.id ==c.id %}selected="selected"{% endif %}value="{{c.id}}">{{c.name}}</option>
+            {% endfor%}
+          </select>
         </div>
-        <div class="row mt-2">
-            <div class="col-sm-12">
-                <div id="timeline"></div>
-            </div>
-        </div>
+      </div>
     </div>
+    <div class="row mt-2">
+      <div class="col-sm-12">
+        <div id="timeline"></div>
+      </div>
+    </div>
+  </div>
 </div>
 {%- endblock %}
 
@@ -79,18 +78,18 @@ intact. #}
 
 <script>
 Handlebars.registerHelper("formatUnix", function(dateobject) {
-    d=new Date(dateobject)
-        return d.getTime();
+  d=new Date(dateobject)
+    return d.getTime();
 });
 </script>
 
 <script id="item-template" type="text/x-handlebars-template">
 {%raw%}
-    <table class="score">
-      <tr>
-        <th colspan="2" class="description">{{content}}</th>
-      </tr>
-    </table>
+  <table class="score">
+    <tr>
+    <th colspan="2" class="description">{{content}}</th>
+    </tr>
+  </table>
 {%endraw%}
 </script>
 
@@ -101,45 +100,45 @@ var tt = new vis.DataSet({{preview_dict['items']|tojson}});
 var tg = new vis.DataSet({{preview_dict['groups']|tojson}});
 
 var options = {
-    align: "left",
-    showMajorLabels: false,
-    groupOrder: 'rpi',
-    showCurrentTime: false,
-    min: new Date(0),
-    template: template,
-    editable: {
-        add: false,
-        updateTime: false,
-        updateGroup: false,
-        remove: false
+  align: "left",
+  showMajorLabels: false,
+  groupOrder: 'rpi',
+  showCurrentTime: false,
+  min: new Date(0),
+  template: template,
+  editable: {
+    add: false,
+    updateTime: false,
+    updateGroup: false,
+    remove: false
+  },
+  moment: function(date) {
+    return vis.moment(date).utc();
+  },
+  format: {
+    minorLabels: {
+      millisecond:'x[m]',
+      second:     'X',
+      minute:     'X',
+      hour:       'X',
+      weekday:    'X',
+      day:        'X',
+      week:       'X',
+      month:      'X',
+      year:       'X'
     },
-    moment: function(date) {
-        return vis.moment(date).utc();
-    },
-    format: {
-        minorLabels: {
-            millisecond:'x[m]',
-            second:     'X',
-            minute:     'X',
-            hour:       'X',
-            weekday:    'X',
-            day:        'X',
-            week:       'X',
-            month:      'X',
-            year:       'X'
-        },
-        majorLabels: {
-            millisecond:'',
-            second:     '',
-            minute:     '',
-            hour:       '',
-            weekday:    '',
-            day:        '',
-            week:       '',
-            month:      '',
-            year:       ''
-        }
+    majorLabels: {
+      millisecond:'',
+      second:     '',
+      minute:     '',
+      hour:       '',
+      weekday:    '',
+      day:        '',
+      week:       '',
+      month:      '',
+      year:       ''
     }
+  }
 };
 var tl = new vis.Timeline(timeline, tt, options);
 tl.setGroups(tg);
@@ -147,8 +146,8 @@ tl.setGroups(tg);
 $("#composition").on('change', update_composition);
 
 function update_composition(){
-    comp=$("#composition").val();
-    window.open("/jamming?composition="+comp,"_self");
+  comp=$("#composition").val();
+  window.open("/jamming?composition="+comp,"_self");
 }
 
 

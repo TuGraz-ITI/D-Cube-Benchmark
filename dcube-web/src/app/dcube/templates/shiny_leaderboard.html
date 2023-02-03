@@ -1,26 +1,25 @@
-<!--
--- MIT License
---
--- Copyright (c) 2022 Graz University of Technology
---
--- Permission is hereby granted, free of charge, to any person obtaining a copy
--- of this software and associated documentation files (the "Software"), to deal
--- in the Software without restriction, including without limitation the rights
--- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
--- copies of the Software, and to permit persons to whom the Software is
--- furnished to do so, subject to the following conditions:
---
--- The above copyright notice and this permission notice shall be included in all
--- copies or substantial portions of the Software.
---
--- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
--- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
--- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
--- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
--- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
--- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
--- SOFTWARE.
--->
+{# MIT License
+
+  Copyright (c) 2023 Graz University of Technology
+  
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+  
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+  
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE. #}
+  
 {# This simple template derives from ``base.html``. See ``base.html`` for
 more information about template inheritance. #}
 {%- extends "base.html" %}
@@ -37,25 +36,25 @@ intact. #}
 {{super()}}
 <style>
 html{
-    overflow-y: scroll;
+  overflow-y: scroll;
 }
 
 .row.no-pad {
-    margin-right:0;
-    margin-left:0;
+  margin-right:0;
+  margin-left:0;
 }
 
 .row #toggle {
-    padding-top:5px;
+  padding-top:5px;
 }
 
 .row.no-pad > [class*='col-'] {
-    padding-right:2px;
-    padding-left:2px;
+  padding-right:2px;
+  padding-left:2px;
 }
 
 #chart {
-    width:100%;
+  width:100%;
 }
 
 </style>
@@ -68,132 +67,132 @@ html{
 {% block content %}
 <div class="container" id="stats">
 
-    <div class="row no-pad collapse.show" id="controls">
+  <div class="row no-pad collapse.show" id="controls">
 
-        <div class="col-md-2">
-            <label for="duration" id="duration-addon">Duration</label>
-            <div class="input-group-btn">
-                <select class="form-control" id="duration" name="duration" aria-describedby="duration-addon">
-                    {% if duration=="any"%}<option selected value="any">Any</option>
-                    {% else %}<option value="any">Any</option>{%endif%}
-                    {% for d in durations %}
-		    <option {% if duration|int == d %}selected {% endif %}value="{{d}}">{{d}}</option>
-                    {% endfor%}
-                </select>
-            </div>
-        </div>
-
-
-        <div class="col-md-2">
-            <label for="jamming" id="jamming-addon">Jamming</label>
-            <div class="input-group-btn">
-                <select class="form-control" id="jamming" name="jamming" aria-describedby="jamming-addon">
-                    {% if jamming=="any"%}<option selected value="any">Any</option>
-                    {% else %}<option value="any">Any</option>{%endif%}
-                    {% for j in jammings %}
-                    <option {% if jamming|int == j.id %}selected {% endif %}value="{{j.id}}">{{j.name}}</option>
-                    {% endfor%}
-                </select>
-            </div>
-        </div>
-
-        <div class="col-md-2">
-            <label for="count" id="count-addon">Count</label>
-            <div class="input-group-btn">
-                <select class="form-control" id="count" name="count" aria-describedby="count-addon">
-                    <option {% if count=="median"%}selected {%endif%}value="median">Median</option>
-                    {% for i in [0, 1, 2, 3, 5, 10] %}
-                    <option {% if not (count=="median") and  i==count|int %}selected {% endif %}value={{i}}>{% if i==0%}All{% else %}{{i}}{% endif%}</option>
-                    {% endfor%}
-                </select>
-            </div>
-        </div>
-
-        <div class="col-md-2">
-            <label for="layout" id="layout-addon">Layout</label>
-            <div class="input-group-btn">
-                <select class="form-control" id="layout" name="layout" aria-describedby="layout-addon">
-                    {% if layout=="any"%}<option selected value="any">Any</option>
-                    {% else %}<option value="any">Any</option>{%endif%}
-                    {% for i in layouts %}
-                    <option {% if i.id==layout|int %}selected {% endif %}value={{i.id}}>{{i.short}}</option>
-                    {% endfor%}
-                </select>
-            </div>
-        </div>
-
-        <div class="col-md-2">
-            <label for="period" id="period-addon">Periodicity</label>
-            <div class="input-group-btn">
-                <select class="form-control" id="period" name="period" aria-describedby="period-addon">
-                    {% if period=="any"%}<option selected value="any">Any</option>
-                    {% else %}<option value="any">Any</option>{%endif%}
-                    {% if period=="periodic"%}<option selected value="periodic">Periodic</option>
-                    {% else %}<option value="periodic">Periodic</option>{%endif%}
-                    {% for i in periods %}
-                    <option {% if i==period|int and not (period=="any" or period=="periodic") %}selected {% endif %}value={{i}}>{%if i==0%}Aperiodic{%else%}{{i}}{%endif%}</option>
-                    {% endfor%}
-                </select>
-            </div>
-        </div>
-
-        <div class="col-md-2">
-            <label for="length" id="length-addon">Msg. len.</label>
-            <div class="input-group-btn">
-                <select class="form-control" id="length" name="length" aria-describedby="length-addon">
-                    {% if length=="any"%}<option selected value="any">Any</option>
-                    {% else %}<option value="any">Any</option>{%endif%}
-                    {% for i in lengths %}
-                    <option {% if i==length|int %}selected {% endif %}value={{i}}>{{i}}</option>
-                    {% endfor%}
-                </select>
-            </div>
-        </div>
-
+    <div class="col-md-2">
+      <label for="duration" id="duration-addon">Duration</label>
+      <div class="input-group-btn">
+        <select class="form-control" id="duration" name="duration" aria-describedby="duration-addon">
+          {% if duration=="any"%}<option selected value="any">Any</option>
+          {% else %}<option value="any">Any</option>{%endif%}
+          {% for d in durations %}
+      <option {% if duration|int == d %}selected {% endif %}value="{{d}}">{{d}}</option>
+          {% endfor%}
+        </select>
+      </div>
     </div>
-    <div class="row d-block d-md-none">
-        <div class="col-xs-12" id="toggle">
-            <button class="btn btn-block btn-primary" type="button" data-toggle="collapse" data-target="#controls" aria-expanded="false" aria-controls="controls">Toggle Filters</button>
-        </div>
+
+
+    <div class="col-md-2">
+      <label for="jamming" id="jamming-addon">Jamming</label>
+      <div class="input-group-btn">
+        <select class="form-control" id="jamming" name="jamming" aria-describedby="jamming-addon">
+          {% if jamming=="any"%}<option selected value="any">Any</option>
+          {% else %}<option value="any">Any</option>{%endif%}
+          {% for j in jammings %}
+          <option {% if jamming|int == j.id %}selected {% endif %}value="{{j.id}}">{{j.name}}</option>
+          {% endfor%}
+        </select>
+      </div>
     </div>
+
+    <div class="col-md-2">
+      <label for="count" id="count-addon">Count</label>
+      <div class="input-group-btn">
+        <select class="form-control" id="count" name="count" aria-describedby="count-addon">
+          <option {% if count=="median"%}selected {%endif%}value="median">Median</option>
+          {% for i in [0, 1, 2, 3, 5, 10] %}
+          <option {% if not (count=="median") and  i==count|int %}selected {% endif %}value={{i}}>{% if i==0%}All{% else %}{{i}}{% endif%}</option>
+          {% endfor%}
+        </select>
+      </div>
+    </div>
+
+    <div class="col-md-2">
+      <label for="layout" id="layout-addon">Layout</label>
+      <div class="input-group-btn">
+        <select class="form-control" id="layout" name="layout" aria-describedby="layout-addon">
+          {% if layout=="any"%}<option selected value="any">Any</option>
+          {% else %}<option value="any">Any</option>{%endif%}
+          {% for i in layouts %}
+          <option {% if i.id==layout|int %}selected {% endif %}value={{i.id}}>{{i.short}}</option>
+          {% endfor%}
+        </select>
+      </div>
+    </div>
+
+    <div class="col-md-2">
+      <label for="period" id="period-addon">Periodicity</label>
+      <div class="input-group-btn">
+        <select class="form-control" id="period" name="period" aria-describedby="period-addon">
+          {% if period=="any"%}<option selected value="any">Any</option>
+          {% else %}<option value="any">Any</option>{%endif%}
+          {% if period=="periodic"%}<option selected value="periodic">Periodic</option>
+          {% else %}<option value="periodic">Periodic</option>{%endif%}
+          {% for i in periods %}
+          <option {% if i==period|int and not (period=="any" or period=="periodic") %}selected {% endif %}value={{i}}>{%if i==0%}Aperiodic{%else%}{{i}}{%endif%}</option>
+          {% endfor%}
+        </select>
+      </div>
+    </div>
+
+    <div class="col-md-2">
+      <label for="length" id="length-addon">Msg. len.</label>
+      <div class="input-group-btn">
+        <select class="form-control" id="length" name="length" aria-describedby="length-addon">
+          {% if length=="any"%}<option selected value="any">Any</option>
+          {% else %}<option value="any">Any</option>{%endif%}
+          {% for i in lengths %}
+          <option {% if i==length|int %}selected {% endif %}value={{i}}>{{i}}</option>
+          {% endfor%}
+        </select>
+      </div>
+    </div>
+
+  </div>
+  <div class="row d-block d-md-none">
+    <div class="col-xs-12" id="toggle">
+      <button class="btn btn-block btn-primary" type="button" data-toggle="collapse" data-target="#controls" aria-expanded="false" aria-controls="controls">Toggle Filters</button>
+    </div>
+  </div>
 
 </div>
-    <div class="container">
-        <h1>{{benchmark_suite.name}} Results</h1>
-        <table class="table-hover table">
-            <thead>
-                <tr>
-                    {% if not count=="median" %}
-                    <th>#</th>
-                    {% endif %}
-                    <th>Procotol#</th>
-                    <th class="d-none d-sm-table-cell">Protocol</th>
-		    {%if benchmark_suite.energy%}<th>Energy[J]</th>{%endif%}
-		    {%if benchmark_suite.reliability%}<th>Reliablity [%]</th>{%endif%}
-		    {%if benchmark_suite.latency%}<th>Latency [ms]</th>{%endif%}
-                </tr>
-            </thead>
-            <tbody>
-                {% for index,metric in df.iterrows() %}
-		<tr>
-                    {% if not count=="median" %}
-                    <td>{{metric['job_id']}}</td>
-                    {% endif %}
-                    <td>{{metric['pid']|int}}</td>
-                    <td class="d-none d-sm-table-cell">{{metric['protocol']}}</td>
-		    {%if benchmark_suite.energy%}<td>{{'%0.2f' | format(metric['energy'])}}</td>{%endif%}
-                    {%if benchmark_suite.reliability%}<td>{{'%0.2f' | format(metric['reliability']*100)}}</td>{%endif%}
-		    {%if benchmark_suite.latency%}<td>{%if metric['latency']|isnan %}-{%else%}{{'%0.2f' | format(metric['latency'])}}{%endif%}</td>{%endif%}
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <div class="container">
-        {% if png != None %}
-        <img id="chart" src="data:image/png;base64,{{ png }}"\>
-        {% endif %}
-    </div>
+  <div class="container">
+    <h1>{{benchmark_suite.name}} Results</h1>
+    <table class="table-hover table">
+      <thead>
+        <tr>
+          {% if not count=="median" %}
+          <th>#</th>
+          {% endif %}
+          <th>Procotol#</th>
+          <th class="d-none d-sm-table-cell">Protocol</th>
+      {%if benchmark_suite.energy%}<th>Energy[J]</th>{%endif%}
+      {%if benchmark_suite.reliability%}<th>Reliablity [%]</th>{%endif%}
+      {%if benchmark_suite.latency%}<th>Latency [ms]</th>{%endif%}
+        </tr>
+      </thead>
+      <tbody>
+        {% for index,metric in df.iterrows() %}
+    <tr>
+          {% if not count=="median" %}
+          <td>{{metric['job_id']}}</td>
+          {% endif %}
+          <td>{{metric['pid']|int}}</td>
+          <td class="d-none d-sm-table-cell">{{metric['protocol']}}</td>
+      {%if benchmark_suite.energy%}<td>{{'%0.2f' | format(metric['energy'])}}</td>{%endif%}
+          {%if benchmark_suite.reliability%}<td>{{'%0.2f' | format(metric['reliability']*100)}}</td>{%endif%}
+      {%if benchmark_suite.latency%}<td>{%if metric['latency']|isnan %}-{%else%}{{'%0.2f' | format(metric['latency'])}}{%endif%}</td>{%endif%}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="container">
+    {% if png != None %}
+    <img id="chart" src="data:image/png;base64,{{ png }}"\>
+    {% endif %}
+  </div>
 {%- endblock %}
 
 {% block scripts %}
@@ -201,25 +200,25 @@ html{
 <script>
 
 $(document).ready(function () {
-    if (matchMedia) {
-        var mq = window.matchMedia("(min-width: 768px)");
-        mq.addListener(WidthChange);
-        WidthChange(mq);
-    }
-    function WidthChange(mq) {
-        if (mq.matches) {
-            $("#controls").removeClass("collapse");
-            $("#controls").addClass("collapse.show");
-        } else {
-            $("#controls").removeClass("collapse.show");
-            $("#controls").addClass("collapse");
+  if (matchMedia) {
+    var mq = window.matchMedia("(min-width: 768px)");
+    mq.addListener(WidthChange);
+    WidthChange(mq);
+  }
+  function WidthChange(mq) {
+    if (mq.matches) {
+      $("#controls").removeClass("collapse");
+      $("#controls").addClass("collapse.show");
+    } else {
+      $("#controls").removeClass("collapse.show");
+      $("#controls").addClass("collapse");
 
-        }
     }
+  }
 });
 
 $('.clickable-row' ).click(function() {
-    window.document.location = $(this).data("href");
+  window.document.location = $(this).data("href");
 });
 //$( document ).ready(function() {
 //  $("html").css("overflow-y","scroll");
@@ -232,14 +231,14 @@ $("#length").on('change', update);
 $("#duration").on('change', update);
 
 function update(){
-    c=$("#count").val();
-    j=$("#jamming").val();
-    l=$("#layout").val();
-    p=$("#period").val();
-    le=$("#length").val();
-    d=$("#duration").val();
+  c=$("#count").val();
+  j=$("#jamming").val();
+  l=$("#layout").val();
+  p=$("#period").val();
+  le=$("#length").val();
+  d=$("#duration").val();
 
-    window.open("{{url_for("leaderboard.show_benchmark_suite",benchmark_suite_id=benchmark_suite.id)}}?jamming="+j+"&count="+c+"&layout="+l+"&period="+p+"&length="+le+"&duration="+d,"_self");
+  window.open("{{url_for("leaderboard.show_benchmark_suite",benchmark_suite_id=benchmark_suite.id)}}?jamming="+j+"&count="+c+"&layout="+l+"&period="+p+"&length="+le+"&duration="+d,"_self");
 }
 </script>
 {% endblock %} 

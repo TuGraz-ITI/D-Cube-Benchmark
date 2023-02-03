@@ -1,26 +1,25 @@
-<!--
--- MIT License
---
--- Copyright (c) 2022 Graz University of Technology
---
--- Permission is hereby granted, free of charge, to any person obtaining a copy
--- of this software and associated documentation files (the "Software"), to deal
--- in the Software without restriction, including without limitation the rights
--- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
--- copies of the Software, and to permit persons to whom the Software is
--- furnished to do so, subject to the following conditions:
---
--- The above copyright notice and this permission notice shall be included in all
--- copies or substantial portions of the Software.
---
--- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
--- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
--- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
--- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
--- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
--- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
--- SOFTWARE.
--->
+{# MIT License
+
+  Copyright (c) 2023 Graz University of Technology
+  
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+  
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+  
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE. #}
+  
 {# This simple template derives from ``base.html``. See ``base.html`` for
 more information about template inheritance. #}
 {%- extends "base.html" %}
@@ -34,7 +33,7 @@ Layout of Nodes per Benchmark Suite &mdash; D-Cube
 
 <style type="text/css">
 #graph {
-    height: 600px;
+  height: 600px;
 }
 </style>
 
@@ -47,44 +46,44 @@ This will keep scripts at the page end and a navbar you add on later
 intact. #}
 {% block content %}
 <div class="container">
-    <div class="container">
-        <h1>Layout of Nodes per Benchmark Suite</h1>
-        <div class="row">
-            <div class="col-sm-6">
-                <div class="input-group">
-	            <div class="input-group-prepend">
-                    <span class="input-group-text" id="benchmark_suite-addon">Benchmark Suite</span>
-                    </div>
-                    <select class="form-control" id="benchmark_suite" name="benchmark_suite" aria-describedby="benchmark_suite-addon">
-                        {% for c in benchmark_suites %}
-                        <option {% if benchmark_suite.id ==c.id %}selected="selected"{% endif %}value="{{c.id}}">{{c.name}}</option>
-                        {% endfor%}
-                    </select>
-                </div>
-            </div>
-            <div class="col-sm-6">
-                <div class="input-group">
-	            <div class="input-group-prepend">
-                    <span class="input-group-text" id="composition-addon">Node Layout</span>
-		    </div>
-                    <select class="form-control" id="composition" name="composition" aria-describedby="composition-addon">
-                        {% for c in compositions %}
-                        <option {% if composition.id ==c.id %}selected="selected"{% endif %}value="{{c.id}}">{{c.name}}</option>
-                        {% endfor%}
-                    </select>
-                </div>
-            </div>
+  <div class="container">
+    <h1>Layout of Nodes per Benchmark Suite</h1>
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="benchmark_suite-addon">Benchmark Suite</span>
+          </div>
+          <select class="form-control" id="benchmark_suite" name="benchmark_suite" aria-describedby="benchmark_suite-addon">
+            {% for c in benchmark_suites %}
+            <option {% if benchmark_suite.id ==c.id %}selected="selected"{% endif %}value="{{c.id}}">{{c.name}}</option>
+            {% endfor%}
+          </select>
         </div>
-        <div class="row">
-            <div class="container mt-2">
-		    <div class="card">
-                    <div class="card-body">
-                        <div id="graph"></div>
-                    </div>
-                    </div>
-            </div>
+      </div>
+      <div class="col-sm-6">
+        <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="composition-addon">Node Layout</span>
+      </div>
+          <select class="form-control" id="composition" name="composition" aria-describedby="composition-addon">
+            {% for c in compositions %}
+            <option {% if composition.id ==c.id %}selected="selected"{% endif %}value="{{c.id}}">{{c.name}}</option>
+            {% endfor%}
+          </select>
         </div>
+      </div>
     </div>
+    <div class="row">
+      <div class="container mt-2">
+      <div class="card">
+          <div class="card-body">
+            <div id="graph"></div>
+          </div>
+          </div>
+      </div>
+    </div>
+  </div>
 </div>
 {%- endblock %}
 
@@ -106,13 +105,13 @@ var layoutMethod = "directed";
 
 
 var options={
-    layout: {
-        randomSeed: 1
-    },
-    edges: {
-        smooth: true,
-        arrows: {to : true }
-    }
+  layout: {
+    randomSeed: 1
+  },
+  edges: {
+    smooth: true,
+    arrows: {to : true }
+  }
 };
 var network=new vis.Network(container,data,options);
 
@@ -122,14 +121,14 @@ $("#benchmark_suite").on('change', update_benchmark_suite);
 $("#composition").on('change', update_composition);
 
 function update_composition(){
-    cat=$("#benchmark_suite").val();
-    comp=$("#composition").val();
-    window.open("/layout?benchmark_suite="+cat+"&composition="+comp,"_self");
+  cat=$("#benchmark_suite").val();
+  comp=$("#composition").val();
+  window.open("/layout?benchmark_suite="+cat+"&composition="+comp,"_self");
 }
 
 function update_benchmark_suite(){
-    cat=$("#benchmark_suite").val();
-    window.open("/layout?benchmark_suite="+cat,"_self");
+  cat=$("#benchmark_suite").val();
+  window.open("/layout?benchmark_suite="+cat,"_self");
 }
 
 </script>

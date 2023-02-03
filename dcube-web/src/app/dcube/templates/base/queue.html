@@ -1,26 +1,25 @@
-<!--
--- MIT License
---
--- Copyright (c) 2022 Graz University of Technology
---
--- Permission is hereby granted, free of charge, to any person obtaining a copy
--- of this software and associated documentation files (the "Software"), to deal
--- in the Software without restriction, including without limitation the rights
--- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
--- copies of the Software, and to permit persons to whom the Software is
--- furnished to do so, subject to the following conditions:
---
--- The above copyright notice and this permission notice shall be included in all
--- copies or substantial portions of the Software.
---
--- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
--- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
--- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
--- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
--- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
--- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
--- SOFTWARE.
--->
+{# MIT License
+
+  Copyright (c) 2023 Graz University of Technology
+  
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+  
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+  
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE. #}
+  
 {# This simple template derives from ``base.html``. See ``base.html`` for
 more information about template inheritance. #}
 {%- extends "base.html" %}
@@ -42,7 +41,7 @@ more information about template inheritance. #}
 {%if protocols|length==0%}
 <footer class="footer">
   <div class="container">
-    <p class="text-center">You need to create a protocol before being able to create jobs</p>
+  <p class="text-center">You need to create a protocol before being able to create jobs</p>
   </div>
 </footer>
 
@@ -55,264 +54,264 @@ intact. #}
 {% block content %}
 <div class="container">
   <h1>
-    <div class="row">
-      <div class="col-8 col-sm-6 col-md-5">
-	<span class="d-none d-lg-inline-block">Jobs for team {{current_user.group.name}}</span>
-	<span class="d-inline-block d-lg-none">Jobs: {{current_user.group.name}}</span>
-      </div>
-      <div class="col-4 col-sm-6 col-md-7">
-	<div class="float-right">
-	  <div class="btn-group">
-	    <a class="btn btn-lg btn-secondary" href={{url_for("frontend.show_layout")}} title="show testbed layout"><span class="d-none d-lg-inline-block">Show Layout</span><span class="d-none d-md-inline-block d-lg-none">Layout</span><span class="d-inline-block d-md-none fas fa-search-plus" aria-hidden="true" ></span></a>
-	    <div class="tooltip-wrapper" title="Current queue length estimate">
-	    <a id="queue-est" href="#" class="d-none d-sm-inline-block btn btn-lg btn-primary disabled"><span>~{{'%0.1f'|format(est)}}<span class="d-none d-md-inline-block"> min</span></span></a>
-	    </div>
-	    <button {%if protocols|length==0 or not current_user.has_role(module)%}disabled{%endif%} type="button" class="btn btn-lg btn-success" data-toggle="modal" data-target="#createJob" title="create new job"><span class="d-none d-md-inline-block">Create Job</span><span class="d-inline-block d-md-none fas fa-plus" aria-hidden="true" title="Create Job"></span></button>
-	  </div>
-	</div>
-      </div>
+  <div class="row">
+    <div class="col-8 col-sm-6 col-md-5">
+  <span class="d-none d-lg-inline-block">Jobs for team {{current_user.group.name}}</span>
+  <span class="d-inline-block d-lg-none">Jobs: {{current_user.group.name}}</span>
     </div>
+    <div class="col-4 col-sm-6 col-md-7">
+  <div class="float-right">
+    <div class="btn-group">
+    <a class="btn btn-lg btn-secondary" href={{url_for("frontend.show_layout")}} title="show testbed layout"><span class="d-none d-lg-inline-block">Show Layout</span><span class="d-none d-md-inline-block d-lg-none">Layout</span><span class="d-inline-block d-md-none fas fa-search-plus" aria-hidden="true" ></span></a>
+    <div class="tooltip-wrapper" title="Current queue length estimate">
+    <a id="queue-est" href="#" class="d-none d-sm-inline-block btn btn-lg btn-primary disabled"><span>~{{'%0.1f'|format(est)}}<span class="d-none d-md-inline-block"> min</span></span></a>
+    </div>
+    <button {%if protocols|length==0 or not current_user.has_role(module)%}disabled{%endif%} type="button" class="btn btn-lg btn-success" data-toggle="modal" data-target="#createJob" title="create new job"><span class="d-none d-md-inline-block">Create Job</span><span class="d-inline-block d-md-none fas fa-plus" aria-hidden="true" title="Create Job"></span></button>
+    </div>
+  </div>
+    </div>
+  </div>
   </h1>
 </div>
 <div class="container">
   <div class="d-none d-sm-inline-block">
-    {{render_pagination(jobs)}}
+  {{render_pagination(jobs)}}
   </div>
   <div class="d-inline-block d-sm-none">
-    {{render_pagination(jobs,left_edge=1,right_edge=1,left_current=1,right_current=3,size="sm")}}
+  {{render_pagination(jobs,left_edge=1,right_edge=1,left_current=1,right_current=3,size="sm")}}
   </div>
   <!-- Trigger the modal with a button -->
   <table id=refreshing class="table queue">
-    <thead>
-      <tr>
-	<th class="d-none d-md-table-cell">#</th>
-	<th>Protocol</th>
-	<th>Name</th>
-	<th class="d-none d-xl-table-cell">Description</th>
-	<th class="d-none d-md-table-cell"><span class="d-none d-xl-inline-block">Scheduled</span><span class="d-inline-block d-xl-none">Sched.</th>
-	<th class="d-none d-md-table-cell"><span class="d-none d-xl-inline-block">Duration [s]</span><span class="d-inline-block d-xl-none">Dur. [s]</th>
-	<th class="d-none d-sm-table-cell"><span class="d-none d-lg-inline-block">B.S. | Layout</span><span class="d-inline-block d-lg-none">B.S.</span></th>
-	<th class="d-none d-sm-table-cell"><span class="d-none d-lg-inline-block">Traffic Load</span><span class="d-inline-block d-lg-none">T.L.</span></th>
-	<th>Flags</th>
-	<th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {%- for job in jobs.items %}
-      <tr {% if job.running %}class="lead" style="background-color: #eee;"{% endif %}>
-	<td class="d-none d-md-table-cell">{{job.id}}</td>
-	<td class="text-break" >{% if job.protocol == None %}-{% else %}{{job.protocol.name}}{% endif %}</td>
-	<td><span class="d-none d-lg-table-cell text-break">{{job.name}}</span><span class="shortname d-inline-block d-lg-none">{{job.name}}</span></td>
-	<td class="d-none d-xl-table-cell text-break">{{job.description}}</td>
-	<td class="d-none d-md-table-cell"><span class="d-none d-lg-inline-block">{{job.scheduled|datetimefilter}}</span><span class="d-none d-md-inline-block d-lg-none">{{job.scheduled|datetimefilter("%H:%M")}}</span></td>
-	{%if not job.duration==0%}
-	<td class="d-none d-md-table-cell">{{job.duration}}</td>
-	{%else%}
-	<td class="d-none d-md-table-cell">-</td>
-	{%endif%}
-	{%if not job.protocol==None and not job.protocol.benchmark_suite==None%}
-	<td class="d-none d-sm-table-cell text-break" >{{job.protocol.benchmark_suite.short}}|{{job.layout.short}}</td>
-	{%else%}
-	<td class="d-none d-sm-table-cell text-break">-</td>
-	{%endif%}
-	{%if not job.traffic_load==None%}
-	<td class="d-none d-sm-table-cell">{% if job.traffic_load == 0 %}<span class="d-inline-block d-lg-none">Ap</span><span class="d-none d-lg-inline-block">Aperiodic</span>{% else %}{% if job.traffic_load > 1000 %}{{(job.traffic_load/1000)|int}}s{%else%}{{job.traffic_load}}ms{%endif%}{%endif%}<span class="d-none d-sm-inline-block">/</span><span class="d-inline-block d-sm-none"> </span>{{job.msg_len}}B</td>
-	{%else%}
-	<td>-</td>
-	{%endif%}
-	<td class="flag-group">
-	  {% if job.running %}
-	  <span class="fas fa-play" aria-hidden="true" title="job running"></span>
-	  {% endif %}
-	  {% if job.failed %}
-	  <span class="fas fa-times" aria-hidden="true" title="job failed"></span>
-	  {% else %}
-	  {% if job.finished %}
-	  <span class="fas fa-check" aria-hidden="true" title="job finished"></span>
-	  {% endif %}
-	  {% endif %}
-	  {% if job.priority %}
-	  <span class="fas fa-star" aria-hidden="true" title="high priority job"></span>
-	  {% endif %}
-	  {% if job.reboot %}
-	  <span class="fas fa-redo" aria-hidden="true" title="rebooting"></span>
-	  {% endif %}
-	  {% if job.logs %}
-	  <span class="fas fa-align-justify" aria-hidden="true" title="serial log captured"></span>
-	  {% endif %}
-	  {% if job.patch %}
-	  <span class="fas fa-cog" aria-hidden="true" title="patching enabled"></span>
-	  {% endif %}
-	  {% if job.cpatch %}
-	  <span class="fas fa-users-cog" aria-hidden="true" title="custom patching enabled"></span>
-	  {% endif %}
-	  {% if job.jamming_composition_id > 1%}
-	  <span class="fas fa-bolt" aria-hidden="true" title="jamming enabled"></span><sub>{{job.jamming_composition.short}}</sub>
-	  {% endif %}
-	  {% if job.temp_profile%}
-	  <span class="fas fa-thermometer-half" aria-hidden="true" title="templab enabled"></span>
-	  {% endif %}
-	</td>
-	<td>
-	  <div class="btn-group float-left">
-	    {% if job.evaluated %}
-	    <a class="btn btn-sm btn-secondary" href="{{url_for("%s.show_details"|format(module),id=job.id)}}" role="button" title="show details" ><span class="fas fa-search" aria-hidden="true"></span></a>
-	    {% endif %}
-	    {% if job.running or job.finished %}
-	    <a class="btn btn-sm btn-info d-none d-sm-inline-block" href="#" role="button" data-toggle="modal" title="show program log" data-job="{{job.id}}" data-target="#showLog"><span class="fas fa-question-circle" aria-hidden="true"></span></a>
-	    {% endif %}
-	    {% if not job.finished and not job.running%}
-	    <a class="btn btn-sm btn-danger" href="{{url_for("%s.delete_job"|format(module),id=job.id)}}" role="button" title="delete job"><span class="fas fa-times" aria-hidden="true"></span></a>
-	    {% endif %}
-	    {% if job.finished and not (job.result == None) and not job.failed%}
-	    <a class="btn btn-sm btn-primary hidden-xs" href="#" role="button" title="show results in grafana" data-job-templab="{{not job.temp_profile==None}}" data-job-composition="{{job.layout.id}}" data-job-start="{{job.result.begin|timestampfilter +30000}}" data-job-end="{{job.result.end|timestampfilter}}" data-toggle="modal" data-target="#selectDash"><span class="fas fa-eye" aria-hidden="true"></span></a>
-	    {% endif %}
-	    {% if job.logs and job.finished and not job.failed%}
-	    <a class="btn btn-sm btn-secondary d-none d-sm-inline-block" href="{{url_for("%s.download_job_logs"|format(module),id=job.id)}}" role="button" title="download serial logs"><span class="fas fa-align-justify" aria-hidden="true"></span></a>
-	    {% endif %}
-	    {% if job.failed and current_user.is_authenticated and current_user.has_role("admins") %}
-	    <a class="btn btn-sm btn-success" href="/admin/queue/rerun_job/{{job.id}}" role="button" 
-										       title="rerun job"><span class="fas fa-redo" aria-hidden="true"></span></a> 
-	    {% endif %}
-	    {% if job.priority==False and job.running==False and job.finished==False and current_user.is_authenticated and current_user.has_role("admins") %}
-	    <a class="btn btn-sm btn-success" href="{{url_for("admin.admin_prioritize_job",id=job.id)}}" role="button" title="prioritize job"><span class="fas fa-star" aria-hidden="true"></span></a>
-	    {% endif %}
-	  </div>
-	</td>
-      </tr>
-      {%- endfor %}
-    </tbody>
+  <thead>
+    <tr>
+  <th class="d-none d-md-table-cell">#</th>
+  <th>Protocol</th>
+  <th>Name</th>
+  <th class="d-none d-xl-table-cell">Description</th>
+  <th class="d-none d-md-table-cell"><span class="d-none d-xl-inline-block">Scheduled</span><span class="d-inline-block d-xl-none">Sched.</th>
+  <th class="d-none d-md-table-cell"><span class="d-none d-xl-inline-block">Duration [s]</span><span class="d-inline-block d-xl-none">Dur. [s]</th>
+  <th class="d-none d-sm-table-cell"><span class="d-none d-lg-inline-block">B.S. | Layout</span><span class="d-inline-block d-lg-none">B.S.</span></th>
+  <th class="d-none d-sm-table-cell"><span class="d-none d-lg-inline-block">Traffic Load</span><span class="d-inline-block d-lg-none">T.L.</span></th>
+  <th>Flags</th>
+  <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {%- for job in jobs.items %}
+    <tr {% if job.running %}class="lead" style="background-color: #eee;"{% endif %}>
+  <td class="d-none d-md-table-cell">{{job.id}}</td>
+  <td class="text-break" >{% if job.protocol == None %}-{% else %}{{job.protocol.name}}{% endif %}</td>
+  <td><span class="d-none d-lg-table-cell text-break">{{job.name}}</span><span class="shortname d-inline-block d-lg-none">{{job.name}}</span></td>
+  <td class="d-none d-xl-table-cell text-break">{{job.description}}</td>
+  <td class="d-none d-md-table-cell"><span class="d-none d-lg-inline-block">{{job.scheduled|datetimefilter}}</span><span class="d-none d-md-inline-block d-lg-none">{{job.scheduled|datetimefilter("%H:%M")}}</span></td>
+  {%if not job.duration==0%}
+  <td class="d-none d-md-table-cell">{{job.duration}}</td>
+  {%else%}
+  <td class="d-none d-md-table-cell">-</td>
+  {%endif%}
+  {%if not job.protocol==None and not job.protocol.benchmark_suite==None%}
+  <td class="d-none d-sm-table-cell text-break" >{{job.protocol.benchmark_suite.short}}|{{job.layout.short}}</td>
+  {%else%}
+  <td class="d-none d-sm-table-cell text-break">-</td>
+  {%endif%}
+  {%if not job.traffic_load==None%}
+  <td class="d-none d-sm-table-cell">{% if job.traffic_load == 0 %}<span class="d-inline-block d-lg-none">Ap</span><span class="d-none d-lg-inline-block">Aperiodic</span>{% else %}{% if job.traffic_load > 1000 %}{{(job.traffic_load/1000)|int}}s{%else%}{{job.traffic_load}}ms{%endif%}{%endif%}<span class="d-none d-sm-inline-block">/</span><span class="d-inline-block d-sm-none"> </span>{{job.msg_len}}B</td>
+  {%else%}
+  <td>-</td>
+  {%endif%}
+  <td class="flag-group">
+    {% if job.running %}
+    <span class="fas fa-play" aria-hidden="true" title="job running"></span>
+    {% endif %}
+    {% if job.failed %}
+    <span class="fas fa-times" aria-hidden="true" title="job failed"></span>
+    {% else %}
+    {% if job.finished %}
+    <span class="fas fa-check" aria-hidden="true" title="job finished"></span>
+    {% endif %}
+    {% endif %}
+    {% if job.priority %}
+    <span class="fas fa-star" aria-hidden="true" title="high priority job"></span>
+    {% endif %}
+    {% if job.reboot %}
+    <span class="fas fa-redo" aria-hidden="true" title="rebooting"></span>
+    {% endif %}
+    {% if job.logs %}
+    <span class="fas fa-align-justify" aria-hidden="true" title="serial log captured"></span>
+    {% endif %}
+    {% if job.patch %}
+    <span class="fas fa-cog" aria-hidden="true" title="patching enabled"></span>
+    {% endif %}
+    {% if job.cpatch %}
+    <span class="fas fa-users-cog" aria-hidden="true" title="custom patching enabled"></span>
+    {% endif %}
+    {% if job.jamming_composition_id > 1%}
+    <span class="fas fa-bolt" aria-hidden="true" title="jamming enabled"></span><sub>{{job.jamming_composition.short}}</sub>
+    {% endif %}
+    {% if job.temp_profile%}
+    <span class="fas fa-thermometer-half" aria-hidden="true" title="templab enabled"></span>
+    {% endif %}
+  </td>
+  <td>
+    <div class="btn-group float-left">
+    {% if job.evaluated %}
+    <a class="btn btn-sm btn-secondary" href="{{url_for("%s.show_details"|format(module),id=job.id)}}" role="button" title="show details" ><span class="fas fa-search" aria-hidden="true"></span></a>
+    {% endif %}
+    {% if job.running or job.finished %}
+    <a class="btn btn-sm btn-info d-none d-sm-inline-block" href="#" role="button" data-toggle="modal" title="show program log" data-job="{{job.id}}" data-target="#showLog"><span class="fas fa-question-circle" aria-hidden="true"></span></a>
+    {% endif %}
+    {% if not job.finished and not job.running%}
+    <a class="btn btn-sm btn-danger" href="{{url_for("%s.delete_job"|format(module),id=job.id)}}" role="button" title="delete job"><span class="fas fa-times" aria-hidden="true"></span></a>
+    {% endif %}
+    {% if job.finished and not (job.result == None) and not job.failed%}
+    <a class="btn btn-sm btn-primary hidden-xs" href="#" role="button" title="show results in grafana" data-job-templab="{{not job.temp_profile==None}}" data-job-composition="{{job.layout.id}}" data-job-start="{{job.result.begin|timestampfilter +30000}}" data-job-end="{{job.result.end|timestampfilter}}" data-toggle="modal" data-target="#selectDash"><span class="fas fa-eye" aria-hidden="true"></span></a>
+    {% endif %}
+    {% if job.logs and job.finished and not job.failed%}
+    <a class="btn btn-sm btn-secondary d-none d-sm-inline-block" href="{{url_for("%s.download_job_logs"|format(module),id=job.id)}}" role="button" title="download serial logs"><span class="fas fa-align-justify" aria-hidden="true"></span></a>
+    {% endif %}
+    {% if job.failed and current_user.is_authenticated and current_user.has_role("admins") %}
+    <a class="btn btn-sm btn-success" href="/admin/queue/rerun_job/{{job.id}}" role="button" 
+                         title="rerun job"><span class="fas fa-redo" aria-hidden="true"></span></a> 
+    {% endif %}
+    {% if job.priority==False and job.running==False and job.finished==False and current_user.is_authenticated and current_user.has_role("admins") %}
+    <a class="btn btn-sm btn-success" href="{{url_for("admin.admin_prioritize_job",id=job.id)}}" role="button" title="prioritize job"><span class="fas fa-star" aria-hidden="true"></span></a>
+    {% endif %}
+    </div>
+  </td>
+    </tr>
+    {%- endfor %}
+  </tbody>
   </table>
 </div>
 </div>
 <div class="container">
   <!-- Modal -->
   <div class="modal fade" id="createJob" role="dialog">
-    <div class="modal-dialog">
+  <div class="modal-dialog">
 
-      <!-- Modal content-->
-      <div class="modal-content">
-	<div class="modal-header">
-	  <h1 class="col-12 text-center modal-title">Create Job
-	    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></h1>
-	</div>
-	<form action="{{url_for("%s.create_job"|format(module))}}" enctype="multipart/form-data" method="post">
-	  <div class="modal-body">
-	    <div class="form-group required"><label class="control-label" for="protocol">Protocol</label>
-		  <select class="form-control" id="protocol" name="protocol" required>
-		    {% for p in protocols %}
-		    <option {% if (protocol==None and loop.index==1) or (protocol and protocol.id==p.id) %}selected="selected"{% endif %}value={{p.id}}>{{p.name}}</option>
-		    {% endfor%}
-		  </select>
-	    </div>
+    <!-- Modal content-->
+    <div class="modal-content">
+  <div class="modal-header">
+    <h1 class="col-12 text-center modal-title">Create Job
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></h1>
+  </div>
+  <form action="{{url_for("%s.create_job"|format(module))}}" enctype="multipart/form-data" method="post">
+    <div class="modal-body">
+    <div class="form-group required"><label class="control-label" for="protocol">Protocol</label>
+      <select class="form-control" id="protocol" name="protocol" required>
+      {% for p in protocols %}
+      <option {% if (protocol==None and loop.index==1) or (protocol and protocol.id==p.id) %}selected="selected"{% endif %}value={{p.id}}>{{p.name}}</option>
+      {% endfor%}
+      </select>
+    </div>
 
-	    <div class="form-group required"><label class="control-label" for="name">Name</label>
-	      <input class="form-control" id="name" name="name" required type="text" value="" maxlength="255">
-	    </div>
-	    <div class="form-group required"><label class="control-label" for="description">Description</label>
-	      <input class="form-control" id="description" name="description" type="text" value="" maxlength="255">
-	    </div>
-	    <div class="form-group required"><label class="control-label" for="duration">Duration</label>
-	      <div class="input-group">
+    <div class="form-group required"><label class="control-label" for="name">Name</label>
+      <input class="form-control" id="name" name="name" required type="text" value="" maxlength="255">
+    </div>
+    <div class="form-group required"><label class="control-label" for="description">Description</label>
+      <input class="form-control" id="description" name="description" type="text" value="" maxlength="255">
+    </div>
+    <div class="form-group required"><label class="control-label" for="duration">Duration</label>
+      <div class="input-group">
 
-		<select class="form-control" id="duration" name="duration" aria-describedby="duration-addon">
-		  {% for d in durations %}
-		  <option {% if d==default_duration|int %}selected="selected"{% endif %}value={{d}}>{{d}}</option>
-		  {% endfor%}
-		</select>
-		<span class="input-group-text">Seconds</span>
-	      </div>
-	    </div>
-	    {% if current_user.has_role("admins") or current_user.has_role("privileged")%}
-	    <div class="form-group">
-	      <label><input type="checkbox" id="priority" name="priority" data-toggle="toggle" data-size="sm">
-		High Priority
-	      </label>
-	    </div>
-	    {% endif %}
-	    <div class="form-group">
-	      <label><input type="checkbox" id="logs" name="logs" data-toggle="toggle" data-size="sm">
-	        Capture serial log
-	      </label>
-	    </div>
-	    <div class="form-group required {% if jamming_option == False and not current_user.has_role("admins")%}d-none{% endif %}"><label class="control-label" for="jamming">Jamming type</label>
-	      <select class="form-control" id="jamming" name="jamming"required>
-	        {% for j in jammings %}
-	        <option {% if j.name=="None" %}selected="selected"{% endif %}value="{{j.name}}">{{j.name}}</option>
-	        {% endfor%}
-	      </select>
-	    </div>
-            <div class="form-group required"><label class="control-label" for="node_placement">Node Placement</label>
-              <div class="input-group">
-                <select class="form-control" id="node_placement" name="node_placement" required>
-                </select>
-              </div>
-            </div>
-	    <label><input type="checkbox" id="patch" name="patch" data-toggle="toggle" checked data-size="sm">
-	      Binary Patching
-	    </label>               
-	    <div class="collapse.show" id="collapseAll">
-      	      <div class="form-group required"><label class="control-label" for="traffic_load">Traffic Load</label>
-		<div class="input-group">
-		  <select class="form-control" id="traffic_load_time" name="traffic_load_time" required aria-describedby="traffic_load_time_addon">
-		    {% for i in (0, 5000, 30000 ) %}
-		    <option {% if i==0 %}selected="selected"{% endif %}value={{i}}>{% if i==0 %}Aperiodic{% else %}{{i}}{% endif %}</option>
-		    {% endfor%}
-		  </select>
-		  <span class="input-group-text" id="traffic_load_time_addon">Milliseconds</span>
-		</div>
-		<div class="input-group">
-		  <select class="form-control" id="traffic_load_len" name="traffic_load_len" required aria-describedby="traffic_load_len_addon">
-		    {% for i in (8, 64 ) %}
-		    <option {% if i==8 %}selected="selected"{% endif %}value={{i}}>{{i}}</option>
-		    {% endfor%}
-		  </select>
-		  <span class="input-group-text" id="traffic_load_len_addon">Bytes</span>
-		</div>
-	      </div>
-	      <label><input type="checkbox" id="cpatch" name="cpatch" data-toggle="toggle" data-size="sm">
-		Custom Patch
-	      </label>
-	      <div class="collapse" id="collapsePatch">
-		<label>
-		  XML File
-		</label>
-		<div class="form-group">
-		  <input class="file-upload" id="cfile" name="cfile" type="file" accept=".xml" value="">
-		</div>
-		<div class="form-group"><label class="control-label" for="cjson">Overrides JSON</label>
-		  <textarea class="form-control" id="cjson" name="cjson" maxlength="4096"></textarea>
-		</div>
-	      </div>
-	    </div>
-              {% if current_user.has_role("templab") or current_user.has_role("admins") %}
-	      <div class="form-group">
-	        <label><input type="checkbox" id="temp_profile" name="temp_profile" data-toggle="toggle" data-size="sm">
-	          Templab
-	        </label>
-	        <div class="collapse" id="collapseTempProfile">
-	          <label>
-	            CSV File
-	          </label>
-	          <div class="form-group">
-	            <input class="file-upload" id="temp_profile_file" name="temp_profile_file" type="file" accept=".csv" value="">
-	          </div>
-	        </div>
-	      </div>
-            {% endif %}
-
-	    <div class="form-group required">
-	      <input class="file-upload" id="file" name="file" required type="file" accept=".hex,.ihex" value="">
-	    </div>
-
-	  </div>
-	  <div class="modal-footer">
-	    <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Create">
-	    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-	  </div>
-	</form>
+    <select class="form-control" id="duration" name="duration" aria-describedby="duration-addon">
+      {% for d in durations %}
+      <option {% if d==default_duration|int %}selected="selected"{% endif %}value={{d}}>{{d}}</option>
+      {% endfor%}
+    </select>
+    <span class="input-group-text">Seconds</span>
       </div>
     </div>
+    {% if current_user.has_role("admins") or current_user.has_role("privileged")%}
+    <div class="form-group">
+      <label><input type="checkbox" id="priority" name="priority" data-toggle="toggle" data-size="sm">
+    High Priority
+      </label>
+    </div>
+    {% endif %}
+    <div class="form-group">
+      <label><input type="checkbox" id="logs" name="logs" data-toggle="toggle" data-size="sm">
+      Capture serial log
+      </label>
+    </div>
+    <div class="form-group required {% if jamming_option == False and not current_user.has_role("admins")%}d-none{% endif %}"><label class="control-label" for="jamming">Jamming type</label>
+      <select class="form-control" id="jamming" name="jamming"required>
+      {% for j in jammings %}
+      <option {% if j.name=="None" %}selected="selected"{% endif %}value="{{j.name}}">{{j.name}}</option>
+      {% endfor%}
+      </select>
+    </div>
+      <div class="form-group required"><label class="control-label" for="node_placement">Node Placement</label>
+        <div class="input-group">
+        <select class="form-control" id="node_placement" name="node_placement" required>
+        </select>
+        </div>
+      </div>
+    <label><input type="checkbox" id="patch" name="patch" data-toggle="toggle" checked data-size="sm">
+      Binary Patching
+    </label>               
+    <div class="collapse.show" id="collapseAll">
+        <div class="form-group required"><label class="control-label" for="traffic_load">Traffic Load</label>
+    <div class="input-group">
+      <select class="form-control" id="traffic_load_time" name="traffic_load_time" required aria-describedby="traffic_load_time_addon">
+      {% for i in (0, 5000, 30000 ) %}
+      <option {% if i==0 %}selected="selected"{% endif %}value={{i}}>{% if i==0 %}Aperiodic{% else %}{{i}}{% endif %}</option>
+      {% endfor%}
+      </select>
+      <span class="input-group-text" id="traffic_load_time_addon">Milliseconds</span>
+    </div>
+    <div class="input-group">
+      <select class="form-control" id="traffic_load_len" name="traffic_load_len" required aria-describedby="traffic_load_len_addon">
+      {% for i in (8, 64 ) %}
+      <option {% if i==8 %}selected="selected"{% endif %}value={{i}}>{{i}}</option>
+      {% endfor%}
+      </select>
+      <span class="input-group-text" id="traffic_load_len_addon">Bytes</span>
+    </div>
+      </div>
+      <label><input type="checkbox" id="cpatch" name="cpatch" data-toggle="toggle" data-size="sm">
+    Custom Patch
+      </label>
+      <div class="collapse" id="collapsePatch">
+    <label>
+      XML File
+    </label>
+    <div class="form-group">
+      <input class="file-upload" id="cfile" name="cfile" type="file" accept=".xml" value="">
+    </div>
+    <div class="form-group"><label class="control-label" for="cjson">Overrides JSON</label>
+      <textarea class="form-control" id="cjson" name="cjson" maxlength="4096"></textarea>
+    </div>
+      </div>
+    </div>
+        {% if current_user.has_role("templab") or current_user.has_role("admins") %}
+      <div class="form-group">
+      <label><input type="checkbox" id="temp_profile" name="temp_profile" data-toggle="toggle" data-size="sm">
+        Templab
+      </label>
+      <div class="collapse" id="collapseTempProfile">
+        <label>
+        CSV File
+        </label>
+        <div class="form-group">
+        <input class="file-upload" id="temp_profile_file" name="temp_profile_file" type="file" accept=".csv" value="">
+        </div>
+      </div>
+      </div>
+      {% endif %}
+
+    <div class="form-group required">
+      <input class="file-upload" id="file" name="file" required type="file" accept=".hex,.ihex" value="">
+    </div>
+
+    </div>
+    <div class="modal-footer">
+    <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Create">
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    </div>
+  </form>
+    </div>
+  </div>
   </div>
 </div>
 
@@ -321,22 +320,22 @@ intact. #}
 
   <!-- Modal -->
   <div class="modal fade" id="showLog" role="dialog">
-    <div class="modal-dialog modal-lg">
+  <div class="modal-dialog modal-lg">
 
-      <!-- Modal content-->
-      <div class="modal-content">
-	<div class="modal-header">
-	  <h1 class="col-12 text-center">Program Log Summary
-	  <button type="button" class="close" data-dismiss="modal">&times;</button></h1>
-	</div>
-	<div class="modal-body report-modal-body">
-	  <div id="logWindow"><pre>Loading...</pre></div>
-	</div>
-	<div class="modal-footer">
-	  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-	</div>
-      </div>
+    <!-- Modal content-->
+    <div class="modal-content">
+  <div class="modal-header">
+    <h1 class="col-12 text-center">Program Log Summary
+    <button type="button" class="close" data-dismiss="modal">&times;</button></h1>
+  </div>
+  <div class="modal-body report-modal-body">
+    <div id="logWindow"><pre>Loading...</pre></div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+  </div>
     </div>
+  </div>
   </div>
 </div>
 
@@ -346,26 +345,26 @@ intact. #}
 
   <!-- Modal -->
   <div class="modal fade" id="selectDash" role="dialog">
-    <div class="modal-dialog">
+  <div class="modal-dialog">
 
-      <!-- Modal content-->
-      <div class="modal-content">
-	<div class="modal-header">
-	  <h1 class="col-12 text-center">Select Grafana Dashboard
-	  <button type="button" class="close" data-dismiss="modal">&times;</button>
-	  </h1>
-	</div>
-	<div class="modal-body">
-	  <table class="table table-borderless">
-	    <tbody id="dashbody">
-	    </tbody>
-	  </table>
-	</div>
-	<div class="modal-footer">
-	  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-	</div>
-      </div>
+    <!-- Modal content-->
+    <div class="modal-content">
+  <div class="modal-header">
+    <h1 class="col-12 text-center">Select Grafana Dashboard
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    </h1>
+  </div>
+  <div class="modal-body">
+    <table class="table table-borderless">
+    <tbody id="dashbody">
+    </tbody>
+    </table>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+  </div>
     </div>
+  </div>
   </div>
 </div>
 {%- endblock %}
@@ -375,18 +374,18 @@ intact. #}
 <script src="{{url_for("static",filename="bootstrap4-toggle/js/bootstrap4-toggle.min.js")}}"></script>
 <script>
   $( document ).ready(function() {
-    $('[data-toggle="tooltip"]').tooltip({
-      container: 'body'
-    });
-    setInterval(function()
-      {
-	$('#refreshing').load(document.URL +  ' #refreshing>*','');
-      }, 5000);
+  $('[data-toggle="tooltip"]').tooltip({
+    container: 'body'
+  });
+  setInterval(function()
+    {
+  $('#refreshing').load(document.URL +  ' #refreshing>*','');
+    }, 5000);
 
-    setInterval(function()
-      {
-	$("#queue-est").load(document.URL +  ' #queue-est>*','');
-      }, 10000);
+  setInterval(function()
+    {
+  $("#queue-est").load(document.URL +  ' #queue-est>*','');
+    }, 10000);
 
   });
 var timer=null;
@@ -400,15 +399,15 @@ function getPlacementDropDown(){
   options=[];
   place.empty()
   $.each(p, function (index, item) {
-    if(item.name==proto.text()){
-      $.each(item.layout, function (index, item) {
-      place.append(
-	$('<option>', {
-	  value: item.id,
-	  text: item.name
-	}, '</option>'));
-    });
-    }
+  if(item.name==proto.text()){
+    $.each(item.layout, function (index, item) {
+    place.append(
+  $('<option>', {
+    value: item.id,
+    text: item.name
+  }, '</option>'));
+  });
+  }
   });
 }
 
@@ -417,29 +416,29 @@ $('#protocol').change(getPlacementDropDown);
 
 $('#patch').change(function(e){
   if(e.target.checked)
-    $('#collapseAll').toggle( {toggle: true} );
+  $('#collapseAll').toggle( {toggle: true} );
   else
-    $('#collapseAll').toggle( {toggle: false} );
+  $('#collapseAll').toggle( {toggle: false} );
 });
 
 
 $('#cpatch').change(function(e){
   if(e.target.checked){
-    $('#collapsePatch').toggle( {toggle: true} );
-    $('#cjson').prop('required',true);
+  $('#collapsePatch').toggle( {toggle: true} );
+  $('#cjson').prop('required',true);
   }
   else{
-    $('#collapsePatch').toggle( {toggle: false} );
-    $('#cjson').prop('required',false);
+  $('#collapsePatch').toggle( {toggle: false} );
+  $('#cjson').prop('required',false);
   }
 });
 
 $('#temp_profile').change(function(e){
   if(e.target.checked){
-    $('#collapseTempProfile').toggle( {toggle: true} );
+  $('#collapseTempProfile').toggle( {toggle: true} );
   }
   else{
-    $('#collapseTempProfile').toggle( {toggle: false} );
+  $('#collapseTempProfile').toggle( {toggle: false} );
   }
 });
 
@@ -450,9 +449,9 @@ $('#showLog').on('show.bs.modal', function(e) {
   job = $(e.relatedTarget).data('job');
   $("#logWindow").load('{{url_for("%s.show_log"|format(module))}}'+job+ " #log pre");
   timer=setInterval(function()
-    {
-      $("#logWindow").load('{{url_for("%s.show_log"|format(module))}}'+job+ " #log pre");
-    }, 1000);
+  {
+    $("#logWindow").load('{{url_for("%s.show_log"|format(module))}}'+job+ " #log pre");
+  }, 1000);
 });
 
 $('#showLog').on('hide.bs.modal', function () {
@@ -462,38 +461,38 @@ $('#showLog').on('hide.bs.modal', function () {
 
 function updateDash(started,ended,templab,nodes){
   $.getJSON('/proxy/dashboards', function(data) {
-    jQuery.each(data, function(i, val) {
-      var params="";
-      if(val.title=="Overview of EEPROM Messages"){
-	for(i=0;i<nodes.length;i++) {
-	  params+="&var-Node="+nodes[i]["label"]+"_eeprom"
-	}
-      }
-      else if(val.title=="Overview of GPIO Events"){
-	for(i=0;i<nodes.length;i++) {
-	  params+="&var-Node="+nodes[i]["label"]+"_evt"
-	}
-	if(nodes.length!=0) {
-	  params+="&var-GPIO=24"
-	}
-      }
-      {#var btnstring = '<a class="btn btn-sm btn-primary" target="_blank" href="{{config['GRAFANA_URL']}}'+val.url+'?from='+started+'&to='+ended+params+'" role="button" title="show in grafana"><span class="fas fa-eye" aria-hidden="true"></span></a>'#}
-      var btnstring = '<a class="btn btn-sm btn-primary" target="_blank" href="{% if  config['GRAFANA_URL'].startswith("http")%}{{config['GRAFANA_URL']}}{% endif %}'+val.url+'?from='+started+'&to='+ended+params+'" role="button" title="show in grafana"><span class="fas fa-eye" aria-hidden="true"></span></a>'
-      var markup = "<tr><td>"+val.title+"</td><td>" +btnstring+ "</td></tr>";
-      $("#dashbody").append(markup);
-    });
+  jQuery.each(data, function(i, val) {
+    var params="";
+    if(val.title=="Overview of EEPROM Messages"){
+  for(i=0;i<nodes.length;i++) {
+    params+="&var-Node="+nodes[i]["label"]+"_eeprom"
+  }
+    }
+    else if(val.title=="Overview of GPIO Events"){
+  for(i=0;i<nodes.length;i++) {
+    params+="&var-Node="+nodes[i]["label"]+"_evt"
+  }
+  if(nodes.length!=0) {
+    params+="&var-GPIO=24"
+  }
+    }
+    {#var btnstring = '<a class="btn btn-sm btn-primary" target="_blank" href="{{config['GRAFANA_URL']}}'+val.url+'?from='+started+'&to='+ended+params+'" role="button" title="show in grafana"><span class="fas fa-eye" aria-hidden="true"></span></a>'#}
+    var btnstring = '<a class="btn btn-sm btn-primary" target="_blank" href="{% if  config['GRAFANA_URL'].startswith("http")%}{{config['GRAFANA_URL']}}{% endif %}'+val.url+'?from='+started+'&to='+ended+params+'" role="button" title="show in grafana"><span class="fas fa-eye" aria-hidden="true"></span></a>'
+    var markup = "<tr><td>"+val.title+"</td><td>" +btnstring+ "</td></tr>";
+    $("#dashbody").append(markup);
+  });
   if(templab=="True")
   {
-    $.getJSON('/proxy/dashboards/templab', function(data) {
-      jQuery.each(data, function(i, val) {
-        var params="";
-       {#var btnstring = '<a class="btn btn-sm btn-primary" target="_blank" href="{{config['GRAFANA_URL']}}'+val.url+'?from='+started+'&to='+ended+params+'" role="button" title="show in grafana"><span class="fas fa-eye" aria-hidden="true"></span></a>'#}
+  $.getJSON('/proxy/dashboards/templab', function(data) {
+    jQuery.each(data, function(i, val) {
+    var params="";
+     {#var btnstring = '<a class="btn btn-sm btn-primary" target="_blank" href="{{config['GRAFANA_URL']}}'+val.url+'?from='+started+'&to='+ended+params+'" role="button" title="show in grafana"><span class="fas fa-eye" aria-hidden="true"></span></a>'#}
 
-        var btnstring = '<a class="btn btn-sm btn-primary" target="_blank" href="{% if  config['GRAFANA_URL'].startswith("http")%}{{config['GRAFANA_URL']}}{% endif %}'+val.url+'?from='+started+'&to='+ended+params+'" role="button" title="show in grafana"><span class="fas fa-eye" aria-hidden="true"></span></a>'
-        var markup = "<tr><td>"+val.title+"</td><td>" +btnstring+ "</td></tr>";
-        $("#dashbody").append(markup);
-      });
+    var btnstring = '<a class="btn btn-sm btn-primary" target="_blank" href="{% if  config['GRAFANA_URL'].startswith("http")%}{{config['GRAFANA_URL']}}{% endif %}'+val.url+'?from='+started+'&to='+ended+params+'" role="button" title="show in grafana"><span class="fas fa-eye" aria-hidden="true"></span></a>'
+    var markup = "<tr><td>"+val.title+"</td><td>" +btnstring+ "</td></tr>";
+    $("#dashbody").append(markup);
     });
+  });
   }
 
   });
@@ -508,11 +507,11 @@ $('#selectDash').on('show.bs.modal', function(e) {
   var templab = $(e.relatedTarget).data('job-templab'); 
 
   if(composition==null){
-    updateDash(started,ended,[]); 
+  updateDash(started,ended,[]); 
   } else {
-    $.getJSON('{{url_for("frontend.show_nodes")}}'+composition, function(data) {
-      updateDash(started,ended,templab,data); 
-    });
+  $.getJSON('{{url_for("frontend.show_nodes")}}'+composition, function(data) {
+    updateDash(started,ended,templab,data); 
+  });
   }
 });
 </script>

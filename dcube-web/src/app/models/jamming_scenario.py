@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# Copyright (c) 2022 Graz University of Technology
+# Copyright (c) 2023 Graz University of Technology
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal

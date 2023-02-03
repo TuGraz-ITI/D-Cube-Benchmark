@@ -1,26 +1,25 @@
-<!--
--- MIT License
---
--- Copyright (c) 2022 Graz University of Technology
---
--- Permission is hereby granted, free of charge, to any person obtaining a copy
--- of this software and associated documentation files (the "Software"), to deal
--- in the Software without restriction, including without limitation the rights
--- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
--- copies of the Software, and to permit persons to whom the Software is
--- furnished to do so, subject to the following conditions:
---
--- The above copyright notice and this permission notice shall be included in all
--- copies or substantial portions of the Software.
---
--- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
--- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
--- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
--- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
--- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
--- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
--- SOFTWARE.
--->
+{# MIT License
+
+  Copyright (c) 2023 Graz University of Technology
+  
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+  
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+  
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE. #}
+  
 {# This simple template derives from ``base.html``. See ``base.html`` for
 more information about template inheritance. #}
 {%- extends "base.html" %}
@@ -36,206 +35,206 @@ This will keep scripts at the page end and a navbar you add on later
 intact. #}
 {% block content %}
 <div class="container">
-    <div class="jumbotron">
-        {% if pagetitle is defined and not pagetitle == None %}
-        <h1 class="text-center">{{pagetitle}}</h1>
-        {% else %}
-        <h1 class="text-center">CPS Testbed</h1>
-        {% endif %} {% if pagetitle is defined and not (pagesubtitle == "" or pagesubtitle == None) %}
-        <h2 class="text-center" style="margin-top: -10px;">{{pagesubtitle}}</h2>
-        {% endif %}
-	{#<h4 class="text-center">Powered by <a class="btn btn-success" target="_blank" href="http://www.iti.tugraz.at/D-Cube" role="button">D-Cube</a></h4>#}
-        {% if msg is defined and not msg == None %}
-        <div class="maintainance_banner">
-            <h2 class="text-center">{{msg}}</h2>
-        </div>
-        {% endif %}
+  <div class="jumbotron">
+    {% if pagetitle is defined and not pagetitle == None %}
+    <h1 class="text-center">{{pagetitle}}</h1>
+    {% else %}
+    <h1 class="text-center">CPS Testbed</h1>
+    {% endif %} {% if pagetitle is defined and not (pagesubtitle == "" or pagesubtitle == None) %}
+    <h2 class="text-center" style="margin-top: -10px;">{{pagesubtitle}}</h2>
+    {% endif %}
+  {#<h4 class="text-center">Powered by <a class="btn btn-success" target="_blank" href="http://www.iti.tugraz.at/D-Cube" role="button">D-Cube</a></h4>#}
+    {% if msg is defined and not msg == None %}
+    <div class="maintainance_banner">
+      <h2 class="text-center">{{msg}}</h2>
     </div>
+    {% endif %}
+  </div>
 </div>
 
 <div class="container">
-    <div class="row">
-        {% if not jobs.items == None %}
-        <div class="col-xl-8">
-            <h2>Last Jobs</h2>
-            <table class="table queue" id="refreshing">
-                <thead>
-                    <tr>
-                        <th>#</th>
-			<th class="d-none d-sm-table-cell">Protocol</th>
-			<th class="d-none d-sm-table-cell">Dur. [s]</th>
-			<th class="d-none d-sm-table-cell">Exec. time</th>
-			<th><span class="d-none d-lg-block">B.S. | Layout</span><span class="d-block d-lg-none">Cat.</span></th>
-			{#<th class="d-none d-sm-table-cell"><span class="d-none d-lg-block">Traffic Load</span><span class="d-block d-lg-none">T.L.</span></th>#}
-                        <th>Flags</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {%- for job in jobs.items %}
-                    <tr {% if job.running %}class="lead" style="background-color: #eee;" {% endif %}>
-                        <td>{{job.id}}</td>
-			<td class="d-none d-sm-table-cell">{{job.protocol.name}}</td>
-                        {%if not job.duration==0%}
-			<td class="d-none d-sm-table-cell">{{job.duration}}</td>
-                        {%else%}
-			<td class="d-none d-sm-table-cell">-</td>
-                        {%endif%}
-			<td class="d-none d-sm-table-cell">{% if not job.result == None and not job.result.begin == None %}{{job.result.begin|datetimefilter}}{% else%}{% if job.running %}Running{%else%}Queued for execution{%endif%}{%endif%}</td>
-                        {%if not job.protocol==None and not job.protocol.benchmark_suite==None%}
-                        <td class="text-nowrap">{{job.protocol.benchmark_suite.short}}|{{job.layout.short}}</td>
-                        {%else%}
-                        <td>-</td>
-                        {%endif%}
-			{#{%if not job.traffic_load==None%}
-                        <td class="d-none d-sm-table-cell">{% if job.traffic_load == 0 %}<span class="d-none d-lg-block">Aperiodic</span><span class="d-block d-lg-none">Ap</span>{% else %}{% if job.traffic_load > 1000 %}{{(job.traffic_load/1000)|int}}s{%else%}{{job.traffic_load}}ms{%endif%}{%endif%}<span class="d-none d-sm-inline-block">/</span><span class="d-inline-block d-sm-none"> </span>{{job.msg_len}}B</td>
-                        {%else%}
-                        <td>-</td>
-			{%endif%}#}
-                        <td class="flag-group">
-                            {% if job.running %}<span class="fas fa-play" aria-hidden="true" title="job running"></span> {% endif %} 
-			    {% if job.failed %}<span class="fas fa-times" aria-hidden="true" title="job failed"></span> {% else %}
-			    {% if job.finished %}<span class="fas fa-check" aria-hidden="true" title="job finished"></span> {% endif %} {% endif %} 
-			    {% if job.priority %}<span class="fas fa-star" aria-hidden="true" title="high priority job"></span> {% endif %}
-			    {% if job.reboot %} <span class="fas fa-redo" aria-hidden="true" title="rebooting"></span> {% endif %} 
-			    {% if job.logs %}<span class="fas fa-align-justify" aria-hidden="true" title="logs enabled"></span> {% endif %} 
-			    {% if job.jamming_composition_id and job.jamming_composition_id > 1 %}
-                            <span class="fas fa-bolt" aria-hidden="true" title="jamming enabled"></span><sub>{{job.jamming_composition.short}}</sub> {% endif %}
-                            {% if job.temp_profile and (current_user.is_authenticated and ( current_user.has_role('admins') or (current_user.group_id==job.group_id) ) ) %}
-                            <span class="fas fa-thermometer-half" aria-hidden="true" title="templab enabled"></span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <div class="btn-group float-left">
-                                {% if job.evaluated and (current_user.is_authenticated and (current_user.group.id == job.group.id or current_user.has_role("admins"))) %}
-                                <a class="btn btn-sm btn-secondary {%if not jobdetails(job)%}disabled" href="#"{%else%}" href="{{url_for(jobdetails(job),id=job.id)}}" {%endif%} role="button" title="show details" ><span class="fas fa-search" aria-hidden="true"></span></a>
-                                {% if job.finished and not (job.result == None) and not job.failed %}
-                                {% if job.layout==None %}
-                                <a class="btn btn-sm btn-primary" href="#" title="show in grafana" role="button" data-job-templab="{{not job.temp_profile==None}}" data-job-start="{{job.result.begin|timestampfilter + 30000}}" data-job-end="{{job.result.end|timestampfilter}}" data-toggle="modal" data-target="#selectDash"><span class="fas fa-eye" aria-hidden="true"></span></a>
-                                {%else%}
-                                <a class="btn btn-sm btn-primary" href="#" title="show in grafana" role="button" data-job-templab="{{not job.temp_profile==None}}" data-job-composition="{{job.layout.id}}" data-job-start="{{job.result.begin|timestampfilter + 30000}}" data-job-end="{{job.result.end|timestampfilter}}" data-toggle="modal" data-target="#selectDash"><span class="fas fa-eye" aria-hidden="true"></span></a>
-                                {% endif %}
-                                {% endif %}
-                                {% endif %}
-                                {% if job.failed and current_user.is_authenticated and current_user.has_role("admins") %}
-                                <a class="btn btn-sm btn-success" href="/admin/queue/rerun_job/{{job.id}}" role="button" 
-                                                                                                           title="rerun job"><span class="fas fa-redo" aria-hidden="true"></span></a> 
-                                {% endif %}
+  <div class="row">
+    {% if not jobs.items == None %}
+    <div class="col-xl-8">
+      <h2>Last Jobs</h2>
+      <table class="table queue" id="refreshing">
+        <thead>
+          <tr>
+            <th>#</th>
+      <th class="d-none d-sm-table-cell">Protocol</th>
+      <th class="d-none d-sm-table-cell">Dur. [s]</th>
+      <th class="d-none d-sm-table-cell">Exec. time</th>
+      <th><span class="d-none d-lg-block">B.S. | Layout</span><span class="d-block d-lg-none">Cat.</span></th>
+      {#<th class="d-none d-sm-table-cell"><span class="d-none d-lg-block">Traffic Load</span><span class="d-block d-lg-none">T.L.</span></th>#}
+            <th>Flags</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {%- for job in jobs.items %}
+          <tr {% if job.running %}class="lead" style="background-color: #eee;" {% endif %}>
+            <td>{{job.id}}</td>
+      <td class="d-none d-sm-table-cell">{{job.protocol.name}}</td>
+            {%if not job.duration==0%}
+      <td class="d-none d-sm-table-cell">{{job.duration}}</td>
+            {%else%}
+      <td class="d-none d-sm-table-cell">-</td>
+            {%endif%}
+      <td class="d-none d-sm-table-cell">{% if not job.result == None and not job.result.begin == None %}{{job.result.begin|datetimefilter}}{% else%}{% if job.running %}Running{%else%}Queued for execution{%endif%}{%endif%}</td>
+            {%if not job.protocol==None and not job.protocol.benchmark_suite==None%}
+            <td class="text-nowrap">{{job.protocol.benchmark_suite.short}}|{{job.layout.short}}</td>
+            {%else%}
+            <td>-</td>
+            {%endif%}
+      {#{%if not job.traffic_load==None%}
+            <td class="d-none d-sm-table-cell">{% if job.traffic_load == 0 %}<span class="d-none d-lg-block">Aperiodic</span><span class="d-block d-lg-none">Ap</span>{% else %}{% if job.traffic_load > 1000 %}{{(job.traffic_load/1000)|int}}s{%else%}{{job.traffic_load}}ms{%endif%}{%endif%}<span class="d-none d-sm-inline-block">/</span><span class="d-inline-block d-sm-none"> </span>{{job.msg_len}}B</td>
+            {%else%}
+            <td>-</td>
+      {%endif%}#}
+            <td class="flag-group">
+              {% if job.running %}<span class="fas fa-play" aria-hidden="true" title="job running"></span> {% endif %} 
+        {% if job.failed %}<span class="fas fa-times" aria-hidden="true" title="job failed"></span> {% else %}
+        {% if job.finished %}<span class="fas fa-check" aria-hidden="true" title="job finished"></span> {% endif %} {% endif %} 
+        {% if job.priority %}<span class="fas fa-star" aria-hidden="true" title="high priority job"></span> {% endif %}
+        {% if job.reboot %} <span class="fas fa-redo" aria-hidden="true" title="rebooting"></span> {% endif %} 
+        {% if job.logs %}<span class="fas fa-align-justify" aria-hidden="true" title="logs enabled"></span> {% endif %} 
+        {% if job.jamming_composition_id and job.jamming_composition_id > 1 %}
+              <span class="fas fa-bolt" aria-hidden="true" title="jamming enabled"></span><sub>{{job.jamming_composition.short}}</sub> {% endif %}
+              {% if job.temp_profile and (current_user.is_authenticated and ( current_user.has_role('admins') or (current_user.group_id==job.group_id) ) ) %}
+              <span class="fas fa-thermometer-half" aria-hidden="true" title="templab enabled"></span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="btn-group float-left">
+                {% if job.evaluated and (current_user.is_authenticated and (current_user.group.id == job.group.id or current_user.has_role("admins"))) %}
+                <a class="btn btn-sm btn-secondary {%if not jobdetails(job)%}disabled" href="#"{%else%}" href="{{url_for(jobdetails(job),id=job.id)}}" {%endif%} role="button" title="show details" ><span class="fas fa-search" aria-hidden="true"></span></a>
+                {% if job.finished and not (job.result == None) and not job.failed %}
+                {% if job.layout==None %}
+                <a class="btn btn-sm btn-primary" href="#" title="show in grafana" role="button" data-job-templab="{{not job.temp_profile==None}}" data-job-start="{{job.result.begin|timestampfilter + 30000}}" data-job-end="{{job.result.end|timestampfilter}}" data-toggle="modal" data-target="#selectDash"><span class="fas fa-eye" aria-hidden="true"></span></a>
+                {%else%}
+                <a class="btn btn-sm btn-primary" href="#" title="show in grafana" role="button" data-job-templab="{{not job.temp_profile==None}}" data-job-composition="{{job.layout.id}}" data-job-start="{{job.result.begin|timestampfilter + 30000}}" data-job-end="{{job.result.end|timestampfilter}}" data-toggle="modal" data-target="#selectDash"><span class="fas fa-eye" aria-hidden="true"></span></a>
+                {% endif %}
+                {% endif %}
+                {% endif %}
+                {% if job.failed and current_user.is_authenticated and current_user.has_role("admins") %}
+                <a class="btn btn-sm btn-success" href="/admin/queue/rerun_job/{{job.id}}" role="button" 
+                                                       title="rerun job"><span class="fas fa-redo" aria-hidden="true"></span></a> 
+                {% endif %}
 
-                            </div>
-                        </td>
-                    </tr>
-                    {%- endfor %}
-                </tbody>
-            </table>
-	  {% if jobs %}
-          <div class="d-none d-sm-inline-block">
-            {{render_pagination(jobs)}}
-          </div>
-          <div class="d-inline-block d-sm-none">
-            {{render_pagination(jobs,left_edge=1,right_edge=1,left_current=1,right_current=3,size="sm")}}
-          </div>
-	  {% endif %}
-        </div>
-
-        {% endif %}
-
-        {% if not upcomming == None %}
-        <div class="col-xl-4">
-        <div class="row">
-            <div class="col-7">
-                <h2 id="queue-len-h2"><span id="queue-len">Queued{#<span class="hidden-md"> Jobs</span>#} ({{num_upcomming}})</span></h2>
-            </div>
-            <div class="col-5">
-                <div class="float-right">
-	            <div title="Current queue length estimate">
-                        <a id="queue-est" href="#" class="btn btn-primary disabled"><span>~{{'%0.1f'|format(est)}} min</span></a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <table class="table queue" id="refreshing2">
-                <thead>
-                    <tr>
-                        <th>#</th>
-			<th>Group</th>
-                        <th>B.S.</th>
-			{#<th class="d-none d-sm-table-cell">Name</th>#}
-                        <th class="d-none d-sm-table-cell">Dur. [s]</th>
-                        <th>Flags</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {%- for job in upcomming %}
-                    {#{%if (num_upcomming>upcomming|length) and loop.last%}style="color: #aaa;"{%endif%}#}
-		    <tr {% if job.running %}class="lead" style="background-color: #eee;"{% endif %}>
-                        <td>{{job.id}}</td>
-                        <td>{{job.group.name}}</td>
-                        {% if not job.protocol == None %}
-                        <td>{{job.protocol.benchmark_suite.short}}</td>
-                        {% else %}
-                        <td>{{job.group.name}} | ?</td>
-                        {% endif %}
-			{#<td class="shortname visible-xs">{{job.name}}</td>
-			<td class="jobname d-none d.sm-block">{{job.name}}</td>#}
-                        {%if not job.duration==0%}
-                        <td class="d-none d-sm-block">{{job.duration}}</td>
-                        {%else%}
-                        <td class="d-none d-sm-block">-</td>
-                        {%endif%}
-                        <td>
-                            {% if job.running %}
-                            <span class="fas fa-play" aria-hidden="true" title="job running"></span> {% endif %} {% if job.failed %}
-                            <span class="fas fa-remove" aria-hidden="true" title="job failed"></span> {% else %} {% if job.finished %}
-                            <span class="fas fa-ok" aria-hidden="true" title="job finished"></span> {% endif %} {% endif %} {% if job.priority %}
-                            <span class="fas fa-star" aria-hidden="true" title="high priority job"></span> {% endif %} {% if job.reboot %}
-                            <span class="fas fa-repeat" aria-hidden="true" title="rebooting"></span> {% endif %} {% if job.logs %}
-                            <span class="fas fa-align-justify" aria-hidden="true" title="serial log captured"></span> {% endif %} {% if job.jamming_composition_id and job.jamming_composition_id > 1 %}
-                            <span class="fas fa-bolt" aria-hidden="true" title="jamming enabled"><sub>{{job.jamming_composition.short}}</sub> {% endif %}</span>
-                        </td>
-                    </tr>
-                    {%- endfor %}
-		    {%if (num_upcomming>upcomming|length)%}
-                    <tr>
-	              <td class="d-none d-sm-table-cell text-center" colspan="5">{{num_upcomming-upcomming|length}} more</td>
-                      <td class="d-table-cell d-sm-none text-center" colspan="4">{{num_upcomming-upcomming|length}} more</td>
-                    </tr>
-                    {%- endif %}
-                </tbody>
-            </table>
-        </div>
-        </div>
-        {% endif %}
+              </div>
+            </td>
+          </tr>
+          {%- endfor %}
+        </tbody>
+      </table>
+    {% if jobs %}
+      <div class="d-none d-sm-inline-block">
+      {{render_pagination(jobs)}}
+      </div>
+      <div class="d-inline-block d-sm-none">
+      {{render_pagination(jobs,left_edge=1,right_edge=1,left_current=1,right_current=3,size="sm")}}
+      </div>
+    {% endif %}
     </div>
+
+    {% endif %}
+
+    {% if not upcomming == None %}
+    <div class="col-xl-4">
+    <div class="row">
+      <div class="col-7">
+        <h2 id="queue-len-h2"><span id="queue-len">Queued{#<span class="hidden-md"> Jobs</span>#} ({{num_upcomming}})</span></h2>
+      </div>
+      <div class="col-5">
+        <div class="float-right">
+        <div title="Current queue length estimate">
+            <a id="queue-est" href="#" class="btn btn-primary disabled"><span>~{{'%0.1f'|format(est)}} min</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <table class="table queue" id="refreshing2">
+        <thead>
+          <tr>
+            <th>#</th>
+      <th>Group</th>
+            <th>B.S.</th>
+      {#<th class="d-none d-sm-table-cell">Name</th>#}
+            <th class="d-none d-sm-table-cell">Dur. [s]</th>
+            <th>Flags</th>
+          </tr>
+        </thead>
+        <tbody>
+          {%- for job in upcomming %}
+          {#{%if (num_upcomming>upcomming|length) and loop.last%}style="color: #aaa;"{%endif%}#}
+      <tr {% if job.running %}class="lead" style="background-color: #eee;"{% endif %}>
+            <td>{{job.id}}</td>
+            <td>{{job.group.name}}</td>
+            {% if not job.protocol == None %}
+            <td>{{job.protocol.benchmark_suite.short}}</td>
+            {% else %}
+            <td>{{job.group.name}} | ?</td>
+            {% endif %}
+      {#<td class="shortname visible-xs">{{job.name}}</td>
+      <td class="jobname d-none d.sm-block">{{job.name}}</td>#}
+            {%if not job.duration==0%}
+            <td class="d-none d-sm-block">{{job.duration}}</td>
+            {%else%}
+            <td class="d-none d-sm-block">-</td>
+            {%endif%}
+            <td>
+              {% if job.running %}
+              <span class="fas fa-play" aria-hidden="true" title="job running"></span> {% endif %} {% if job.failed %}
+              <span class="fas fa-remove" aria-hidden="true" title="job failed"></span> {% else %} {% if job.finished %}
+              <span class="fas fa-ok" aria-hidden="true" title="job finished"></span> {% endif %} {% endif %} {% if job.priority %}
+              <span class="fas fa-star" aria-hidden="true" title="high priority job"></span> {% endif %} {% if job.reboot %}
+              <span class="fas fa-repeat" aria-hidden="true" title="rebooting"></span> {% endif %} {% if job.logs %}
+              <span class="fas fa-align-justify" aria-hidden="true" title="serial log captured"></span> {% endif %} {% if job.jamming_composition_id and job.jamming_composition_id > 1 %}
+              <span class="fas fa-bolt" aria-hidden="true" title="jamming enabled"><sub>{{job.jamming_composition.short}}</sub> {% endif %}</span>
+            </td>
+          </tr>
+          {%- endfor %}
+      {%if (num_upcomming>upcomming|length)%}
+          <tr>
+          <td class="d-none d-sm-table-cell text-center" colspan="5">{{num_upcomming-upcomming|length}} more</td>
+            <td class="d-table-cell d-sm-none text-center" colspan="4">{{num_upcomming-upcomming|length}} more</td>
+          </tr>
+          {%- endif %}
+        </tbody>
+      </table>
+    </div>
+    </div>
+    {% endif %}
+  </div>
 </div>
 {% if not jobs.items == None %}
 <div class="container">
-    <!-- Trigger the modal with a button -->
+  <!-- Trigger the modal with a button -->
 
-    <!-- Modal -->
-    <div class="modal fade" id="selectDash" role="dialog">
-        <div class="modal-dialog">
+  <!-- Modal -->
+  <div class="modal fade" id="selectDash" role="dialog">
+    <div class="modal-dialog">
 
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h1 class="text-center login-title">Select Grafana Dashboard</h1>
-                </div>
-                <div class="modal-body">
-                    <table class="table table-borderless">
-                        <tbody id="dashbody">
-                        </tbody>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h1 class="text-center login-title">Select Grafana Dashboard</h1>
         </div>
+        <div class="modal-body">
+          <table class="table table-borderless">
+            <tbody id="dashbody">
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+
     </div>
+  </div>
 </div>
 {% endif %}
 
@@ -252,83 +251,83 @@ $( document ).ready(function() {
 $('[data-toggle="tooltip"]').tooltip();
 
 
-    setInterval(function()
-            {
-                $('#refreshing').load(document.URL +  ' #refreshing>*','');
-                $('#refreshing2').load(document.URL +  ' #refreshing2>*','');
-            }, 5000);
-    setInterval(function()
-            {
-                $("#queue-est").load(document.URL +  ' #queue-est>*','');
-                $("#queue-len").load(document.URL +  ' #queue-len','');
-            }, 10000);
+  setInterval(function()
+      {
+        $('#refreshing').load(document.URL +  ' #refreshing>*','');
+        $('#refreshing2').load(document.URL +  ' #refreshing2>*','');
+      }, 5000);
+  setInterval(function()
+      {
+        $("#queue-est").load(document.URL +  ' #queue-est>*','');
+        $("#queue-len").load(document.URL +  ' #queue-len','');
+      }, 10000);
 });
 
 function updateDash(started,ended,templab,nodes){
-        $.getJSON('/proxy/dashboards', function(data) {
-            jQuery.each(data, function(i, val) {
-                var params="";
-                if(val.title=="Overview of EEPROM Messages"){
-                    for(i=0;i<nodes.length;i++) {
-                        params+="&var-Node="+nodes[i]["label"]+"_eeprom"
-                    }
-                }
-                else if(val.title=="Overview of GPIO Events"){
-                    for(i=0;i<nodes.length;i++) {
-                        params+="&var-Node="+nodes[i]["label"]+"_evt"
-                    }
-                    if(nodes.length!=0) {
-                        params+="&var-GPIO=24"
-                    }
-                }
-
-		    {#var btnstring = '<a class="btn btn-sm btn-primary" target="_blank" href="{{config['GRAFANA_URL']}}'+val.url+'?from='+started+'&to='+ended+params+'" role="button" title="show in grafana"><span class="fas fa-eye" aria-hidden="true"></span></a>'#}
-		    var btnstring = '<a class="btn btn-sm btn-primary" target="_blank" href="{% if  config['GRAFANA_URL'].startswith("http")%}{{config['GRAFANA_URL']}}{% endif %}'+val.url+'?from='+started+'&to='+ended+params+'" role="button" title="show in grafana"><span class="fas fa-eye" aria-hidden="true"></span></a>'
-                var markup = "<tr><td>"+val.title+"</td><td>" +btnstring+ "</td></tr>";
-                $("#dashbody").append(markup);
-            });
-
-  if(templab=="True")
-  {
-    $.getJSON('/proxy/dashboards/templab', function(data) {
+    $.getJSON('/proxy/dashboards', function(data) {
       jQuery.each(data, function(i, val) {
         var params="";
-	      {#var btnstring = '<a class="btn btn-sm btn-primary" target="_blank" href="{{config['GRAFANA_URL']}}'+val.url+'?from='+started+'&to='+ended+params+'" role="button" title="show in grafana"><span class="fas fa-eye" aria-hidden="true"></span></a>'#}
-        var btnstring = '<a class="btn btn-sm btn-primary" target="_blank" href="{% if  config['GRAFANA_URL'].startswith("http")%}{{config['GRAFANA_URL']}}{% endif %}'+val.url+'?from='+started+'&to='+ended+params+'" role="button" title="show in grafana"><span class="fas fa-eye" aria-hidden="true"></span></a>'
+        if(val.title=="Overview of EEPROM Messages"){
+          for(i=0;i<nodes.length;i++) {
+            params+="&var-Node="+nodes[i]["label"]+"_eeprom"
+          }
+        }
+        else if(val.title=="Overview of GPIO Events"){
+          for(i=0;i<nodes.length;i++) {
+            params+="&var-Node="+nodes[i]["label"]+"_evt"
+          }
+          if(nodes.length!=0) {
+            params+="&var-GPIO=24"
+          }
+        }
+
+      {#var btnstring = '<a class="btn btn-sm btn-primary" target="_blank" href="{{config['GRAFANA_URL']}}'+val.url+'?from='+started+'&to='+ended+params+'" role="button" title="show in grafana"><span class="fas fa-eye" aria-hidden="true"></span></a>'#}
+      var btnstring = '<a class="btn btn-sm btn-primary" target="_blank" href="{% if  config['GRAFANA_URL'].startswith("http")%}{{config['GRAFANA_URL']}}{% endif %}'+val.url+'?from='+started+'&to='+ended+params+'" role="button" title="show in grafana"><span class="fas fa-eye" aria-hidden="true"></span></a>'
         var markup = "<tr><td>"+val.title+"</td><td>" +btnstring+ "</td></tr>";
         $("#dashbody").append(markup);
       });
+
+  if(templab=="True")
+  {
+  $.getJSON('/proxy/dashboards/templab', function(data) {
+    jQuery.each(data, function(i, val) {
+    var params="";
+      {#var btnstring = '<a class="btn btn-sm btn-primary" target="_blank" href="{{config['GRAFANA_URL']}}'+val.url+'?from='+started+'&to='+ended+params+'" role="button" title="show in grafana"><span class="fas fa-eye" aria-hidden="true"></span></a>'#}
+    var btnstring = '<a class="btn btn-sm btn-primary" target="_blank" href="{% if  config['GRAFANA_URL'].startswith("http")%}{{config['GRAFANA_URL']}}{% endif %}'+val.url+'?from='+started+'&to='+ended+params+'" role="button" title="show in grafana"><span class="fas fa-eye" aria-hidden="true"></span></a>'
+    var markup = "<tr><td>"+val.title+"</td><td>" +btnstring+ "</td></tr>";
+    $("#dashbody").append(markup);
     });
+  });
   }
 
-        });
+    });
 }
 
 
 
 $('#selectDash').on('show.bs.modal', function(e) {
-    $("#dashbody").find("tr").remove();
+  $("#dashbody").find("tr").remove();
 
-    var ended = $(e.relatedTarget).data('job-end');
-    var started = $(e.relatedTarget).data('job-start');
-    var composition = $(e.relatedTarget).data('job-composition'); 
-    var templab = $(e.relatedTarget).data('job-templab'); 
+  var ended = $(e.relatedTarget).data('job-end');
+  var started = $(e.relatedTarget).data('job-start');
+  var composition = $(e.relatedTarget).data('job-composition'); 
+  var templab = $(e.relatedTarget).data('job-templab'); 
 
-    if(composition==null){
-        updateDash(started,ended,[]); 
-    } else {
-        $.getJSON('{{url_for("frontend.show_nodes")}}'+composition, function(data) {
-        updateDash(started,ended,templab,data); 
-    });
-    }
+  if(composition==null){
+    updateDash(started,ended,[]); 
+  } else {
+    $.getJSON('{{url_for("frontend.show_nodes")}}'+composition, function(data) {
+    updateDash(started,ended,templab,data); 
+  });
+  }
 }); 
 
 $.ajaxPrefilter( function (options) {
-    if (options.crossDomain && jQuery.support.cors) {
-        var http = (window.location.protocol === 'http:' ? 'http:' : 'https:');
-        options.url = http + '//cors-anywhere.herokuapp.com/' + options.url;
-        //options.url = "http://cors.corsproxy.io/url=" + options.url;
-    }
+  if (options.crossDomain && jQuery.support.cors) {
+    var http = (window.location.protocol === 'http:' ? 'http:' : 'https:');
+    options.url = http + '//cors-anywhere.herokuapp.com/' + options.url;
+    //options.url = "http://cors.corsproxy.io/url=" + options.url;
+  }
 });
 </script>
 {%- endblock %}
