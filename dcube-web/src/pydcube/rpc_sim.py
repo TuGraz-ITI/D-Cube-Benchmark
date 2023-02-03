@@ -23,7 +23,7 @@
 # SOFTWARE.
 #
 import DCM
-from DCM.server import Server
+from DCM.sim import Simulation
 
 import logging
 import json
@@ -90,5 +90,5 @@ else:
         logger.error("Node JSON file does not exist or cannot be opened!")
         exit(-1)
  
-dcube=Server("rabbitmq",args.hostname,user_name,user_pass,nodes,resturl="http://dcube-web")
-dcube.run()
+simly=Simulation("rabbitmq",args.hostname,user_name,user_pass,nodes,resturl="http://dcube-web")
+simly.run()

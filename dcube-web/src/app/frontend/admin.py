@@ -241,10 +241,10 @@ def setup_defaults():
             pskydd=Protocol("Administrative Experiment TelosB Sky DD", "https://iti-testbed.tugraz.at/", "Maintenance Jobs", admins.id, skydd.id)
             db.session.add(pskydd)
         if(not nrfdc==None):
-            pnrfdc=Protocol("Administrative Experiment TelosB nRF DC", "https://iti-testbed.tugraz.at/", "Maintenance Jobs", admins.id, nrfdc.id)
+            pnrfdc=Protocol("Administrative Experiment nRF DC", "https://iti-testbed.tugraz.at/", "Maintenance Jobs", admins.id, nrfdc.id)
             db.session.add(pnrfdc)
         if(not nrfdd==None):
-            pnrfdd=Protocol("Administrative Experiment TelosB nRF DD", "https://iti-testbed.tugraz.at/", "Maintenance Jobs", admins.id, nrfdd.id)
+            pnrfdd=Protocol("Administrative Experiment nRF DD", "https://iti-testbed.tugraz.at/", "Maintenance Jobs", admins.id, nrfdd.id)
             db.session.add(pnrfdd)
 
     db.session.commit()

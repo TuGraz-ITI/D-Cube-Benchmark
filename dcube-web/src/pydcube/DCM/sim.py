@@ -25,22 +25,12 @@ from .server import Server
 from .command import CommandState,CommandReturn
 
 from .nodes.node import NodeFactory
-from .nodes.sky import Sky
-from .nodes.nrf52840dk import NRFNative,NRFJLink
+from .nodes.dummy import DummyNode
 
 import subprocess
 
-import pysystemd
-import usb.core
-import pigpio
+class Simulation(Server):
 
-POWER_PIN=21
-RESET_PIN=20
-MAYOR_PIN=6
-MINOR_PIN=5
-
-class Raspberry(Server):
-    
 ################################################################################
 # Select node using the mux
 ################################################################################
@@ -50,73 +40,22 @@ class Raspberry(Server):
         if "mote" in request:
             for node in self.nodes:
                 if node.name==request["mote"]:
-                    return self.set_mux(node.mayor, node.minor)
+                    return self.set_mux(node.name)
             else:
                 response["message"]="Invalid mux state requested!"
                 self.logger.error(response["message"])
             
         else:
-            response["message"]="Mayor and Minor Pin must be specified!"
+            response["message"]="Mote must be specified!"
             self.logger.error(response["message"])
         return ret
 
-    def set_mux(self,mayor,minor):
-        ret=CommandReturn.FAILED
-        if ( ( mayor==1 or mayor==0) and
-            (minor==1 or minor==0) ):
-                self.pi.write(MAYOR_PIN,mayor)
-                self.pi.write(MINOR_PIN,minor)
-                ret=CommandReturn.SUCCESS
-        else:
-            self.logger.error("Invalid mux state requested!")
-            
+    def set_mux(self,node_name):
+        self.node_name=node_name
+        ret=CommandReturn.SUCCESS
         return ret
 
-################################################################################
-# Reboot Raspberry Pi via systemd
-################################################################################
-
-    def reboot(self):
-        power=pysystemd.power()
-        power.reboot()
-
-################################################################################
-# Commands for the measurement service
-################################################################################
-
-    def cmd_measurement(self,request,response):
-        if "state" in request:
-            if request["state"]==CommandState.ON:
-                self.start_measurement()
-            elif request["state"]==CommandState.OFF:
-                self.stop_measurement()
-
-        response["message"]=self.get_measurement()
-        return CommandReturn.SUCCESS
-
-    def get_measurement(self):
-        status=pysystemd.status("d-cube-influx.service")
-        if status.is_run():
-            return CommandReturn.STOPPED
-        else:
-            return CommandReturn.RUNNING
-
-    def start_measurement(self):
-        service=pysystemd.services("d-cube-influx.service")
-        service.start() #TODO handle return codes
-
-        i2c_service=pysystemd.services("d-cube-i2c-influx.service")
-        i2c_service.start() #TODO handle return codes
-
-
-    def stop_measurement(self):
-        service=pysystemd.services("d-cube-influx.service")
-        service.stop()  #TODO handle return codes
-
-        i2c_service=pysystemd.services("d-cube-i2c-influx.service")
-        i2c_service.stop()  #TODO handle return codes
-
-
+    
 ################################################################################
 # Command to control node power
 ################################################################################
@@ -130,18 +69,15 @@ class Raspberry(Server):
     def set_power(self,value):
         if value==CommandState.ON:
             self.logger.debug("Turing node power ON")
-            self.pi.write(POWER_PIN,1)
+            self.power_state=value
         elif value==CommandState.OFF:
             self.logger.debug("Turing node power OFF")
-            self.pi.write(POWER_PIN,0)
+            self.power_state=value
         else:
             self.logger.error("Invalid power state requested!")
     
     def get_power(self):
-        if self.pi.read(POWER_PIN)==1:
-            return CommandState.ON
-        else:
-            return CommandState.OFF
+        return self.power_state
 
 ################################################################################
 # Command to control node reset
@@ -156,18 +92,35 @@ class Raspberry(Server):
     def set_reset(self,value):
         if value==CommandState.ON:
             self.logger.debug("Turing node reset ON")
-            self.pi.write(RESET_PIN,1)
+            self.reset_state=value
         elif value==CommandState.OFF:
             self.logger.debug("Turing node reset OFF")
-            self.pi.write(RESET_PIN,0)
+            self.reset_state=value
         else:
             self.logger.error("Invalid power state requested!")
     
     def get_reset(self):
-        if self.pi.read(RESET_PIN)==1:
-            return CommandState.ON
+        return self.reset_state
+
+################################################################################
+# Commands for the measurement service
+################################################################################
+
+    def cmd_measurement(self,request,response):
+        if "state" in request:
+            if request["state"]==CommandState.ON:
+                self.measurement_started=True
+            elif request["state"]==CommandState.OFF:
+                self.measurement_started=False
+
+        response["message"]=self.get_measurement()
+        return CommandReturn.SUCCESS
+
+    def get_measurement(self):
+        if self.measurement_started:
+            return CommandReturn.STOPPED
         else:
-            return CommandState.OFF
+            return CommandReturn.RUNNING
 
 ################################################################################
 # Command list currnt nodes
@@ -176,16 +129,33 @@ class Raspberry(Server):
     def motelist(self):
         motes=[]
         for node in self.nodes:
-            dev=usb.core.find(idProduct=node.product_id,idVendor=node.vendor_id)
-            if not dev==None:
+            if self.node_name == node.name:
                 motes.append(node)
         return motes
 
+################################################################################
+# Command to indicate the server to reboot
+################################################################################
+
+    def cmd_reboot(self,request,response):
+        return CommandReturn.SUCCESS
+
+################################################################################
+# Command dispatcher
+################################################################################
+
+    def cmd_process(self,request,response):
+        return CommandReturn.SUCCESS
+
     def __init__(self, host, hostname, user_name, user_pass, nodes=[], tempdir="/tmp", resturl="http://dcube-web"):
         n=NodeFactory()
-        n.register_node("sky",Sky)
-        n.register_node("nrf52840dk-jlink",NRFJLink)
-        n.register_node("nrf52840dk-native",NRFNative)
+        n.register_node("sky",DummyNode)
+        n.register_node("nrf52840dk-jlink",DummyNode)
+        n.register_node("nrf52840dk-native",DummyNode)
 
-        super().__init__(host,hostname,user_name,user_pass, nodes,tempdir)
-        self.pi=pigpio.pi()
+        super().__init__(host, hostname, user_name, user_pass, nodes, tempdir)
+        self.reset_state=CommandState.ON
+        self.power_state=CommandState.ON
+        self.measurement_started=False
+        self.node_name=self.nodes[0]
+ 

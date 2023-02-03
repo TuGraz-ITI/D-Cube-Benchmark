@@ -444,7 +444,7 @@ class Server:
 # Constructor
 ################################################################################
 
-    def __init__(self, host, hostname, user_name, user_pass,nodes=[],tempdir="/tmp",resturl="http://192.168.100.16"):
+    def __init__(self, host, hostname, user_name, user_pass,nodes=[],tempdir="/tmp",resturl="http://dcube-web"):
         self.JAMMING_PWD="/home/pi/testbed/"
         self.JAMMING_CMD="./jammer"
 
