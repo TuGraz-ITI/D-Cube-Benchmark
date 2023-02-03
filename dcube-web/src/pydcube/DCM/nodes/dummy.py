@@ -23,6 +23,7 @@
 #
 from .node import Node
 from ..command import CommandReturn
+import base64
 
 class DummyNode(Node):
 
@@ -34,6 +35,11 @@ class DummyNode(Node):
 
     def stop_traces(self):
         return CommandReturn.SUCCESS
+
+    def collect_traces(self):
+        enc=base64.b64encode(b'Your Ad Here')
+        string=enc.decode()
+        return string
 
     def program(self,hexfile,connection):
         return CommandReturn.SUCCESS

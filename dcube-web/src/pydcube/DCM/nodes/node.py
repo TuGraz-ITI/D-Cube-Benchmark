@@ -23,6 +23,7 @@
 #
 import json
 import logging
+from ..command import CommandReturn
 
 class Node:
     def __init__(self, name, mayor, minor, vendor_id=None, product_id=None, tempdir="/tmp"):
