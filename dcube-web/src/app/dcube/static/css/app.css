@@ -115,6 +115,7 @@ body main {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
+
 .form-signin .form-control:focus
 {
     z-index: 2;
@@ -130,6 +131,22 @@ body main {
     margin-bottom: 10px;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
+}
+
+.form-twofactor .form-control
+{
+    font-size: 16px;
+    height: auto;
+}
+
+.form-twofactor .form-group.row
+{
+    margin-bottom: 0px;
+}
+
+.form-twofactor #submit
+{
+    margin-top: 12px;
 }
 
 .account-wall
@@ -201,3 +218,4 @@ body main {
   margin-bottom: 1rem;
   padding-bottom: 1rem;
 }
+

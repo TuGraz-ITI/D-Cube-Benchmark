@@ -39,6 +39,9 @@ class User(db.Model, UserMixin):
                             backref=db.backref('users', lazy='dynamic'))
     group_id = db.Column(db.Integer, db.ForeignKey('group.id'))
     fs_uniquifier = db.Column(db.String(255), unique=True, nullable=False)
+    tf_phone_number = db.Column(db.String(128), nullable=True)
+    tf_primary_method = db.Column(db.String(64), nullable=True)
+    tf_totp_secret = db.Column(db.String(255), nullable=True)
 
     def get_name(self):
         return self.username

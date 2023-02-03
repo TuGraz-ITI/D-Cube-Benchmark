@@ -66,6 +66,19 @@ class Config(object):
     SECURITY_PASSWORD_SALT = '5d99d5d942024a86bf15427a3a1685e9'
     SECURITY_USER_IDENTITY_ATTRIBUTES = [{'username':{"mapper":uia_username_mapper}}]
 
+    # Enforce 2FA
+    SECURITY_TWO_FACTOR_ENABLED_METHODS = ['authenticator','email']  # 'sms' also valid but requires an sms provider
+    SECURITY_TWO_FACTOR = True
+    SECURITY_TWO_FACTOR_REQUIRED = True
+    SECURITY_TWO_FACTOR_RESCUE_EMAIL = False
+    SECURITY_TWO_FACTOR_ALWAYS_VALIDATE = True
+    SECURITY_TWO_FACTOR_LOGIN_VALIDITY = "1 week"
+
+    # Generate a good totp secret using: passlib.totp.generate_secret()
+    SECURITY_TOTP_SECRETS = {"1": "TjQ9Qa31VOrfEzuPy4VHQWPCTmRzCnFzMKLxXYiZu9B"}
+    SECURITY_TOTP_ISSUER = "D-Cube"
+
+
     PYTHON_PATH = "/usr/bin/python3" 
     DCM_PATH = "/testbed/pydcube"
     DCM_BINARY = "/testbed/pydcube/rpc_testbed.py"
