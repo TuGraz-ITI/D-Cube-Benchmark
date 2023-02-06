@@ -44,67 +44,65 @@
 {#{% from "security/_macros.html" import render_field_with_errors, render_field, render_field_no_label, render_field_errors %}#}
 
 {% block content %}
-    {% include "security/_messages.html" %}
-
-    <div class="container">
-        <div class="col-sm col-md-6 offset-md-4">
-            <div class="callout callout-info">
-	    <h4><i class="fas fa-fw fa-info-circle"></i>Two-factor</h4>
-	    Two-factor authentication adds an extra layer of security to your account. In addition to your username and password, you'll need to use a code.</div>
-	    <div class="callout {%if primary_method==None%}callout-danger{%elif chosen_method%}callout-warning{%else%}callout-success{%endif%}">
+  <div class="container">
+      <div class="col-sm col-md-6 offset-md-4">
+          <div class="callout callout-info">
+            <h4><i class="fas fa-fw fa-info-circle"></i>Two-factor</h4>
+            Two-factor authentication adds an extra layer of security to your account. In addition to your username and password, you'll need to use a code.
+          </div>
+          <div class="callout {%if primary_method==None%}callout-danger{%elif chosen_method%}callout-warning{%else%}callout-success{%endif%}">
             {%if primary_method==None%}
-            <h4><i class="fas fa-times-circle"></i> Error</h4>
+              <h4><i class="fas fa-times-circle"></i> Error</h4>
             {%elif chosen_method%}
-            <h4><i class="fas fa-fw fa-exclamation-circle"></i> Warning</h4>
+              <h4><i class="fas fa-fw fa-exclamation-circle"></i> Warning</h4>
             {%else%}
-            <h4><i class="fas fa-fw fa-check-circle"></i> Success</h4>
+              <h4><i class="fas fa-fw fa-check-circle"></i> Success</h4>
             {%endif%}
-	    {%if primary_method==None%}No two-factor method configured{%elif chosen_method%}Please complete the setup below to configure two-factor{%else%}Currently setup two-factor method: {{primary_method}}{%endif%}
-	    </div>
-
-            <form action="{{ url_for_security('two_factor_setup') }}" method="POST" name="two_factor_setup_form" class="form-twofactor">
-                {{ two_factor_setup_form.hidden_tag() }}
-                {% for subfield in two_factor_setup_form.setup %}
-                    {% if subfield.data in choices %}
-	    	    {{ render_field(subfield,form_type="horizontal",horizontal_columns=("lg",10,2),class="btn btn-sm") }}
-                    {% endif %}
-                {% endfor %}
-                {{ render_field(two_factor_setup_form.submit) }}
-                {% if chosen_method=="email" and chosen_method in choices %}
-                    <div>To complete logging in, please enter the code sent to your mail</div>
-                {% endif %}
-                {% if chosen_method=="authenticator" and chosen_method in choices %}
-                  <hr>
-                  <div class="fs-center">
-                    <div>
-                      Open an authenticator app on your device and scan the following QRcode (or enter the code below manually) to start receiving codes:
-                    </div>
-                    <div>
-                       <img alt="Two factor authentication code" id="qrcode" src="{{ authr_qrcode }}">
-                    </div>
-                    <div>
-                      {{ authr_key }}
-                    </div>
+            {%if primary_method==None%}No two-factor method configured{%elif chosen_method%}Please complete the setup below to configure two-factor{%else%}Currently setup two-factor method: {{primary_method}}{%endif%}
+          </div>
+          <form action="{{ url_for_security('two_factor_setup') }}" method="POST" name="two_factor_setup_form" class="form-twofactor">
+              {{ two_factor_setup_form.hidden_tag() }}
+              {% for subfield in two_factor_setup_form.setup %}
+              {% if subfield.data in choices %}
+                {{ render_field(subfield,form_type="horizontal",horizontal_columns=("lg",10,2),class="btn btn-sm") }}
+              {% endif %}
+              {% endfor %}
+              {{ render_field(two_factor_setup_form.submit) }}
+              {% if chosen_method=="email" and chosen_method in choices %}
+                <div>To complete logging in, please enter the code sent to your mail</div>
+              {% endif %}
+              {% if chosen_method=="authenticator" and chosen_method in choices %}
+                <hr>
+                <div class="fs-center">
+                  <div>
+                    Open an authenticator app on your device and scan the following QRcode (or enter the code below manually) to start receiving codes:
                   </div>
-                {% endif %}
+                  <div>
+                    <img alt="Two factor authentication code" id="qrcode" src="{{ authr_qrcode }}">
+                  </div>
+                  <div>
+                    {{ authr_key }}
+                  </div>
+                </div>
+              {% endif %}
+          </form>
+          {% if chosen_method %}
+            {# Hide this when first setting up #}
+            <hr>
+            <form action="{{ url_for_security("two_factor_token_validation") }}" method="POST"
+                  name="two_factor_verify_code_form">
+                {{ two_factor_verify_code_form.hidden_tag() }}
+                {{ render_field(two_factor_verify_code_form.code) }}
+                {{ render_field(two_factor_verify_code_form.submit) }}
             </form>
-            {% if chosen_method %}
-              {# Hide this when first setting up #}
-              <hr>
-              <form action="{{ url_for_security("two_factor_token_validation") }}" method="POST"
-                    name="two_factor_verify_code_form">
-                  {{ two_factor_verify_code_form.hidden_tag() }}
-                  {{ render_field(two_factor_verify_code_form.code) }}
-                  {{ render_field(two_factor_verify_code_form.submit) }}
-              </form>
-            {% endif %}
-            {% if security.support_mfa and security.multi_factor_recovery_codes %}
-              <h3>Recovery Codes</h3>
-              <div class="fs-div">
-                This application supports setting up recovery codes
-                <a href="{{ url_for_security('mf_recovery_codes') }}">You can set them up here.</a>
-              </div>
-            {% endif %}
-        </div>
-    </div>
+          {% endif %}
+          {% if security.support_mfa and security.multi_factor_recovery_codes %}
+            <h3>Recovery Codes</h3>
+            <div class="fs-div">
+              This application supports setting up recovery codes
+              <a href="{{ url_for_security('mf_recovery_codes') }}">You can set them up here.</a>
+            </div>
+          {% endif %}
+      </div>
+  </div>
 {% endblock %}

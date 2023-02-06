@@ -49,8 +49,17 @@ class Config(object):
     PATCH_FOLDER = '/storage/patches/'
     TEMPLAB_FOLDER = '/storage/temperature_profiles/'
     
+    # Flask-Mailman setup
+    MAIL_SERVER = 'mail.testbed.local'
+    MAIL_PORT = 465
+    MAIL_USE_SSL = True
+    #MAIL_PORT = 587
+    #MAIL_USE_TLS = True
+    #MAIL_USERNAME = 'username'
+    #MAIL_PASSWORD = 'password'
+
     # Flask-Security setup
-    SECURITY_EMAIL_SENDER = 'Testbed < noreply@testbed.local>'
+    SECURITY_EMAIL_SENDER = 'Testbed <noreply@testbed.local>'
     SECURITY_LOGIN_WITHOUT_CONFIRMATION = True
     SECURITY_REGISTERABLE = False
     SECURITY_RECOVERABLE = False
@@ -62,27 +71,28 @@ class Config(object):
     SECURITY_POST_LOGOUT_VIEW = 'frontend.index'
     SECURITY_UNAUTHORIZED_VIEW = 'frontend.index'
     SECURITY_PASSWORD_HASH = 'pbkdf2_sha512'
+    
     # import uuid; salt = uuid.uuid4().hex
     SECURITY_PASSWORD_SALT = '5d99d5d942024a86bf15427a3a1685e9'
     SECURITY_USER_IDENTITY_ATTRIBUTES = [{'username':{"mapper":uia_username_mapper}}]
 
-    # Enforce 2FA
+    # Configure 2FA
     SECURITY_TWO_FACTOR_ENABLED_METHODS = ['authenticator','email']  # 'sms' also valid but requires an sms provider
     SECURITY_TWO_FACTOR = True
-    SECURITY_TWO_FACTOR_REQUIRED = True
-    SECURITY_TWO_FACTOR_RESCUE_EMAIL = False
+    SECURITY_TWO_FACTOR_REQUIRED = False
+    #SECURITY_TWO_FACTOR_RESCUE_EMAIL = False
+    SECURITY_TWO_FACTOR_RESCUE_MAIL = "noreply@testbed.local"
     SECURITY_TWO_FACTOR_ALWAYS_VALIDATE = True
     SECURITY_TWO_FACTOR_LOGIN_VALIDITY = "1 week"
 
     # Generate a good totp secret using: passlib.totp.generate_secret()
     SECURITY_TOTP_SECRETS = {"1": "TjQ9Qa31VOrfEzuPy4VHQWPCTmRzCnFzMKLxXYiZu9B"}
-    SECURITY_TOTP_ISSUER = "D-Cube"
-
+    SECURITY_TOTP_ISSUER = "D-Cube Testbed Docker Edition"
 
     PYTHON_PATH = "/usr/bin/python3" 
     DCM_PATH = "/testbed/pydcube"
     DCM_BINARY = "/testbed/pydcube/rpc_testbed.py"
-    DCM_BROKER="rabbitmq"
+    DCM_BROKER = "rabbitmq"
     SWITCH_CONFIG = "switch.json"
 
     INFLUX_USER = "root"

@@ -151,9 +151,11 @@
       <li class="nav-item dropdown">
       {{ render_nav_dropdown_toggle("navbarUser",current_user.username) }}
       <div class="dropdown-menu" aria-labelledby="navbarUser">
-        {{ render_nav_dropdown_item('security.logout', 'Logout') }}
         {{ render_nav_dropdown_item('security.change_password', 'Change Password') }}
+        {{ render_nav_dropdown_item('security.two_factor_setup', 'Two-factor Setup') }}
         {{ render_nav_dropdown_item('frontend.user_manage_api_key', 'API key Management') }}
+        <div class="dropdown-divider"></div>
+        {{ render_nav_dropdown_item('security.logout', 'Logout') }}
       </div>
       </li>
       {% else %}

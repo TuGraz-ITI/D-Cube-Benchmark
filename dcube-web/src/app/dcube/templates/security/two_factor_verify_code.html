@@ -1,27 +1,58 @@
-{% extends "security/base.html" %}
-{% from "security/_macros.html" import render_field_with_errors, render_field, prop_next %}
+{# MIT License
+
+  Copyright (c) 2023 Graz University of Technology
+  
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+  
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+  
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE. #}
+
+{%- extends "base.html" %}
+
+{% from "bootstrap4/form.html" import render_field %}
+{% from "security/_macros.html" import prop_next %}
 
 {% block content %}
-    {% include "security/_messages.html" %}
-    <h1>{{ _fsdomain("Two-factor Authentication") }}</h1>
-    <h2>{{ _fsdomain("Please enter your authentication code generated via: %(method)s", method=chosen_method) }}</h2>
-    <form action="{{ url_for_security('two_factor_token_validation') }}{{ prop_next() }}" method="POST"
-          name="two_factor_verify_code_form">
-        {{ two_factor_verify_code_form.hidden_tag() }}
-        {{ render_field_with_errors(two_factor_verify_code_form.code, placeholder="enter code") }}
-        {{ render_field(two_factor_verify_code_form.submit) }}
-    </form>
-    <hr class="fs-gap">
-    <form action="{{ url_for_security('two_factor_rescue') }}{{  prop_next() }}" method="POST" name="two_factor_rescue_form">
-        {{ two_factor_rescue_form.hidden_tag() }}
-        {{ render_field_with_errors(two_factor_rescue_form.help_setup) }}
-        {% if problem=="email" %}
-            <div>{{ _fsdomain("The code for authentication was sent to your email address") }}</div>
-        {% endif %}
-        {% if problem=="help" %}
-            <div>{{ _fsdomain("A mail was sent to us in order to reset your application account") }}</div>
-        {% endif %}
-        {{ render_field(two_factor_rescue_form.submit) }}
-    </form>
-    {% include "security/_menu.html" %}
+  <div class="row">
+    <div class="col-sm-6 col-md-4 offset-md-4">
+      <h1 class="text-center login-title">Two-factor Authentication</h1>
+      <div class="callout callout-info">
+        <h4><i class="fas fa-fw fa-info-circle"></i>Two-factor</h4>
+        Please enter your authentication code generated via: {{chosen_method}}
+      </div>
+      <div class="account-wall">
+        <form action="{{ url_for_security('two_factor_token_validation') }}{{ prop_next() }}" method="POST"
+              name="two_factor_verify_code_form" class="form-signin">
+            {{ two_factor_verify_code_form.hidden_tag() }}
+            {{ render_field(two_factor_verify_code_form.code, placeholder="enter code") }}
+            {{ render_field(two_factor_verify_code_form.submit) }}
+        </form>
+        <hr class="fs-gap">
+        <form action="{{ url_for_security('two_factor_rescue') }}{{  prop_next() }}" method="POST" name="two_factor_rescue_form" class="form-signin">
+            {{ two_factor_rescue_form.hidden_tag() }}
+            {{ render_field(two_factor_rescue_form.help_setup) }}
+            {% if problem=="email" %}
+                <div>The code for authentication was sent to your email address</div>
+            {% endif %}
+            {% if problem=="help" %}
+                <div>A mail was sent to us in order to reset your application account</div>
+            {% endif %}
+            {{ render_field(two_factor_rescue_form.submit) }}
+        </form>
+      </div>
+    </div>
+  </div>
 {% endblock %}

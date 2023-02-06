@@ -25,6 +25,7 @@ from flask import Flask,redirect
 from flask_bootstrap import Bootstrap4
 from flask_security import Security, current_user, uia_username_mapper 
 from flask_migrate import Migrate
+from flask_mailman import Mail
 
 from frontend.frontend import frontend
 from frontend.rest_api import rest_api
@@ -85,6 +86,9 @@ def create_app(configfile=None):
     app.config["SECURITY_USER_IDENTITY_ATTRIBUTES"] = [
         {"username": {"mapper": uia_username_mapper}}
     ]
+
+    # Configure mail context
+    mail = Mail(app)
 
     # We initialize the security context
     Security(app, user_datastore, login_form=ExtendedLoginForm)
