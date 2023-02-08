@@ -156,10 +156,14 @@ def job_to_dict(j):
     line['benchmark_suite'] = str(j.protocol.benchmark_suite.name)
     line['layout'] = int(j.layout_composition_id)
     line['firmware'] = int(j.firmware.id)
-    line['periodicity'] = int(j.traffic_load)
-    line['message_length'] = int(j.msg_len)
-    line['patch'] = bool(j.patch)
-    line['cpatch'] = bool(j.cpatch)
+    if j.traffic_load is not None:
+        line['periodicity'] = int(j.traffic_load)
+    if j.msg_len is not None:
+        line['message_length'] = int(j.msg_len)
+    if j.patch is not None:
+        line['patch'] = bool(j.patch)
+    if j.cpatch is not None:
+        line['cpatch'] = bool(j.cpatch)
     line['logs'] = bool(j.logs)
     line['finished'] = bool(j.finished)
     if(not j.result == None):

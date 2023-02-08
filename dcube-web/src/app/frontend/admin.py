@@ -697,7 +697,7 @@ def admin_change_max_duration():
             flash('Invalid input (durations)!', 'error')
             return redirect(url_for('admin.configs'))
 
-        if(int_value < 20 or int_value > 36000):
+        if(int_value < 0 or int_value > 36000):
             flash('Invalid Durations ('+value+')!', 'error')
             return redirect(url_for('admin.configs'))
 
@@ -720,7 +720,7 @@ def admin_change_max_duration():
     except ValueError:
         flash('Invalid input (max_duration)!', 'error')
         return redirect(url_for('admin.configs'))
-    if(int_value < 20 or int_value > 36000):
+    if(int_value < 0 or int_value > 36000):
         flash('Invalid max Duration!', 'error')
         return redirect(url_for('admin.configs'))
     else:
@@ -743,7 +743,7 @@ def admin_change_max_duration():
     except ValueError:
         flash('Invalid input (def_duration)!', 'error')
         return redirect(url_for('admin.configs'))
-    if(int_value < 20 or int_value > 36000):
+    if(int_value < 0 or int_value > 36000):
         flash('Invalid default Duration!', 'error')
         return redirect(url_for('admin.configs'))
     else:
@@ -858,6 +858,8 @@ def admin_download_firmware(id=None):
 
     firmware = Firmware.query.filter_by(id=id).first()
 
+    ext=request.args.get("ext",default="ihex",type=str)
+
     if (firmware == None):
         abort(404)
 
@@ -868,7 +870,7 @@ def admin_download_firmware(id=None):
 
     if os.path.isfile(new_path):
         return send_from_directory(directory=new_dir, path=firmware.filename, as_attachment=True,
-                                   download_name='firmware_'+str(id)+".ihex")
+                                   download_name="firmware_%d.%s"%(id,ext))
 
     if ((firmware.job == None) or (firmware.job.group == None)):
         abort(404)

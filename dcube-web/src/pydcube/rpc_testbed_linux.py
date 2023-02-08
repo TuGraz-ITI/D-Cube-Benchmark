@@ -177,7 +177,6 @@ logger.info("Programming all nodes...")
 
 #start new experiment
 dcube.experiment(state=DCM.CommandState.ON,job_id=JOB)
-dcube.sleep(5)
 dcube.program(servers=SERVERS)
 
 #start jamming
@@ -188,30 +187,7 @@ dcube.blinker(servers=SERVERS)
 
 #if logs are enabled, start traces
 if(job["logs"]==True):
-    
-    LOG_COPY=list(SERVERS)
-    brs=rest.get_border_routers(JOB)
-    if(len(brs)):
-        for br in brs:
-            if br in LOG_COPY:
-                LOG_COPY.remove(br)
-                logger.info("Excluding border router %s from logs ..."%br)
-            elif "rpi%s"%br in LOG_COPY:
-                LOG_COPY.remove("rpi%s"%br)
-                logger.info("Excluding border router %s from logs ..."%br)
-
-
-    try:
-        dcube.trace(state=DCM.CommandState.ON,servers=LOG_COPY)
-    except DCM.CommandFailedException as e:
-        r=dcube.check_responses(servers=LOG_COPY)
-
-        #recovery loop, if nodes are missing perform reboot
-        if (("missing" in r) and (not len(r["missing"])==0)) or \
-           (("failed" in r) and (not len(r["failed"])==0)):
- 
-            logger.info("Errors have occured, aborting...")
-            exit(-1)
+    dcube.trace(state=DCM.CommandState.ON)
 
 logger.info("Starting measurements...")
 
@@ -244,17 +220,8 @@ dcube.measurement(state=DCM.CommandState.OFF)
 #stopping the traces will automatically also collect the logs
 if(job["logs"]==True):
 
-    LOG_COPY=list(SERVERS)
-    brs=rest.get_border_routers(JOB)
-    if(len(brs)):
-        for br in brs:
-            if br in LOG_COPY:
-                LOG_COPY.remove(br)
-            elif "rpi%s"%br in LOG_COPY:
-                LOG_COPY.remove("rpi%s"%br)
-
     logger.info("Collecting Logfiles ...")
-    r=dcube.trace(state=DCM.CommandState.OFF,servers=LOG_COPY)
+    r=dcube.trace(state=DCM.CommandState.OFF)
 
     if not os.path.exists(LOGFILEPATH):
         os.mkdir(LOGFILEPATH)
@@ -272,7 +239,11 @@ if(job["logs"]==True):
         for k in r.keys():
             response=r[k]
             log=base64.b64decode(response["logs"])
-            zf.writestr("log_%s.txt"%k[3:6],log)
+            if "ext" in response:
+                ext=response["ext"]
+            else:
+                ext="txt"
+            zf.writestr("log_%s.%s"%(k[3:6],ext),log)
 
 #stopping the experiment will also stop all spawend processes (including jamming and blinker)
 dcube.experiment(state=DCM.CommandState.OFF)

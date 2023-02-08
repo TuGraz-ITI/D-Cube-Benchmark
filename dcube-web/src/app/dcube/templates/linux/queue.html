@@ -247,61 +247,8 @@ intact. #}
         </select>
         </div>
       </div>
-    <label><input type="checkbox" id="patch" name="patch" data-toggle="toggle" checked data-size="sm">
-      Binary Patching
-    </label>               
-    <div class="collapse.show" id="collapseAll">
-        <div class="form-group required"><label class="control-label" for="traffic_load">Traffic Load</label>
-    <div class="input-group">
-      <select class="form-control" id="traffic_load_time" name="traffic_load_time" required aria-describedby="traffic_load_time_addon">
-      {% for i in (0, 5000, 30000 ) %}
-      <option {% if i==0 %}selected="selected"{% endif %}value={{i}}>{% if i==0 %}Aperiodic{% else %}{{i}}{% endif %}</option>
-      {% endfor%}
-      </select>
-      <span class="input-group-text" id="traffic_load_time_addon">Milliseconds</span>
-    </div>
-    <div class="input-group">
-      <select class="form-control" id="traffic_load_len" name="traffic_load_len" required aria-describedby="traffic_load_len_addon">
-      {% for i in (8, 64 ) %}
-      <option {% if i==8 %}selected="selected"{% endif %}value={{i}}>{{i}}</option>
-      {% endfor%}
-      </select>
-      <span class="input-group-text" id="traffic_load_len_addon">Bytes</span>
-    </div>
-      </div>
-      <label><input type="checkbox" id="cpatch" name="cpatch" data-toggle="toggle" data-size="sm">
-    Custom Patch
-      </label>
-      <div class="collapse" id="collapsePatch">
-    <label>
-      XML File
-    </label>
-    <div class="form-group">
-      <input class="file-upload" id="cfile" name="cfile" type="file" accept=".xml" value="">
-    </div>
-    <div class="form-group"><label class="control-label" for="cjson">Overrides JSON</label>
-      <textarea class="form-control" id="cjson" name="cjson" maxlength="4096"></textarea>
-    </div>
-      </div>
-    </div>
-        {% if current_user.has_role("templab") or current_user.has_role("admins") %}
-      <div class="form-group">
-      <label><input type="checkbox" id="temp_profile" name="temp_profile" data-toggle="toggle" data-size="sm">
-        Templab
-      </label>
-      <div class="collapse" id="collapseTempProfile">
-        <label>
-        CSV File
-        </label>
-        <div class="form-group">
-        <input class="file-upload" id="temp_profile_file" name="temp_profile_file" type="file" accept=".csv" value="">
-        </div>
-      </div>
-      </div>
-      {% endif %}
-
     <div class="form-group required">
-      <input class="file-upload" id="file" name="file" required type="file" accept=".hex,.ihex" value="">
+      <input class="file-upload" id="file" name="file" required type="file" accept=".zip" value="">
     </div>
 
     </div>

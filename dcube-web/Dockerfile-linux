@@ -1,0 +1,6 @@
+FROM python:alpine
+RUN apk add --no-cache iperf3
+ADD ./src/pydcube /testbed
+WORKDIR /testbed
+RUN pip3 install -r requirements-sim.txt
+CMD python3 rpc_linux.py --credentials=credentials.json --nodes=nodes.json --debug

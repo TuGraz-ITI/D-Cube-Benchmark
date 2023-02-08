@@ -1,0 +1,466 @@
+{# MIT License
+
+  Copyright (c) 2023 Graz University of Technology
+  
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+  
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+  
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE. #}
+  
+{# This simple template derives from ``base.html``. See ``base.html`` for
+more information about template inheritance. #}
+{%- extends "base.html" %}
+
+{% block title %}
+Details for Job {{job.id}} &mdash; D-Cube
+{%- endblock %}
+
+
+{# Inside the ``content`` is where you should place most of your own stuff.
+This will keep scripts at the page end and a navbar you add on later
+intact. #}
+{% block content %}
+<div class="container">
+  <div class="container">
+    <h1>
+    <div class="row">
+        <div class="col-sm-6 col-lg-6 col-xl-4"> 
+          <span class="d-none d-lg-block">Details for job {{job.id}}</span>
+          <span class="d-block d-lg-none">Details: {{job.id}}</span>
+        </div>
+        <div class="col-sm-6 col-lg-6 col-xl-4 offset-xl-4"> 
+          <div class="btn-group float-sm-right">
+            {% if not job.firmware==None and (current_user.is_authenticated and current_user.has_role('admins') ) %}
+            <a class="btn btn-lg btn-secondary" href="{{url_for("admin.admin_download_firmware",id=job.firmware.id,ext="zip")}}" role="button" title="download firmware"><span class="fas fa-save" aria-hidden="true"></span></a>
+            {% endif %}
+            {% if job.logs and job.finished and not job.failed%}
+            <a class="btn btn-lg btn-dark" href="{{url_for("%s.download_job_logs"|format(module),id=job.id)}}" role="button" title="download serial logs"><span class="fas fa-align-justify" aria-hidden="true"></span></a>
+            {% endif %}
+            {% if leaderboard==True or ( current_user.is_authenticated and ( current_user.has_role("admins") )  ) %}
+            {% if report and ((current_user.is_authenticated and ( (current_user.has_role('admins') ) or ( current_user.group_id==job.group_id and (not metrics==None) ))) and (not job.result==None)) %}
+            <a class="btn btn-lg btn-success" href="{{url_for("%s.download_job_evaluation"|format(module),id=job.id)}}" role="button" title="download evaluation"><span class="fas fa-download" aria-hidden="true"></span></a>
+            {% endif %}
+            {% endif %}
+            {% if not job.result==None %}
+            {% if job.layout==None %}
+            <a class="btn btn-lg btn-primary" href="#" role="button" data-job-templab="{{not job.temp_profile==None}}" data-job-start="{{job.result.begin|timestampfilter + 30000}}" data-job-end="{{job.result.end|timestampfilter}}" data-toggle="modal" data-target="#selectDash" title="show in grafana"><span class="d-none d-md-inline-block">Show in Grafana</span><span class="fas fa-eye d-inline-block d-md-none" aria-hidden="true"></span></a>
+            {% else %}
+            <a class="btn btn-lg btn-primary" href="#" role="button" data-job-templab="{{not job.temp_profile==None}}" data-job-composition="{{job.layout.id}}" data-job-start="{{job.result.begin|timestampfilter + 30000}}" data-job-end="{{job.result.end|timestampfilter}}" data-toggle="modal" data-target="#selectDash" title="show in grafana"><span class="d-none d-lg-inline-block">Show in Grafana</span><span class="fas fa-eye d-inline-block d-lg-none" aria-hidden="true"></span></a>
+            {% endif %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </h1>
+  </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-6">
+        <h2>Information</h2>
+        <table class="table" style="table-layout:fixed;">
+          <thead>
+            <tr>
+              <th>Parameter</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td>Team</td>
+              <td>{{job.group.name}}</td>
+            </tr>
+            <tr>
+              <tr>
+                <td>Name</td>
+        <td><span class="text-break">{{job.name}}</span></td>
+              </tr>
+              {% if (current_user.is_authenticated and ( current_user.has_role('admins') or (current_user.group_id==job.group_id) ) ) %}
+              <tr>
+                <td>Firmware</td>
+                <td>{{job.firmware.name}}</td>
+              </tr>
+              <tr>
+              <tr>
+                <td>Description</td>
+                <td class="text-break">{{job.description}}</td>
+              </tr>
+                {%endif%}
+              {%if not job.duration==0%}
+              <tr>
+                <td>Duration</td>
+                <td>{{job.duration}}s</td>
+              </tr>
+              {%endif%}
+              {%if not job.protocol==None and not job.protocol.benchmark_suite==None and not job.protocol.benchmark_suite.node==None %}
+              <tr>
+                <td>Node</td>
+                <td>{{job.protocol.benchmark_suite.node.name}}</td>
+              </tr>
+              {%endif%}
+              <tr>
+                <td>Scheduled</td>
+                <td>{{job.scheduled|datetimefilter}}</td>
+              </tr>
+
+              {% if not job.result==None %}
+              <tr>
+                <td>Job started</td>
+                <td>{{job.result.begin|datetimefilter}}</td>
+              </tr>
+              <tr>
+                <td>Job ended</td>
+                <td>{{job.result.end|datetimefilter}}</td>
+              </tr>
+              {% endif %}
+              <tr>
+                <td>Protocol</td>
+                {%if not job.protocol==None%}
+                <td>{{job.protocol.name}}</td>
+                {%else%}
+                <td>?</td>
+                {%endif%}
+              </tr>
+
+              {%if not job.layout==None%}
+              <tr>
+                <td>Benchmark Suite</td>
+                {%if not job.protocol==None and not job.protocol.benchmark_suite==None%}
+                <td>{{job.protocol.benchmark_suite.name}}</td>
+                {%else%}
+                <td>?</td>
+                {%endif%}
+              </tr>
+              <tr>
+                <td>Node layout</td>
+                {%if not job.layout==None%}
+                <td>{{job.layout.name}}</td>
+                {%else%}
+                <td>?</td>
+                {%endif%}
+              </tr>
+              {% endif %}
+              {%if not job.traffic_load==None%}
+              <tr>
+                <td>Traffic load</td>
+                <td>{% if job.traffic_load==0 %}Aperiodic{%else%}{{job.traffic_load}} ms{%endif%}</td>
+              </tr>
+              {% endif %}
+              {%if not job.msg_len==None%}
+              <tr>
+                <td>Message length</td>
+                <td>{{job.msg_len}} Bytes</td>
+              </tr>
+              {% endif %}
+              <tr>
+                <td>Flags</td>
+                <td>
+                  {% if job.running %}
+                  <span class="fas fa-play" aria-hidden="true" title="job running"></span>
+                  {% endif %}
+                  {% if job.failed %}
+                  <span class="fas fa-times" aria-hidden="true" title="job failed"></span>
+                  {% else %}
+                  {% if job.finished %}
+                  <span class="fas fa-check" aria-hidden="true" title="job finished"></span>
+                  {% endif %}
+                  {% endif %}
+                  {% if job.priority %}
+                  <span class="fas fa-star" aria-hidden="true" title="high priority job"></span>
+                  {% endif %}
+                  {% if job.reboot %}
+                  <span class="fas fa-redo" aria-hidden="true" title="rebooting"></span>
+                  {% endif %}
+                  {% if job.logs %}
+                  <span class="fas fa-align-justify" aria-hidden="true" title="serial log captured"></span>
+                  {% endif %}
+                  {% if job.patch %}
+                  <span class="fas fa-cog" aria-hidden="true" title="patching enabled"></span>
+                  {% endif %}
+                  {% if job.cpatch %}
+                  <span class="fas fa-users-cog" aria-hidden="true" title="custom patching enabled"></span>
+                  {% endif %}
+                  {% if job.jamming_composition_id > 1%}
+                  <span class="fas fa-bolt" aria-hidden="true" title="jamming enabled"></span><sub>{{job.jamming_composition.short}}</sub>
+                  {% endif %}
+                  {% if job.temp_profile and (current_user.is_authenticated and ( current_user.has_role('admins') or (current_user.group_id==job.group_id) ) ) %}
+                  <span class="fas fa-thermometer-half" aria-hidden="true" title="templab enabled"></span>
+                  {% endif %}
+                </td>
+              </tr>
+
+              {% if (current_user.is_authenticated and ( current_user.has_role('admins') or (current_user.group_id==job.group_id) ) ) %}
+              {% if not job.cpatch==None %}
+              <tr>
+                <td>Custom Patch</td>
+                <td>{{job.cpatch.name}}</td>
+              </tr>
+              <tr>
+                <td>Patch Overrides</td>
+                <td id='overrides'></td>
+
+              </tr>
+
+              {%endif%}
+        {% if not job.config_overrides==None %}
+              <tr>
+                <td>Benchmark Config Overrides</td>
+                <td id='config_overrides'></td>
+
+              </tr>
+              {%endif%}
+              {%endif%}
+              <tr>
+              </tr>
+
+          </tbody>
+        </table>
+        {% if leaderboard==True or ( current_user.is_authenticated and ( current_user.has_role("admins") ) ) %}
+        {% if not metrics==None and scenarios|length%}
+        <h2>Performance Metrics</h2>
+        <table class="table">
+          <thead>
+            <th>Metric</th>
+            <th>Result</th>
+          </thead>
+          <tbody>
+      {% if job.protocol and job.protocol.benchmark_suite.latency %}
+            <tr>
+              <td>Latency [ms]</td>
+              <td>
+                {% if not metrics.latency==None %}
+                {{'%0.1f'| format(metrics.latency / 1000) }}
+                {% else %}
+                -
+                {% endif %}
+              </td>
+            </tr>
+      {% endif %}
+      {% if job.protocol and job.protocol.benchmark_suite.reliability %}
+            <tr>
+              <td>Reliability [%]</td>
+              <td>
+                {% if not metrics.reliability==None %}
+                {{'%0.1f' | format(metrics.reliability * 100) }}
+                {% else %}
+                -
+                {% endif %}
+              </td>
+            </tr>
+      {% endif %}
+      {% if job.protocol and job.protocol.benchmark_suite.energy %}
+            <tr>
+              <td>Energy [J]</td>
+              <td>
+                {% if not metrics.energy==None %}
+                {{'%0.1f' | format(metrics.energy) }}
+                {% else %}
+                -
+                {% endif %}
+              </td>
+            </tr>
+      {% endif %}
+          </tbody>
+        </table>
+        {% endif %}
+        {% endif %}
+
+
+      </div>
+      {% if leaderboard==True or ( current_user.is_authenticated and ( current_user.has_role("admins") ) ) %}
+      <div class="col-lg-6">
+    {% if scenarios|length %}
+        <h2>Evaluation</h2>
+        {%- for s in scenarios %}
+        <div class="card card-default">
+          <div class="card-header">{{s.source}} to {{s.destination}}</div>
+          <div class="card-body">
+            <table class="table">
+              <thead>
+                {%- for e in s.evaluation %}
+                {% if e.key=="Reliability [%]" %}
+                <tr>
+                  <th>Reliability</th>
+                  <th></th>
+                </tr>
+                {% elif e.key=="Latency combined [us]" %}
+                <tr>
+                  <th>Latency</th>
+                  <th></th>
+                </tr>
+                {% elif e.key=="Total Energy [J]" %}
+                <tr>
+                  <th>Energy</th>
+                  <th></th>
+                </tr>
+                {% endif %}
+                {% if (current_user.has_role("admins") and e.public == False) or e.public == True %}
+                <tr>
+                  <td>{{e.key}}</td>
+                  {% if e.value=="None" %}
+                  <td>-</td>
+                  {% else %}
+                  <td>{{e.value}}</td>
+                  {% endif %}
+                </tr>
+                {% endif %}
+                {%- endfor %}
+              </thead>
+            </table>
+          </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Trigger the modal with a button -->
+
+  <!-- Modal -->
+  <div class="modal fade" id="selectDash" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="col-12 text-center">Select Dashboard
+      <button type="button" class="close" data-dismiss="modal">&times;</button></h1>
+        </div>
+        <div class="modal-body">
+          <table class="table table-borderless">
+            <tbody id="dashbody">
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  {%- endblock %}
+
+{% block scripts %}
+{{super()}}
+
+<script src="{{url_for("static",filename="js/renderjson.js")}}"></script>
+
+<script>
+
+function updateDash(started,ended,templab,nodes){
+  $.getJSON('/proxy/dashboards', function(data) {
+    jQuery.each(data, function(i, val) {
+      var params="";
+      if(val.title=="Overview of EEPROM Messages"){
+        for(i=0;i<nodes.length;i++) {
+          params+="&var-Node="+nodes[i]["label"]+"_eeprom"
+        }
+      }
+      else if(val.title=="Overview of GPIO Events"){
+        for(i=0;i<nodes.length;i++) {
+          params+="&var-Node="+nodes[i]["label"]+"_evt"
+        }
+        if(nodes.length!=0) {
+          params+="&var-GPIO=24"
+        }
+      }
+
+    {#var btnstring = '<a class="btn btn-sm btn-primary" target="_blank" href="{{config['GRAFANA_URL']}}'+val.url+'?from='+started+'&to='+ended+params+'" role="button" title="show in grafana"><span class="fas fa-eye" aria-hidden="true"></span></a>'#}
+      var btnstring = '<a class="btn btn-sm btn-primary" target="_blank" href="{% if  config['GRAFANA_URL'].startswith("http")%}{{config['GRAFANA_URL']}}{% endif %}'+val.url+'?from='+started+'&to='+ended+params+'" role="button" title="show in grafana"><span class="fas fa-eye" aria-hidden="true"></span></a>'
+        var markup = "<tr><td>"+val.title+"</td><td>" +btnstring+ "</td></tr>";
+      $("#dashbody").append(markup);
+    });
+  if(templab=="True")
+  {
+  $.getJSON('/proxy/dashboards/templab', function(data) {
+    jQuery.each(data, function(i, val) {
+    var params="";
+    {#var btnstring = '<a class="btn btn-sm btn-primary" target="_blank" href="{{config['GRAFANA_URL']}}'+val.url+'?from='+started+'&to='+ended+params+'" role="button" title="show in grafana"><span class="fas fa-eye" aria-hidden="true"></span></a>'#}
+    var btnstring = '<a class="btn btn-sm btn-primary" target="_blank" href="{% if  config['GRAFANA_URL'].startswith("http")%}{{config['GRAFANA_URL']}}{% endif %}'+val.url+'?from='+started+'&to='+ended+params+'" role="button" title="show in grafana"><span class="fas fa-eye" aria-hidden="true"></span></a>'
+    var markup = "<tr><td>"+val.title+"</td><td>" +btnstring+ "</td></tr>";
+    $("#dashbody").append(markup);
+    });
+  });
+  }
+
+
+  });
+
+
+}
+
+$('#selectDash').on('show.bs.modal', function(e) {
+  $("#dashbody").find("tr").remove();
+
+  var ended = $(e.relatedTarget).data('job-end');
+  var started = $(e.relatedTarget).data('job-start');
+  var composition = $(e.relatedTarget).data('job-composition'); 
+  var templab = $(e.relatedTarget).data('job-templab'); 
+
+  if(composition==null){
+    updateDash(started,ended,[]); 
+  } else {
+    $.getJSON('{{url_for("frontend.show_nodes")}}'+composition, function(data) {
+      updateDash(started,ended,templab,data); 
+    });
+
+  }
+
+});
+
+$( document ).ready(function() {
+  {% if not job.cpatch==None %}
+  try{
+    ovdata=JSON.parse({{job.overrides|tojson}});
+    renderjson.set_show_to_level("all");
+    document.getElementById("overrides").appendChild(
+      renderjson(ovdata)
+    );
+  } catch (SyntaxError) {
+    document.getElementById("overrides").appendChild(
+        document.createTextNode("Invalid JSON!")
+    );
+
+  }
+  {% endif %}
+
+  {% if not job.config_overrides==None %}
+  try{
+    covdata=JSON.parse({{job.config_overrides|tojson}});
+    renderjson.set_show_to_level("all");
+    document.getElementById("config_overrides").appendChild(
+      renderjson(covdata)
+    );
+  } catch (SyntaxError) {
+    document.getElementById("config_overrides").appendChild(
+        document.createTextNode("Invalid JSON!")
+    );
+
+  }
+  {% endif %}
+
+
+});
+   
+
+</script>
+{%- endblock %}

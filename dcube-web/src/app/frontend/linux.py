@@ -79,7 +79,7 @@ def setup_defaults():
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower(
-           ) in current_app.config['ALLOWED_EXTENSIONS']
+           ) in ['zip',]
 
 
 @linux.route('/permission')
@@ -186,7 +186,7 @@ def show_queue_page(page=-1):
     protocols = Protocol.query.filter_by(group_id=current_user.group_id).filter(
             Protocol.benchmark_suite.has(BenchmarkSuite.node.has(Node.name.contains("Linux-")))).all()
 
-    return render_template('base/queue.html',
+    return render_template('linux/queue.html',
                            module=MODULE_NAME,
                            jobs=jobs,
                            jamming_option=jamming_option,
@@ -286,7 +286,7 @@ def show_details(id=None):
     metrics = None
     metrics = Metric.query.filter_by(job_id=id).first()
     leaderboard = Config.get_bool("leaderboard", False)
-    return render_template('base/details.html', module=MODULE_NAME, job=job,
+    return render_template('linux/details.html', module=MODULE_NAME, job=job,
                            scenarios=scenarios, metrics=metrics, leaderboard=leaderboard, report=report)
 
 
@@ -299,17 +299,10 @@ def create_job():
     name = (request.form['name'])
     duration = (request.form['duration'])
     logs = ("logs" in (request.form))
-    if("baudrate" in (request.form)):
-        baudrate_str = (request.form['baudrate'])
-    else:
-        baudrate_str = None
     priority = ("priority" in (request.form))
-    patch = ("patch" in (request.form))
     description = (request.form['description'])
 
     node_placement_str = (request.form['node_placement'])
-    traffic_load_str = (request.form['traffic_load_time'])
-    msg_len_str = (request.form['traffic_load_len'])
 
     if(not (node_placement_str is None)):
         node_placement = LayoutComposition.query.filter_by(
@@ -323,25 +316,6 @@ def create_job():
             return redirect(url_for('linux.show_queue'))
     else:
         flash('No node placement selected!', 'error')
-        return redirect(url_for('linux.show_queue'))
-
-    if(not (traffic_load_str is None)):
-        traffic_load = int(traffic_load_str)
-        if not (traffic_load == 0 or traffic_load ==
-                5000 or traffic_load == 30000):
-            flash('Invalid traffic load ' + traffic_load_str + '!', 'error')
-            return redirect(url_for('linux.show_queue'))
-    else:
-        flash('No traffic load selected!', 'error')
-        return redirect(url_for('linux.show_queue'))
-
-    if(not (msg_len_str is None)):
-        msg_len = int(msg_len_str)
-        if not (msg_len == 8 or msg_len == 32 or msg_len == 64):
-            flash('Invalid message length  ' + msg_len_str + '!', 'error')
-            return redirect(url_for('linux.show_queue'))
-    else:
-        flash('No message length selected!', 'error')
         return redirect(url_for('linux.show_queue'))
 
     jamming_option = Config.get_bool("jamming_available")
@@ -367,15 +341,6 @@ def create_job():
         flash('Unknown jamming configuration ' + jamming_str + '!', 'error')
         return redirect(url_for('linux.show_queue'))
 
-    if(not (baudrate_str is None)):
-        baudrate = int(baudrate_str, 10)
-
-        if(not (baudrate == 9600 or baudrate == 115200)):
-            flash('Invalid baudrate configuration!', 'error')
-            return redirect(url_for('linux.show_queue'))
-    else:
-        baudrate = 115200
-
     if(priority == True and not (current_user.has_role("admins") or current_user.have("privileged")) ):
         flash('You do not have permissions to create priority jobs!', 'error')
         return redirect(url_for('linux.show_queue'))
@@ -393,20 +358,6 @@ def create_job():
     if (('file' not in request.files) or name is None or duration is None):
         flash('Missing Data!', 'error')
         return redirect(url_for('linux.show_queue'))
-
-    cpatch = ("cpatch" in (request.form))
-    if cpatch and ("cfile" not in request.files):
-        flash('XML file required with custom patching!', 'error')
-        return redirect(url_for('linux.show_queue'))
-    if cpatch:
-        cfile = request.files['cfile']
-        if cfile.filename == '':
-            flash('XML file required with custom patching!', 'error')
-            return redirect(url_for('linux.show_queue'))
-        cjson = (request.form['cjson'])
-        if (cjson is None):
-            flash('Missing JSON Data!', 'error')
-            return redirect(url_for('linux.show_queue'))
 
     if 'protocol' in request.form:
         protocol_id = (request.form['protocol'])
@@ -445,28 +396,12 @@ def create_job():
         firmware.filename = filename
 
         job = Job(name, description, dt, logs, priority, durationint, current_user.group.id,
-                  traffic_load, msg_len, jamming_composition.id, node_placement.id, protocol.id, patch)
+                  None, None, jamming_composition.id, node_placement.id, protocol.id, None)
         db.session.add(job)
         db.session.flush()
 
         firmware.job_id = job.id
         db.session.commit()
-
-        if(cpatch):
-            patch_upload_name = secure_filename(cfile.filename)
-            patch_filename = "patch_{0}.xml".format(job.id)
-            patch_upload_dir = os.path.join(
-                os.path.abspath(current_app.config['PATCH_FOLDER']))
-
-            if not os.path.exists(patch_upload_dir):
-                os.makedirs(patch_upload_dir)
-
-            patch_filepath = os.path.join(patch_upload_dir, patch_filename)
-            cfile.save(patch_filepath)
-            patch_db = Patch(patch_upload_name, patch_filename, job.id)
-            db.session.add(patch_db)
-            job.overrides = cjson
-            db.session.commit()
 
         db.session.commit()
 
