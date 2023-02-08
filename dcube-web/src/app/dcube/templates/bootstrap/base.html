@@ -100,7 +100,9 @@
       {% if current_user.has_role("nordic") %}
       {{ render_nav_dropdown_item('nordic.show_queue', 'Nordic Queue') }}
       {% endif %}
-
+      {% if current_user.has_role("linux") %}
+      {{ render_nav_dropdown_item('linux.show_queue', 'Linux Queue') }}
+      {% endif %}
     </div>
       </li>
       {% endif %}

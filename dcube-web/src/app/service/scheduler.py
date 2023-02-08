@@ -369,9 +369,15 @@ class Scheduler:
                         #current_task=Popen(['/usr/bin/python3',"/testbed/pydcube/rpc_testbed.py", "--job_id", str(next.id),"--topology", "switch.json"], stderr=PIPE, stdin=PIPE, stdout=PIPE,cwd="/testbed/pydcube")
                         print([py_path,dcm_bin, "--job_id", str(next.id),"--topology", switch_config, "--broker", dcm_broker])
                         current_task=Popen([py_path,dcm_bin, "--job_id", str(next.id),"--topology", switch_config, "--broker", dcm_broker], stderr=PIPE, stdin=PIPE, stdout=PIPE,cwd=dcm_path)
-    
-                    elif (next.node.name=="Anchor-North"):
-                        current_task=Popen(['./program_anchors.sh', name, str(next.id)], stderr=PIPE, stdin=PIPE, stdout=PIPE,cwd="/testbed/script")
+
+                    if (next.protocol.benchmark_suite.node.name=="Linux-All") :
+                        py_path = current_app.config['PYTHON_PATH']
+                        dcm_path = current_app.config['DCM_PATH']
+                        dcm_bin = "rpc_testbed_linux.py"
+                        dcm_broker = current_app.config['DCM_BROKER']
+                        switch_config = current_app.config['SWITCH_CONFIG']
+                        print([py_path,dcm_bin, "--job_id", str(next.id),"--topology", switch_config, "--broker", dcm_broker])
+                        current_task=Popen([py_path,dcm_bin, "--job_id", str(next.id),"--topology", switch_config, "--broker", dcm_broker], stderr=PIPE, stdin=PIPE, stdout=PIPE,cwd=dcm_path)
                     else:
                         next.failed=True
                         next.finished=True

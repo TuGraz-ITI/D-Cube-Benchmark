@@ -58,7 +58,9 @@ Manage Protocols &mdash; D-Cube
           <div class="btn-group float-left">
              <a class="btn btn-secondary" title="show details for protocol" href="{{url_for("frontend.protocol_details",id=protocol.id)}}" role="button" title="show details" ><span class="fas fa-search" aria-hidden="true"></span></a>
 	     <a class="btn btn-primary" title="edit protocol description" href="#" role="button" data-protocol-id="{{protocol.id}}" data-protocol-name="{{protocol.name}}" data-protocol-link="{{protocol.link}}" data-protocol-description="{{protocol.description}}" data-toggle="modal" data-target="#editProtocol"><span class="fas fa-edit" aria-hidden="true"></span></a>
+	     {%if protocolqueue(protocol)%}
 	     <a class="btn btn-success" title="go to protocol queue" href="{{url_for(protocolqueue(protocol),protocol=protocol.id)}}" role="button"><span class="fas fa-plus" aria-hidden="true"></span></a>
+	     {%endif%}
 	    {%if not protocol.jobs|length %} <a class="btn btn-danger" href="{{url_for("frontend.delete_protocol",id=protocol.id)}}" role="button">  <span class="fas fa-times" aria-hidden="true"></span></a>{%endif%}
           </div>
 	</td>

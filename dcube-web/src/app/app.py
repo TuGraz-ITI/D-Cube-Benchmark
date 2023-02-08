@@ -32,6 +32,7 @@ from frontend.rest_api import rest_api
 from frontend.internal_api import internal_api
 from frontend.nordic import nordic
 from frontend.sky import sky
+from frontend.linux import linux
 from frontend.admin import admin
 from frontend.leaderboard import leaderboard
 
@@ -78,6 +79,7 @@ def create_app(configfile=None):
     app.register_blueprint(admin, url_prefix='/admin')
     app.register_blueprint(nordic, url_prefix='/nordic')
     app.register_blueprint(sky, url_prefix='/sky')
+    app.register_blueprint(linux, url_prefix='/linux')
     app.register_blueprint(rest_api, url_prefix='/api')
     app.register_blueprint(internal_api, url_prefix='/internal/api')
     app.register_blueprint(leaderboard, url_prefix='/leaderboard')
@@ -106,6 +108,8 @@ def create_app(configfile=None):
             return "nordic.show_details"
         if job.protocol and "Sky" in job.protocol.benchmark_suite.node.name:
             return "sky.show_details"
+        if job.protocol and "Linux" in job.protocol.benchmark_suite.node.name:
+            return "linux.show_details"
         return None
 
     app.jinja_env.globals.update(jobdetails=jobdetails)
@@ -116,6 +120,8 @@ def create_app(configfile=None):
             return "nordic.show_queue"
         if "Sky" in protocol.benchmark_suite.node.name:
             return "sky.show_queue"
+        if "Linux" in protocol.benchmark_suite.node.name:
+            return "linux.show_queue"
         return None
 
     app.jinja_env.globals.update(protocolqueue=protocolqueue)
