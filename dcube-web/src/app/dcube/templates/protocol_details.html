@@ -68,7 +68,14 @@ intact. #}
       <tr {%if protocol.final_job.id==job.id%}class='clickable-row lead' style="background-color: #eee;"{%else%}class='clickable-row'{%endif%} data-href="{{url_for(jobdetails(job),id=job.id)}}">
         <td>{{job.id}}</td>
         <td>{{job.layout.short}}</td>
-	<td class="d-none d-md-table-cell">{% if job.traffic_load == 0 %}Aperiodic{%else%}{% if job.traffic_load > 1000 %}{{(job.traffic_load/1000)|int}}s{%else%}{{job.traffic_load}}ms{%endif%}{%endif%}/{{job.msg_len}}B</td>
+
+        {%if not job.traffic_load==None%}
+          <td class="d-none d-sm-table-cell">{% if job.traffic_load == 0 %}<span class="d-inline-block d-lg-none">Ap</span><span class="d-none d-lg-inline-block">Aperiodic</span>{% else %}{% if job.traffic_load > 1000 %}{{(job.traffic_load/1000)|int}}s{%else%}{{job.traffic_load}}ms{%endif%}{%endif%}<span class="d-none d-sm-inline-block">/</span><span class="d-inline-block d-sm-none"> </span>{{job.msg_len}}B</td>
+        {%else%}
+           <td>-</td>
+        {%endif%}
+
+
         <td class="d-none d-md-table-cell">
           {% if (not job.metric==None) and (not job.metric.energy==None) %}
           {{'%0.1f' | format(job.metric.energy) }}
