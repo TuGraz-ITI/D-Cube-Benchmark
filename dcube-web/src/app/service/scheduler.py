@@ -46,8 +46,7 @@ import holidays
 import os
 import pytz
 
-import smtplib
-import ssl
+from flask_mailman import EmailMessage
 
 from cryptography.hazmat.primitives import serialization as crypto_serialization
 from cryptography.hazmat.primitives import hashes as crypto_hashes
@@ -92,17 +91,14 @@ def request_e2e_slot(job):
     #signed_message=json.dumps(job).encode("ascii")
     return request
 
-EMAIL_PORT = 465
-EMAIL_TEXT = "Subject: [ITI-Testbed] Testbed failure\n\nDear testbed technician,\n\nthe testbed has failed and ended execution of experiments to prevent further damage.\n\nBest Regards,\nMarkus Schuss"
-EMAIL_FROM = "D-Cube Testbed <dcube@iti.tugraz.at>"
-EMAIL_TO = "D-Cube Testbed <dcube@iti.tugraz.at>"
-#EMAIL_TO = "Markus Schuss <markus.schuss@tugraz.at>"
-#EMAIL_TO = "markus.schuss@tugraz.at,cboano@tugraz.at"
-
 def send_panic_mail():
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL("mrelay.tugraz.at",EMAIL_PORT,context=context) as server:
-        server.sendmail(EMAIL_FROM,EMAIL_TO,EMAIL_TEXT)
+    msg = EmailMessage(
+        current_app.config['SCHEDULER_EMAIL_SUBJECT'],
+        current_app.config['SCHEDULER_EMAIL_BODY'],
+        current_app.config['SCHEDULER_EMAIL_FROM'],
+        current_app.config['SCHEDULER_EMAIL_TO']
+    )
+    msg.send()
 
 current_group=None
 current_benchmark_suite=None
@@ -370,7 +366,7 @@ class Scheduler:
                         print([py_path,dcm_bin, "--job_id", str(next.id),"--topology", switch_config, "--broker", dcm_broker])
                         current_task=Popen([py_path,dcm_bin, "--job_id", str(next.id),"--topology", switch_config, "--broker", dcm_broker], stderr=PIPE, stdin=PIPE, stdout=PIPE,cwd=dcm_path)
 
-                    if (next.protocol.benchmark_suite.node.name=="Linux-All") :
+                    elif (next.protocol.benchmark_suite.node.name=="Linux-All") :
                         py_path = current_app.config['PYTHON_PATH']
                         dcm_path = current_app.config['DCM_PATH']
                         dcm_bin = "rpc_testbed_linux.py"
@@ -378,6 +374,7 @@ class Scheduler:
                         switch_config = current_app.config['SWITCH_CONFIG']
                         print([py_path,dcm_bin, "--job_id", str(next.id),"--topology", switch_config, "--broker", dcm_broker])
                         current_task=Popen([py_path,dcm_bin, "--job_id", str(next.id),"--topology", switch_config, "--broker", dcm_broker], stderr=PIPE, stdin=PIPE, stdout=PIPE,cwd=dcm_path)
+
                     else:
                         next.failed=True
                         next.finished=True
@@ -408,6 +405,7 @@ class Scheduler:
                         sleep(0.1)
                         if check_kill()==True:
                             print("aborting")
+                            send_panic_mail()
                             current_task.terminate()
                             break
                         try:

@@ -58,8 +58,13 @@ class Config(object):
     #MAIL_USERNAME = 'username'
     #MAIL_PASSWORD = 'password'
 
+    SCHEDULER_EMAIL_SUBJECT = "Testbed failure"
+    SCHEDULER_EMAIL_BODY = "The testbed has failed and ended execution of experiments to prevent further damage."
+    SCHEDULER_EMAIL_FROM = 'Testbed <noreply@testbed.local>'
+    SCHEDULER_EMAIL_TO = [SCHEDULER_EMAIL_FROM,]
+
     # Flask-Security setup
-    SECURITY_EMAIL_SENDER = 'Testbed <noreply@testbed.local>'
+    SECURITY_EMAIL_SENDER = SCHEDULER_EMAIL_FROM
     SECURITY_LOGIN_WITHOUT_CONFIRMATION = True
     SECURITY_REGISTERABLE = False
     SECURITY_RECOVERABLE = False

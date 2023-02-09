@@ -160,14 +160,17 @@ def setup_defaults():
     if Node.query.first() == None:
         sky=Node("Sky-All")
         nordic=Node("Nordic-All")
+        linux_node=Node("Linux-All")
         db.session.add(sky)
         db.session.add(nordic)
+        db.session.add(linux_node)
         db.session.commit()
 
     if BenchmarkSuite.query.first() == None:
 
         sky=Node.query.filter_by(name="Sky-All").first()
         nordic=Node.query.filter_by(name="Nordic-All").first()
+        linux_node=Node.query.filter_by(name="Linux-All").first()
 
         suites=[]
         if not sky==None:
@@ -190,17 +193,29 @@ def setup_defaults():
             suites.append(nrfdd)
             db.session.add(nrfdc)
             db.session.add(nrfdd)
+        if not linux_node==None:
+            linux=BenchmarkSuite("Linux iperf3 v1","iperf_1")
+            linux.node_id=linux_node.id
+            suites.append(linux)
+            db.session.add(linux)
+
         db.session.flush()
 
         for suite in suites:
             empty=LayoutComposition("Empty Configuration",0,suite.id)
             db.session.add(empty)
             db.session.flush()
-            default_pi=LayoutPi("default","/home/pi/testbed/i2c/measurement -1 -2 -p24","None","None",empty.id)
+            cmd="/home/pi/testbed/i2c/measurement -1 -2 -p24"
+            if "Linux" in suite.name:
+                cmd="/bin/true"
+
+            default_pi=LayoutPi("default",cmd,"None","None",empty.id)
             db.session.add(default_pi)
             db.session.flush()
 
         for suite in suites:
+            if "Linux" in suite.name:
+                continue
             simple=LayoutComposition("Node Layout 1",1,suite.id)
             db.session.add(simple)
             db.session.flush()
@@ -233,6 +248,7 @@ def setup_defaults():
         skydd=BenchmarkSuite.query.filter_by(name="Tmote Sky Dissemination v1").first()
         nrfdc=BenchmarkSuite.query.filter_by(name="nRF52840 Timely Data Collection v1").first()
         nrfdd=BenchmarkSuite.query.filter_by(name="nRF52840 Timely Dissemination v1").first()
+        linux=BenchmarkSuite.query.filter_by(name="Linux iperf3 v1").first()
 
         if(not skydc==None):
             pskydc=Protocol("Administrative Experiment TelosB Sky DC", "https://iti-testbed.tugraz.at/", "Maintenance Jobs", admins.id, skydc.id)
@@ -246,6 +262,9 @@ def setup_defaults():
         if(not nrfdd==None):
             pnrfdd=Protocol("Administrative Experiment nRF DD", "https://iti-testbed.tugraz.at/", "Maintenance Jobs", admins.id, nrfdd.id)
             db.session.add(pnrfdd)
+        if(not linux==None):
+            plinux=Protocol("Administrative Experiment Linux iperf3", "https://iti-testbed.tugraz.at/", "Maintenance Jobs", admins.id, linux.id)
+            db.session.add(plinux)
 
     db.session.commit()
 

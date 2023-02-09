@@ -138,7 +138,7 @@ class Server:
             with open(tempfile,"wb") as f:
                 f.write(hexfile)
 
-            if job["patch"] or job["cpatch"]:
+            if ("patch" in job and job["patch"]) or ("cpatch" in job and job["cpatch"]):
                 if job["node"]=="Sky-All":
                     arch="msp430"
                 elif job["node"]=="Nordic-All":
@@ -149,7 +149,7 @@ class Server:
                     return CommandReturn.FAILED
                 bp=BinaryPatcher(tempfile,arch,tempdir=self.tempdir)
 
-            if job["patch"]:
+            if "patch" in job and job["patch"]:
                 testbed_xml=os.path.join(self.tempdir,"testbed.xml")
                 self.logger.debug("patching firmware for testbed")
                 p=self.rest.get_patch(job_id,self.hostname)
@@ -162,7 +162,7 @@ class Server:
                     self.logger.error(response["message"])
                     return CommandReturn.FORMAT
 
-            if job["cpatch"]:
+            if "cpatch" in job and job["cpatch"]:
                 custom_xml=os.path.join(self.tempdir,"custom.xml")
                 self.logger.debug("patching firmware with custom patch")
 

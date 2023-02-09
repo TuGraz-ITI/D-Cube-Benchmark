@@ -25,11 +25,21 @@ import logging
 import threading
 import subprocess
 import signal
+import os
+
+from time import sleep
 
 def terminate_process(process):
     p=process
-    #p.terminate()
+    pgrp=os.getpgid(p.pid)
+    os.killpg(pgrp,signal.SIGKILL)
+    sleep(1)
+    p.send_signal(signal.SIGHUP)
+    sleep(1)
     p.send_signal(signal.SIGINT)
+    sleep(1)
+    p.terminate()
+    sleep(1)
     try: 
         outs,errs=p.communicate(timeout=15)
         return True
@@ -54,25 +64,36 @@ class Experiment:
             if p.poll()==None:
                 t=threading.Thread(target=terminate_process,args=(p,))
                 t.start()
-                while(t.isAlive()):
+                while(t.is_alive()):
                     self.connection.sleep(1)
                 if not t.join():
                     #give up on gracefull 
                     self.logger.debug("\tProcess did not respond in time, killing")
                     p.kill()
                     try:
-                        outs,errs=p.communicate()
+                        outs,errs=p.communicate(timeout=5)
                     except ValueError:
                         outs=b''
                         errs=b''
+                    except subprocess.TimeoutExpired:
+                        self.logger.debug("Zombified!")
+                        outs=b''
+                        errs=b''
+
             else:
                 outs,errs=p.communicate()
-            self.logger.debug("Ended process %d with return code %d"%(p.pid,p.returncode))
+            try:
+                self.logger.debug("Ended process %d with return code %d"%(p.pid,p.returncode))
+            except TypeError:
+                self.logger.debug("No return code for process %d"%(p.pid))
             self.logger.debug("STDOUT:")
             self.logger.debug(outs)
             self.logger.debug("STDERR:")
             self.logger.debug(errs)
-            dump[p.pid]={"stdout":outs.decode(),"stderr":errs.decode()}
+            try:
+                dump[p.pid]={"stdout":outs.decode(),"stderr":errs.decode()}
+            except AttributeError:
+                dump[p.pid]={"stdout":"","stderr":""}
         response["output"]=dump
         self.processes=None
 

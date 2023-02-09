@@ -112,7 +112,9 @@ class Linux(Server):
         cmd = [entrypoint,]
 
         try:
-            p=subprocess.Popen(cmd,cwd=workdir,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+            #p=subprocess.Popen(cmd,cwd=workdir,preexec_fn=os.setsid)
+            #p=subprocess.Popen(cmd,cwd=workdir,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,preexec_fn=lambda: os.setpgid(os.getpid(), os.getpid()) )
+            p=subprocess.Popen(cmd,cwd=workdir,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
         except FileNotFoundError as e:
            response["message"]="File does not exist!"
            self.logger.error(response["message"])
