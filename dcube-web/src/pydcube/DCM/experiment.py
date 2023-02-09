@@ -32,7 +32,9 @@ from time import sleep
 def terminate_process(process):
     p=process
     pgrp=os.getpgid(p.pid)
-    os.killpg(pgrp,signal.SIGKILL)
+    os.killpg(pgrp,signal.SIGINT)
+    #os.killpg(pgrp,signal.SIGTERM)
+    #os.killpg(pgrp,signal.SIGKILL)
     sleep(1)
     p.send_signal(signal.SIGHUP)
     sleep(1)
